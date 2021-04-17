@@ -9,23 +9,34 @@
              (smc core log)
              (smc core state))
 
-(define (fsm-eof ch ctx)
-  (and (eof-object? ch) (list->string (reverse ctx))))
+
+;; Guards
 
-(define (fsm-space ch ctx)
-  (and (char=? ch #\space)
-       ctx))
+(define (fsm-eof-object? ch ctx)
+  (eof-object? ch))
 
-(define (fsm-newline ch ctx)
-  (and (char=? ch #\newline)
-       (cons #\newline ctx)))
+(define (fsm-space? ch ctx)
+  (char=? ch #\space))
 
-(define (fsm-read-char ch ctx)
-  (and (not (char=? ch #\space))
-       (cons ch ctx)))
+(define (fsm-non-space? ch ctx)
+  (not (char=? ch #\space)))
 
-(define (fsm-skip ch ctx)
+(define (fsm-newline? ch ctx)
+  (char=? ch #\newline))
+
+
+;; Actions
+
+(define (fsm-end ch ctx)
+  (list->string (reverse ctx)))
+
+(define (fsm-noop ch ctx)
   ctx)
+
+(define (fsm-cons ch ctx)
+  (cons ch ctx))
+
+
 
 (define (main args)
   (let ((fsm (make <fsm>)))
@@ -34,19 +45,19 @@
     (fsm-state-add! fsm (make <state> #:name 'inside))
     (fsm-state-add! fsm (make <state> #:name 'after))
     (fsm-transition-add! fsm 'before
-                         `((,fsm-eof       . #f)
-                           (,fsm-read-char . inside)
-                           (,fsm-space     . before)))
+                         `((,fsm-eof-object? ,fsm-end  #f)
+                           (,fsm-non-space?  ,fsm-cons inside)
+                           (,fsm-space?      ,fsm-noop before)))
 
     (fsm-transition-add! fsm 'inside
-                         `((,fsm-eof       . #f)
-                           (,fsm-space     . after)
-                           (,fsm-read-char . inside)))
+                         `((,fsm-eof-object? ,fsm-end  #f)
+                           (,fsm-space?      ,fsm-noop after)
+                           (,fsm-non-space?  ,fsm-cons inside)))
 
     (fsm-transition-add! fsm 'after
-                         `((,fsm-eof       . #f)
-                           (,fsm-newline   . before)
-                           (,fsm-skip      . after)))
+                         `((,fsm-eof-object? ,fsm-end  #f)
+                           (,fsm-newline?    ,fsm-cons before)
+                           (,(const #t)      ,fsm-noop after)))
 
     (fsm-current-state-set! fsm (fsm-state fsm 'before))
 

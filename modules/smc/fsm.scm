@@ -51,9 +51,11 @@
 (define-method (fsm-transition-add! (self       <fsm>)
                                     (state-name <symbol>)
                                     (tguard     <procedure>)
+                                    (action     <procedure>)
                                     next-state)
   (state-transition-add! (fsm-state self state-name)
                          tguard
+                         action
                          (and next-state
                               (fsm-state self next-state))))
 
@@ -63,8 +65,9 @@
   (for-each (lambda (transition)
               (fsm-transition-add! self
                                    state-name
-                                   (car transition)
-                                   (cdr transition)))
+                                   (list-ref transition 0)
+                                   (list-ref transition 1)
+                                   (list-ref transition 2)))
             transitions))
 
 

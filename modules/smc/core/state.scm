@@ -30,9 +30,10 @@
 
 (define-method (state-transition-add! (self       <state>)
                                       (tguard     <procedure>)
+                                      (action     <procedure>)
                                       next-state)
   (state-transitions-set! self (append (state-transitions self)
-                                       (list (cons tguard next-state)))))
+                                       (list (list tguard action next-state)))))
 
 
 
@@ -42,20 +43,11 @@
     (if (null? transition-alist)
         (values #f context)
         (let* ((transition (car transition-alist))
-               (next-state (cdr transition))
-               (new-context ((car transition) event context)))
-          ;; (log-debug "[~a] new context: ~a"
-          ;;            (state-name self)
-          ;;            new-context)
-          (cond
-           ((not new-context)
-            (loop (cdr transition-alist)))
-           (else
-            ;; (log-debug "[~a] next state: ~a"
-            ;;            (state-name self)
-            ;;            (if next-state
-            ;;                (state-name next-state)
-            ;;                #f))
-            (values next-state new-context)))))))
+               (tguard     (list-ref transition 0))
+               (action     (list-ref transition 1))
+               (next-state (list-ref transition 2)))
+          (if (tguard event context)
+              (values next-state (action event context))
+              (loop (cdr transition-alist)))))))
 
 
