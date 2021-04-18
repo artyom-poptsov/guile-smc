@@ -39,6 +39,24 @@
 
 
 
+(define-method (display (self <fsm>) (port <port>))
+  (format port "#<fsm current-state: ~a ~a>"
+          (state-name (fsm-current-state self))
+          (number->string (object-address self) 16)))
+
+(define-method (write (self <fsm>) (port <port>))
+  (display self port))
+
+(define-method (display (self <fsm>))
+  (next-method)
+  (display self (current-output-port)))
+
+(define-method (write (self <fsm>))
+  (next-method)
+  (display self (current-output-port)))
+
+
+
 ;; Add a new state to the SM table.
 (define-method (fsm-state-add! (self  <fsm>)
                                (state <state>))
