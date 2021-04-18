@@ -28,6 +28,24 @@
 
 
 
+(define-method (display (self <state>) (port <port>))
+  (format port "#<state ~a ~a>"
+          (state-name self)
+          (number->string (object-address self) 16)))
+
+(define-method (write (self <state>) (port <port>))
+  (display self port))
+
+(define-method (display (self <state>))
+  (next-method)
+  (display self (current-output-port)))
+
+(define-method (write (self <state>))
+  (next-method)
+  (display self (current-output-port)))
+
+
+
 (define-method (state-transition-add! (self       <state>)
                                       (tguard     <procedure>)
                                       (action     <procedure>)
