@@ -66,6 +66,7 @@
     (log-debug "action:add-state: buffer: ~a" buf)
     (let ((state (make <state>
                    #:name (list->symbol (reverse buf)))))
+      (log-debug "action:add-state: state: ~a" state)
       (unless (fsm-current-state fsm)
         (fsm-current-state-set! fsm state))
       (fsm-state-add! fsm state)
@@ -98,11 +99,24 @@
            (from (list-ref stanza 0))
            (to   (list-ref stanza 1)))
       (log-debug "action:add-state-with-transition-to: stanza: ~a" stanza)
+      (log-debug "action:add-state-with-transition-to: [~a] -> [~a]" from to)
       (context-stanza-set! ctx '())
-      (fsm-state-add! fsm (make <state> #:name from))
-      (fsm-transition-add! fsm from
-                           (list (list (const #t) action:no-op to)))
-      ctx)))
+      (let ((state-from (make <state> #:name from))
+            (state-to   (make <state> #:name to)))
+        (fsm-state-add! fsm state-from)
+        (log-debug "action:add-state-with-transition-to: state: ~a" state-from)
+        (log-debug "action:add-state-with-transition-to: fsm: ~a" fsm)
+        (fsm-transition-add! fsm from
+                             (list (list (const #t) action:no-op state-to)))
+        ctx))))
+
+(define (action:check-start-tag ch ctx)
+  (let* ((buf (context-buffer ctx))
+         (str (list->string (reverse buf))))
+    (unless (string=? str "@startuml")
+      (error "Misspelled @startuml" str))
+    (context-buffer-set! ctx '())
+    ctx))
 
 
 
@@ -114,14 +128,15 @@
            #:transition-table
            `((read
               (,guard:eof-object?     ,action:no-op        #f)
-              (,guard:at-symbol?      ,action:no-op        read-start-tag)
+              (,guard:at-symbol?      ,action:store-symbol read-start-tag)
               (,guard:letter?         ,action:store-symbol read-state)
               (,guard:square-bracket? ,action:no-op        read-square-brackets)
               (,guard:#t              ,action:no-op        read))
              (read-start-tag
-              (,guard:eof-object?     ,action:no-op        #f)
-              (,guard:space?          ,action:no-op        read)
-              (,guard:#t              ,action:no-op        read-start-tag))
+              (,guard:eof-object?     ,action:no-op           #f)
+              (,guard:space?          ,action:check-start-tag read)
+              (,guard:newline?        ,action:check-start-tag read)
+              (,guard:#t              ,action:store-symbol    read-start-tag))
              (read-square-brackets
               (,guard:eof-object?     ,action:no-op        #f)
               (,guard:star?           ,action:no-op        search-entry-point)
