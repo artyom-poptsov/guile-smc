@@ -12,6 +12,9 @@
             fsm-current-state-set!
             fsm-run!
 
+            transition-list->hash-table
+            hash-table->transition-list
+
             action:no-op))
 
 
@@ -86,6 +89,11 @@
                                #:transitions (cdr transition)))))
               transition-list)
     table))
+
+(define-method (hash-table->transition-list table)
+  (hash-map->list (lambda (state-name state)
+                    (cons state-name (car (state-transitions state))))
+                  table))
 
 (define-method (initialize (self <fsm>) initargs)
   (next-method)
