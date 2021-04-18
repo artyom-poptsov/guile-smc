@@ -5,7 +5,8 @@
             guard:newline?
             guard:space?
             guard:letter?
-            guard:eof-object?))
+            guard:eof-object?
+            guard:single-quote?))
 
 (define (guard:#t event ctx)
   "This guard is always returns #t."
@@ -22,3 +23,6 @@
 
 (define (guard:eof-object? ch ctx)
   (eof-object? ch))
+
+(define (guard:single-quote? ch ctx)
+  (char=? ch #\'))
