@@ -10,7 +10,10 @@
             fsm-state
             fsm-current-state
             fsm-current-state-set!
-            fsm-run!))
+            fsm-run!
+
+            guard:#t
+            action:no-op))
 
 
 (define-class <fsm> ()
@@ -90,5 +93,13 @@
           (fsm-current-state-set! self next-state)
           (values next-state new-context))
         (values #f context))))
+
+
+
+(define (action:no-op event ctx)
+  ctx)
+
+(define (guard:#t event ctx)
+  #t)
 
 
