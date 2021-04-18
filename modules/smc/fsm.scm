@@ -12,7 +12,6 @@
             fsm-current-state-set!
             fsm-run!
 
-            guard:#t
             action:no-op))
 
 
@@ -98,8 +97,5 @@
 
 (define (action:no-op event ctx)
   ctx)
-
-(define (guard:#t event ctx)
-  #t)
 
 
