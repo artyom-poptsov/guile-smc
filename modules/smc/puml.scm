@@ -118,6 +118,9 @@
     (context-buffer-set! ctx '())
     ctx))
 
+(define (action:no-start-tag-error ch ctx)
+  (error "No start tag found"))
+
 
 
 (define (puml->fsm port)
@@ -126,11 +129,14 @@
          (make <fsm>
            #:debug-mode? #t
            #:transition-table
-           `((read
-              (,guard:eof-object?     ,action:no-op        #f)
-              (,guard:at-symbol?      ,action:store-symbol read-start-tag)
-              (,guard:letter?         ,action:store-symbol read-state)
+           `((search-start-tag
+              (,guard:eof-object?     ,action:no-op              #f)
+              (,guard:at-symbol?      ,action:store-symbol       read-start-tag)
+              (,guard:letter?         ,action:no-start-tag-error #f)
+              (,guard:#t              ,action:no-op              search-start-tag))
+             (read
               (,guard:square-bracket? ,action:no-op        read-square-brackets)
+              (,guard:letter?         ,action:store-symbol read-state)
               (,guard:#t              ,action:no-op        read))
              (read-start-tag
               (,guard:eof-object?     ,action:no-op           #f)
