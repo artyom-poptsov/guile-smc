@@ -3,6 +3,7 @@
   #:use-module (ice-9 receive)
   #:use-module (smc core log)
   #:export (<state>
+            state?
             state-name
             state-run
             state-transition-add!
@@ -43,6 +44,11 @@
 (define-method (write (self <state>))
   (next-method)
   (display self (current-output-port)))
+
+
+
+(define-method (state? x)
+  (is-a? x <state>))
 
 
 
