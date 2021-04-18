@@ -13,4 +13,5 @@
     (format #t "output fsm: ~a~%" fsm)
     (format #t "transition table:~%")
     (pretty-print
-     (hash-table->transition-list (fsm-transition-table fsm)))))
+     (hash-table->transition-list (fsm-transition-table fsm))
+     #:display? #t)))
