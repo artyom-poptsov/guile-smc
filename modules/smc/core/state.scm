@@ -30,11 +30,13 @@
 
 
 (define-method (display (self <state>) (port <port>))
+  (next-method)
   (format port "#<state ~a ~a>"
           (state-name self)
           (number->string (object-address self) 16)))
 
 (define-method (write (self <state>) (port <port>))
+  (next-method)
   (display self port))
 
 (define-method (display (self <state>))
