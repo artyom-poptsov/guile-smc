@@ -44,6 +44,22 @@
              (state-name state)
              state))
 
+(define-method (initialize (fsm <fsm>) initargs)
+  (next-method)
+  (let ((states (and (memq #:states initargs)
+                     (cadr (memq #:states initargs)))))
+
+  (when states
+    (for-each (lambda (state)
+                (fsm-state-add! fsm state))
+              states)
+    (fsm-current-state-set! fsm (car states)))))
+
+
+
+
+
+
 (define-method (fsm-state (self <fsm>)
                           (name <symbol>))
   (hash-ref (fsm-transition-table self) name))
