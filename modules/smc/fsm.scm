@@ -121,15 +121,27 @@
 (define-generic fsm-transition-add!)
 
 (define-method (fsm-transition-add! (self       <fsm>)
+                                    (state      <state>)
+                                    (tguard     <procedure>)
+                                    (action     <procedure>)
+                                    next-state)
+  (state-transition-add! state
+                         tguard
+                         action
+                         (and next-state
+                              (cond
+                               ((symbol? next-state)
+                                (fsm-state self next-state))
+                               ((state? next-state)
+                                next-state)))))
+
+(define-method (fsm-transition-add! (self       <fsm>)
                                     (state-name <symbol>)
                                     (tguard     <procedure>)
                                     (action     <procedure>)
                                     next-state)
-  (state-transition-add! (fsm-state self state-name)
-                         tguard
-                         action
-                         (and next-state
-                              (fsm-state self next-state))))
+  (fsm-transition-add! self (fsm-state self state-name) tguard action next-state))
+
 
 (define-method (fsm-transition-add! (self       <fsm>)
                                     (state-name <symbol>)
