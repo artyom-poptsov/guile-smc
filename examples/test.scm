@@ -7,59 +7,43 @@
              (ice-9 textual-ports)
              (smc fsm)
              (smc core log)
+             (smc guards char)
              (smc core state))
 
 
 ;; Guards
 
-(define (fsm-eof-object? ch ctx)
-  (eof-object? ch))
-
-(define (fsm-space? ch ctx)
-  (char=? ch #\space))
-
-(define (fsm-non-space? ch ctx)
+(define (guard:non-space? ch ctx)
   (not (char=? ch #\space)))
-
-(define (fsm-newline? ch ctx)
-  (char=? ch #\newline))
 
 
 ;; Actions
 
-(define (fsm-end ch ctx)
+(define (action:end ch ctx)
   (list->string (reverse ctx)))
 
-(define (fsm-noop ch ctx)
-  ctx)
-
-(define (fsm-cons ch ctx)
+(define (action:cons ch ctx)
   (cons ch ctx))
 
 
 
 (define (main args)
-  (let ((fsm (make <fsm>)))
-    (log-use-stderr! #t)
-    (fsm-state-add! fsm (make <state> #:name 'before))
-    (fsm-state-add! fsm (make <state> #:name 'inside))
-    (fsm-state-add! fsm (make <state> #:name 'after))
-    (fsm-transition-add! fsm 'before
-                         `((,fsm-eof-object? ,fsm-end  #f)
-                           (,fsm-non-space?  ,fsm-cons inside)
-                           (,fsm-space?      ,fsm-noop before)))
-
-    (fsm-transition-add! fsm 'inside
-                         `((,fsm-eof-object? ,fsm-end  #f)
-                           (,fsm-space?      ,fsm-noop after)
-                           (,fsm-non-space?  ,fsm-cons inside)))
-
-    (fsm-transition-add! fsm 'after
-                         `((,fsm-eof-object? ,fsm-end  #f)
-                           (,fsm-newline?    ,fsm-cons before)
-                           (,(const #t)      ,fsm-noop after)))
-
-    (fsm-current-state-set! fsm (fsm-state fsm 'before))
+  (log-use-stderr! #t)
+  (let ((fsm (make <fsm>
+               #:debug-mode? #t
+               #:transition-table
+               `((before
+                  (,guard:eof-object? ,action:end   #f)
+                  (,guard:non-space?  ,action:cons  inside)
+                  (,guard:space?      ,action:no-op before))
+                 (inside
+                  (,guard:eof-object? ,action:end   #f)
+                  (,guard:space?      ,action:no-op after)
+                  (,guard:non-space?  ,action:cons  inside))
+                 (after
+                  (,guard:eof-object? ,action:end   #f)
+                  (,guard:newline?    ,action:cons  before)
+                  (,(const #t)        ,action:no-op after))))))
 
     (let loop ((context '()))
       (receive (new-state new-context)

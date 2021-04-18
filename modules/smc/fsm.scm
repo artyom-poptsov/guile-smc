@@ -24,6 +24,8 @@
   ;; <hash-table>
   (transition-table
    #:getter     fsm-transition-table
+   #:setter     fsm-transition-table-set!
+   #:init-keyword #:transition-table
    #:init-value (make-hash-table))
 
   ;; REQUIRED.  Name of the current state.
@@ -44,25 +46,51 @@
              (state-name state)
              state))
 
-(define-method (initialize (fsm <fsm>) initargs)
+(define-method (fsm-state (self <fsm>)
+                          (name <symbol>))
+  (hash-ref (fsm-transition-table self) name))
+
+
+
+;; Convert a TRANSITION-LIST to a hash table.
+(define-method (transition-list->hash-table (transition-list <list>))
+  (let ((table (make-hash-table)))
+    (for-each (lambda (transition)
+                (let* ((state-name (car transition))
+                       (state      (hash-ref table state-name)))
+                  (when state
+                    (error "Duplicate state" state-name))
+                  (format #t "tr: ~a~%" (cdr transition))
+                  (hash-set! table
+                             state-name
+                             (make <state>
+                               #:name state-name
+                               #:transitions (cdr transition)))))
+              transition-list)
+    table))
+
+(define-method (initialize (self <fsm>) initargs)
   (next-method)
   (let ((states (and (memq #:states initargs)
                      (cadr (memq #:states initargs)))))
 
-  (when states
-    (for-each (lambda (state)
-                (fsm-state-add! fsm state))
-              states)
-    (fsm-current-state-set! fsm (car states)))))
+    (when states
+      (for-each (lambda (state)
+                  (fsm-state-add! self state))
+                states)
+      (fsm-current-state-set! self (car states))))
 
+  (let ((table (and (memq #:transition-table initargs)
+                    (cadr (memq #:transition-table initargs)))))
+    (when table
+      (cond
+       ((list? table)
+        (fsm-transition-table-set! self (transition-list->hash-table table))
+        (fsm-current-state-set! self (fsm-state self (caar table))))
+       (else
+        (error "Transition table must be a list"))))))
 
 
-
-
-
-(define-method (fsm-state (self <fsm>)
-                          (name <symbol>))
-  (hash-ref (fsm-transition-table self) name))
 
 (define-generic fsm-transition-add!)
 
@@ -93,6 +121,9 @@
 (define-method (log-debug-transition (from <state>) (to <state>))
   (log-debug "[~a] -> [~a]" (state-name from) (state-name to)))
 
+(define-method (log-debug-transition (from <state>) (to <symbol>))
+  (log-debug "[~a] -> [~a]" (state-name from) to))
+
 (define-method (log-debug-transition (from <state>) (to <boolean>))
   (log-debug "[~a] -> [*]" (state-name from)))
 
@@ -101,12 +132,15 @@
 (define-method (fsm-run! (self <fsm>) event context)
   (let ((state (fsm-current-state self)))
     (if state
-        (receive (next-state new-context)
-            (state-run state event context)
-          (when (fsm-debug-mode? self)
-            (log-debug-transition state next-state))
-          (fsm-current-state-set! self next-state)
-          (values next-state new-context))
+        (let ((state (if (symbol? state)
+                         (fsm-state self state)
+                         state)))
+          (receive (next-state new-context)
+              (state-run state event context)
+            (when (fsm-debug-mode? self)
+              (log-debug-transition state next-state))
+            (fsm-current-state-set! self next-state)
+            (values next-state new-context)))
         (values #f context))))
 
 
