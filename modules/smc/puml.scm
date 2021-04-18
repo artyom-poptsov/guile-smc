@@ -132,12 +132,23 @@
            `((search-start-tag
               (,guard:eof-object?     ,action:no-op              #f)
               (,guard:at-symbol?      ,action:store-symbol       read-start-tag)
+              (,guard:single-quote?   ,action:no-op              search-start-tag/skip-comment)
               (,guard:letter?         ,action:no-start-tag-error #f)
               (,guard:#t              ,action:no-op              search-start-tag))
+             (search-start-tag/skip-comment
+              (,guard:eof-object?     ,action:no-op              #f)
+              (,guard:newline?        ,action:no-op              search-start-tag)
+              (,guard:#t              ,action:no-op              search-start-tag/skip-comment))
              (read
+              (,guard:eof-object?     ,action:no-op              #f)
+              (,guard:single-quote?   ,action:no-op        read/skip-comment)
               (,guard:square-bracket? ,action:no-op        read-square-brackets)
               (,guard:letter?         ,action:store-symbol read-state)
               (,guard:#t              ,action:no-op        read))
+             (read/skip-comment
+              (,guard:eof-object?     ,action:no-op              #f)
+              (,guard:newline?        ,action:no-op              read)
+              (,guard:#t              ,action:no-op              read/skip-comment))
              (read-start-tag
               (,guard:eof-object?     ,action:no-op           #f)
               (,guard:space?          ,action:check-start-tag read)
