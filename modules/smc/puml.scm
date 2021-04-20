@@ -39,6 +39,9 @@
 (define (guard:square-bracket? ch ctx)
   (char=? ch #\[))
 
+(define (guard:closing-square-bracket? ch ctx)
+  (char=? ch #\]))
+
 (define (guard:at-symbol? ch ctx)
   (char=? ch #\@))
 
@@ -109,6 +112,15 @@
         (fsm-transition-add! fsm from
                              (list (list (const #t) action:no-op state-to)))
         ctx))))
+
+(define (action:add-final-transition ch ctx)
+  (let* ((fsm    (context-fsm ctx))
+	 (stanza (context-stanza ctx))
+	 (from   (list-ref stanza 0)))
+    (log-debug "action:add-final-transition: from: ~a" from)
+    (fsm-transition-add! fsm from guard:#t action:no-op #f)
+    (context-stanza-set! ctx '())
+    ctx))
 
 (define (action:check-start-tag ch ctx)
   (let* ((buf (context-buffer ctx))
@@ -183,7 +195,11 @@
              (search-state-transition-to
               (,guard:eof-object?     ,action:no-op        #f)
               (,guard:letter?         ,action:store-symbol read-state-transition-to)
+              (,guard:square-bracket? ,action:no-op        read-final-state)
               (,guard:#t              ,action:no-op        search-state-transition-to))
+             (read-final-state
+              (,guard:closing-square-bracket? ,action:add-final-transition read)
+              (,guard:#t                      ,action:no-op                read-final-state))
              (read-state-transition-to
               (,guard:eof-object?     ,action:no-op                        #f)
               (,guard:newline?        ,action:add-state-with-transition-to read)
