@@ -6,6 +6,8 @@
             state?
             state-name
             state-run
+	    state-description
+	    state-description-set!
             state-transition-add!
             state-transitions))
 
@@ -19,6 +21,13 @@
    #:accessor     state-name
    #:init-value   #f
    #:init-keyword #:name)
+
+  ;; <string>
+  (description
+   #:getter       state-description
+   #:setter       state-description-set!
+   #:init-keyword #:description
+   #:init-value   #f)
 
   ;; <list> of transitions.
   (transitions
