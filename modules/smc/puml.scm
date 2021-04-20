@@ -110,7 +110,7 @@
         (log-debug "action:add-state-with-transition-to: state: ~a" state-from)
         (log-debug "action:add-state-with-transition-to: fsm: ~a" fsm)
         (fsm-transition-add! fsm from
-                             (list (list (const #t) action:no-op state-to)))
+                             (list (list guard:#t action:no-op to)))
         ctx))))
 
 (define (action:add-final-transition ch ctx)
@@ -119,6 +119,18 @@
 	 (from   (list-ref stanza 0)))
     (log-debug "action:add-final-transition: from: ~a" from)
     (fsm-transition-add! fsm from guard:#t action:no-op #f)
+    (context-stanza-set! ctx '())
+    ctx))
+
+(define (action:add-state-description ch ctx)
+  (let* ((fsm    (context-fsm ctx))
+	 (stanza (context-stanza ctx))
+	 (buf    (context-buffer ctx))
+	 (state-name (list-ref stanza 0)))
+    (fsm-state-description-add! fsm
+				state-name
+				(list->string (reverse buf)))
+    (context-buffer-set! ctx '())
     (context-stanza-set! ctx '())
     ctx))
 
@@ -185,9 +197,14 @@
               (,guard:#t              ,action:store-symbol         read-state))
              (search-state-transition
               (,guard:eof-object?     ,action:no-op        #f)
+	      (,guard:colon?          ,action:no-op        read-state-description)
               (,guard:dash?           ,action:no-op        read-state-right-arrow)
               (,guard:arrow-left-end? ,action:no-op        read-state-left-arrow)
               (,guard:#t              ,action:no-op        search-state-transition))
+	     (read-state-description
+	      (,guard:eof-object?     ,action:no-op                 #f)
+	      (,guard:newline?        ,action:add-state-description read)
+	      (,guard:#t              ,action:store-symbol          read-state-description))
              (read-state-right-arrow
               (,guard:eof-object?     ,action:no-op        #f)
               (,guard:space?          ,action:no-op        search-state-transition-to)
