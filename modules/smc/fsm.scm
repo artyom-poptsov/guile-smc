@@ -93,8 +93,10 @@
 
 (define-method (hash-table->transition-list table)
   (hash-map->list (lambda (state-name state)
-                    (cons state-name (car (state-transitions state))))
-                  table))
+		    (if (null? (state-transitions state))
+			(list state-name)
+			(cons state-name (car (state-transitions state)))))
+		  table))
 
 (define-method (initialize (self <fsm>) initargs)
   (next-method)
