@@ -64,9 +64,11 @@
 ;; Add a new state to the SM table.
 (define-method (fsm-state-add! (self  <fsm>)
                                (state <state>))
-  (hash-set! (fsm-transition-table self)
-             (state-name state)
-             state))
+  (let ((name (state-name state)))
+    (unless (fsm-state self name)
+      (hash-set! (fsm-transition-table self)
+		 name
+		 state))))
 
 (define-method (fsm-state (self <fsm>)
                           (name <symbol>))
