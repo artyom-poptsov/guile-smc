@@ -5,6 +5,7 @@
             guard:newline?
             guard:space?
             guard:letter?
+            guard:colon?
             guard:eof-object?
             guard:single-quote?))
 
@@ -26,3 +27,6 @@
 
 (define (guard:single-quote? ch ctx)
   (char=? ch #\'))
+
+(define (guard:colon? ch ctx)
+  (char=? ch #\:))
