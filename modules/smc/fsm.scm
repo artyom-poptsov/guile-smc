@@ -97,7 +97,7 @@
   (hash-map->list (lambda (state-name state)
 		    (if (null? (state-transitions state))
 			(list state-name)
-			(cons state-name (car (state-transitions state)))))
+			(cons state-name (state-transitions state))))
 		  table))
 
 (define-method (initialize (self <fsm>) initargs)
