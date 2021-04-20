@@ -140,6 +140,10 @@
                                     (tguard     <procedure>)
                                     (action     <procedure>)
                                     next-state)
+
+  (unless (fsm-state self state-name)
+    (fsm-state-add! self (make <state> #:name state-name)))
+
   (fsm-transition-add! self (fsm-state self state-name) tguard action next-state))
 
 
