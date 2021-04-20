@@ -141,13 +141,24 @@
     ctx))
 
 (define (action:add-state-description ch ctx)
-  (let* ((fsm    (context-fsm ctx))
-	 (stanza (context-stanza ctx))
-	 (buf    (context-buffer ctx))
-	 (state-name (list-ref stanza 0)))
-    (fsm-state-description-add! fsm
-				state-name
-				(list->string (reverse buf)))
+  (let* ((fsm             (context-fsm ctx))
+	 (stanza          (context-stanza ctx))
+	 (buf             (context-buffer ctx))
+	 (state-name      (list-ref stanza 0))
+	 (description     (and (fsm-state fsm state-name)
+			       (state-description
+				(fsm-state fsm state-name))))
+	 (new-description (list->string (reverse buf))))
+
+    (if description
+	(fsm-state-description-add! fsm
+				    state-name
+				    (string-append
+				     description
+				     new-description))
+	(fsm-state-description-add! fsm
+				    state-name
+				    new-description))
     (context-buffer-set! ctx '())
     (context-stanza-set! ctx '())
     ctx))
