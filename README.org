@@ -2,3 +2,23 @@
 
 GNU Guile state machine compiler.
 
+** License
+    Guile-SMC is free software: you can redistribute it and/or modify it under
+    the terms of the GNU General Public License as published by the Free
+    Software Foundation, either version 3 of the License, or (at your option)
+    any later version.  Please see =COPYING= file for the terms of GNU General
+    Public License.
+
+** Usage
+   PlantUML (<http://www.plantuml.com/>) state machine compiler:
+
+#+BEGIN_EXAMPLE scheme
+  (let ((fsm (puml->fsm (current-input-port))))
+    (format #t "output fsm: ~a~%" fsm)
+    (format #t "transition table:~%")
+    (pretty-print
+     (hash-table->transition-list (fsm-transition-table fsm))
+     #:display? #t)))
+#+END_EXAMPLE
+
+   Also see the =examples= directory.
