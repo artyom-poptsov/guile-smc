@@ -149,6 +149,9 @@
   (unless (fsm-state self state-name)
     (fsm-state-add! self (make <state> #:name state-name)))
 
+  (when (and next-state (not (fsm-state self next-state)))
+    (fsm-state-add! self (make <state> #:name next-state)))
+
   (fsm-transition-add! self (fsm-state self state-name) tguard action next-state))
 
 
