@@ -19,8 +19,8 @@
 
   ;; A module which contains state machine procedures.
   (module
-   #:init-keyword #:module
-   #:getter     context-module)
+      #:init-keyword #:module
+    #:getter     context-module)
 
   (buffer
    #:init-value '()
@@ -120,12 +120,12 @@
 
 (define (action:add-state-transition-with-guard ch ctx)
   (let* ((fsm     (context-fsm ctx))
-	 (stanza  (context-stanza ctx))
-	 (module  (context-module ctx))
-	 (buf     (context-buffer ctx))
-	 (tguard  (string->symbol (string-trim (list->string (reverse buf)))))
-	 (from    (list-ref stanza 0))
-	 (to      (list-ref stanza 1)))
+         (stanza  (context-stanza ctx))
+         (module  (context-module ctx))
+         (buf     (context-buffer ctx))
+         (tguard  (string->symbol (string-trim (list->string (reverse buf)))))
+         (from    (list-ref stanza 0))
+         (to      (list-ref stanza 1)))
     (fsm-transition-add! fsm from (module-ref module tguard) action:no-op to)
     (context-buffer-set! ctx '())
     (context-stanza-set! ctx '())
@@ -133,8 +133,8 @@
 
 (define (action:add-final-transition ch ctx)
   (let* ((fsm    (context-fsm ctx))
-	 (stanza (context-stanza ctx))
-	 (from   (list-ref stanza 0)))
+         (stanza (context-stanza ctx))
+         (from   (list-ref stanza 0)))
     (log-debug "action:add-final-transition: from: ~a" from)
     (fsm-transition-add! fsm from guard:#t action:no-op #f)
     (context-stanza-set! ctx '())
@@ -142,23 +142,23 @@
 
 (define (action:add-state-description ch ctx)
   (let* ((fsm             (context-fsm ctx))
-	 (stanza          (context-stanza ctx))
-	 (buf             (context-buffer ctx))
-	 (state-name      (list-ref stanza 0))
-	 (description     (and (fsm-state fsm state-name)
-			       (state-description
-				(fsm-state fsm state-name))))
-	 (new-description (list->string (reverse buf))))
+         (stanza          (context-stanza ctx))
+         (buf             (context-buffer ctx))
+         (state-name      (list-ref stanza 0))
+         (description     (and (fsm-state fsm state-name)
+                               (state-description
+                                (fsm-state fsm state-name))))
+         (new-description (list->string (reverse buf))))
 
     (if description
-	(fsm-state-description-add! fsm
-				    state-name
-				    (string-append
-				     description
-				     new-description))
-	(fsm-state-description-add! fsm
-				    state-name
-				    new-description))
+        (fsm-state-description-add! fsm
+                                    state-name
+                                    (string-append
+                                     description
+                                     new-description))
+        (fsm-state-description-add! fsm
+                                    state-name
+                                    new-description))
     (context-buffer-set! ctx '())
     (context-stanza-set! ctx '())
     ctx))
@@ -226,14 +226,14 @@
               (,guard:#t              ,action:store-symbol         read-state))
              (search-state-transition
               (,guard:eof-object?     ,action:no-op        #f)
-	      (,guard:colon?          ,action:no-op        read-state-description)
+              (,guard:colon?          ,action:no-op        read-state-description)
               (,guard:dash?           ,action:no-op        read-state-right-arrow)
               (,guard:arrow-left-end? ,action:no-op        read-state-left-arrow)
               (,guard:#t              ,action:no-op        search-state-transition))
-	     (read-state-description
-	      (,guard:eof-object?     ,action:no-op                 #f)
-	      (,guard:newline?        ,action:add-state-description read)
-	      (,guard:#t              ,action:store-symbol          read-state-description))
+             (read-state-description
+              (,guard:eof-object?     ,action:no-op                 #f)
+              (,guard:newline?        ,action:add-state-description read)
+              (,guard:#t              ,action:store-symbol          read-state-description))
              (read-state-right-arrow
               (,guard:eof-object?     ,action:no-op        #f)
               (,guard:space?          ,action:no-op        search-state-transition-to)
@@ -248,14 +248,14 @@
               (,guard:#t                      ,action:no-op                read-final-state))
              (read-state-transition-to
               (,guard:eof-object?     ,action:no-op                        #f)
-	      (,guard:space?          ,action:no-op                        read-state-transition-to)
-	      (,guard:colon?          ,action:add-buffer-to-stanza         read-state-transition-guard)
+              (,guard:space?          ,action:no-op                        read-state-transition-to)
+              (,guard:colon?          ,action:add-buffer-to-stanza         read-state-transition-guard)
               (,guard:newline?        ,action:add-state-with-transition-to read)
               (,guard:#t              ,action:store-symbol                 read-state-transition-to))
-	     (read-state-transition-guard
-	      (,guard:eof-object?     ,action:no-op                           #f)
-	      (,guard:newline?        ,action:add-state-transition-with-guard read)
-	      (,guard:#t              ,action:store-symbol                 read-state-transition-guard))))))
+             (read-state-transition-guard
+              (,guard:eof-object?     ,action:no-op                           #f)
+              (,guard:newline?        ,action:add-state-transition-with-guard read)
+              (,guard:#t              ,action:store-symbol                 read-state-transition-guard))))))
 
     (let loop ((context (make <context> #:module module)))
       (receive (new-state new-context)
