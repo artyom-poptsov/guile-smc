@@ -6,9 +6,9 @@
             state?
             state-name
             state-run
-	    state-description
-	    state-description-set!
-      state-transition-count
+            state-description
+            state-description-set!
+            state-transition-count
             state-transition-add!
             state-transitions))
 
@@ -42,9 +42,9 @@
 (define-method (display (self <state>) (port <port>))
   (format port "#<state ~a~a ~a>"
           (state-name self)
-	  (if (state-description self)
-	      (string-append ": " (state-description self))
-	      "")
+          (if (state-description self)
+              (string-append ": " (state-description self))
+              "")
           (number->string (object-address self) 16)))
 
 (define-method (write (self <state>) (port <port>))
