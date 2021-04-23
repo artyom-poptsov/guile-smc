@@ -41,9 +41,6 @@
       (char-set-contains? char char-set:digit)
       (char=? #\_)))
 
-(define (guard:star? ch ctx)
-  (char=? ch #\* ))
-
 (define (guard:dash? ch ctx)
   (char=? ch #\-))
 
@@ -172,6 +169,100 @@
 
 
 
+(define %transition-table
+  `((search-start-tag
+     (,guard:eof-object?     ,action:no-op              #f)
+     (,guard:at-symbol?      ,action:store-symbol       read-start-tag)
+     (,guard:single-quote?   ,action:no-op              search-start-tag/skip-comment)
+     (,guard:letter?         ,action:no-start-tag-error #f)
+     (,guard:#t              ,action:no-op              search-start-tag))
+    (search-start-tag/skip-comment
+     (,guard:eof-object?     ,action:no-op              #f)
+     (,guard:newline?        ,action:no-op              search-start-tag)
+     (,guard:#t              ,action:no-op              search-start-tag/skip-comment))
+    (read-start-tag
+     (,guard:eof-object?     ,action:no-op           #f)
+     (,guard:space?          ,action:check-start-tag read)
+     (,guard:newline?        ,action:check-start-tag read)
+     (,guard:#t              ,action:store-symbol    read-start-tag))
+    (read
+     (,guard:eof-object?     ,action:no-op              #f)
+     (,guard:at-symbol?      ,action:no-op        read-end-tag)
+     (,guard:single-quote?   ,action:no-op        read/skip-comment)
+     (,guard:left-square-bracket? ,action:no-op        read-state)
+     (,guard:letter?         ,action:store-symbol read-state)
+     (,guard:#t              ,action:no-op        read))
+    (read-end-tag
+     (,guard:eof-object?     ,action:no-op        #f)
+     (,guard:newline?        ,action:no-op        #f)
+     (,guard:#t              ,action:no-op        read-end-tag))
+    (read/skip-comment
+     (,guard:eof-object?     ,action:no-op              #f)
+     (,guard:newline?        ,action:no-op              read)
+     (,guard:#t              ,action:no-op              read/skip-comment))
+    (read-state
+     (,guard:eof-object?             ,action:no-op                #f)
+     (,guard:newline?                ,action:syntax-error         #f)
+     (,guard:right-square-bracket? ,action:add-buffer-to-stanza search-state-transition)
+     (,guard:space?                  ,action:add-buffer-to-stanza search-state-transition)
+     (,guard:colon?                  ,action:add-buffer-to-stanza read-state-description)
+     (,guard:#t                      ,action:store-symbol         read-state))
+    (search-state-transition
+     (,guard:eof-object?     ,action:no-op        #f)
+     (,guard:colon?          ,action:no-op        read-state-description)
+     (,guard:dash?           ,action:no-op        read-state-right-arrow)
+     (,guard:arrow-left-end? ,action:no-op        read-state-left-arrow)
+     (,guard:#t              ,action:no-op        search-state-transition))
+    (read-state-description
+     (,guard:eof-object?     ,action:no-op                 #f)
+     (,guard:newline?        ,action:add-state-description read)
+     (,guard:#t              ,action:store-symbol          read-state-description))
+    (read-state-right-arrow
+     (,guard:eof-object?     ,action:no-op        #f)
+     (,guard:space?          ,action:no-op        search-state-transition-to)
+     (,guard:#t              ,action:no-op        read-state-right-arrow))
+    (search-state-transition-to
+     (,guard:eof-object?     ,action:no-op        #f)
+     (,guard:letter?         ,action:store-symbol read-state-transition-to)
+     (,guard:left-square-bracket? ,action:no-op        read-state-transition-to)
+     (,guard:#t              ,action:no-op        search-state-transition-to))
+    (read-state-transition-to
+     (,guard:eof-object?     ,action:no-op                        #f)
+     ;; (,guard:space?          ,action:no-op                        read-state-transition-guard)
+     (,guard:right-square-bracket? ,action:no-op read-state-transition-to)
+     (,guard:colon?          ,action:add-buffer-to-stanza         search-state-transition-guard)
+     (,guard:newline?        ,action:add-state-transition         read)
+     (,guard:#t              ,action:store-symbol                 read-state-transition-to))
+    (search-state-transition-guard
+     (,guard:eof-object?     ,action:no-op                           #f)
+     (,guard:letter?         ,action:store-symbol                    read-state-transition-guard)
+     (,guard:#t              ,action:no-op                           search-state-transition-guard))
+    (read-state-transition-guard
+     (,guard:eof-object?     ,action:no-op                           #f)
+     (,guard:space?          ,action:add-buffer-to-stanza            search-state-action-arrow)
+     (,guard:newline?        ,action:add-state-transition            read)
+     (,guard:#t              ,action:store-symbol                    read-state-transition-guard))
+    (search-state-action-arrow
+     (,guard:eof-object?     ,action:no-op                           #f)
+     (,guard:newline?        ,action:no-op                           read)
+     (,guard:dash?           ,action:no-op                           read-state-action-arrow)
+     (,guard:#t              ,action:no-op                           search-state-action-arrow))
+    (read-state-action-arrow
+     (,guard:eof-object?      ,action:unexpected-end-of-file-error   #f)
+     (,guard:newline?         ,action:no-op                          #f)
+     (,guard:arrow-right-end? ,action:no-op                          search-state-transition-action))
+    (search-state-transition-action
+     (,guard:eof-object?      ,action:unexpected-end-of-file-error   #f)
+     (,guard:letter?          ,action:store-symbol                   read-state-transition-action)
+     (,guard:newline?         ,action:no-op                          #f)
+     (,guard:#t               ,action:no-op                          search-state-transition-action))
+    (read-state-transition-action
+     (,guard:eof-object?      ,action:unexpected-end-of-file-error   #f)
+     (,guard:newline?         ,action:add-state-transition           read)
+     (,guard:#t               ,action:store-symbol                   read-state-transition-action))))
+
+
+
 (define* (puml->fsm port
                     #:key
                     (module (current-module))
@@ -180,97 +271,7 @@
   (let ((reader-fsm
          (make <fsm>
            #:debug-mode? debug-mode?
-           #:transition-table
-           `((search-start-tag
-              (,guard:eof-object?     ,action:no-op              #f)
-              (,guard:at-symbol?      ,action:store-symbol       read-start-tag)
-              (,guard:single-quote?   ,action:no-op              search-start-tag/skip-comment)
-              (,guard:letter?         ,action:no-start-tag-error #f)
-              (,guard:#t              ,action:no-op              search-start-tag))
-             (search-start-tag/skip-comment
-              (,guard:eof-object?     ,action:no-op              #f)
-              (,guard:newline?        ,action:no-op              search-start-tag)
-              (,guard:#t              ,action:no-op              search-start-tag/skip-comment))
-             (read-start-tag
-              (,guard:eof-object?     ,action:no-op           #f)
-              (,guard:space?          ,action:check-start-tag read)
-              (,guard:newline?        ,action:check-start-tag read)
-              (,guard:#t              ,action:store-symbol    read-start-tag))
-             (read
-              (,guard:eof-object?     ,action:no-op              #f)
-              (,guard:at-symbol?      ,action:no-op        read-end-tag)
-              (,guard:single-quote?   ,action:no-op        read/skip-comment)
-              (,guard:left-square-bracket? ,action:no-op        read-state)
-              (,guard:letter?         ,action:store-symbol read-state)
-              (,guard:#t              ,action:no-op        read))
-             (read-end-tag
-              (,guard:eof-object?     ,action:no-op        #f)
-              (,guard:newline?        ,action:no-op        #f)
-              (,guard:#t              ,action:no-op        read-end-tag))
-             (read/skip-comment
-              (,guard:eof-object?     ,action:no-op              #f)
-              (,guard:newline?        ,action:no-op              read)
-              (,guard:#t              ,action:no-op              read/skip-comment))
-             (read-state
-              (,guard:eof-object?             ,action:no-op                #f)
-              (,guard:newline?                ,action:syntax-error         #f)
-              (,guard:right-square-bracket? ,action:add-buffer-to-stanza search-state-transition)
-              (,guard:space?                  ,action:add-buffer-to-stanza search-state-transition)
-              (,guard:colon?                  ,action:add-buffer-to-stanza read-state-description)
-              (,guard:#t                      ,action:store-symbol         read-state))
-             (search-state-transition
-              (,guard:eof-object?     ,action:no-op        #f)
-              (,guard:colon?          ,action:no-op        read-state-description)
-              (,guard:dash?           ,action:no-op        read-state-right-arrow)
-              (,guard:arrow-left-end? ,action:no-op        read-state-left-arrow)
-              (,guard:#t              ,action:no-op        search-state-transition))
-             (read-state-description
-              (,guard:eof-object?     ,action:no-op                 #f)
-              (,guard:newline?        ,action:add-state-description read)
-              (,guard:#t              ,action:store-symbol          read-state-description))
-             (read-state-right-arrow
-              (,guard:eof-object?     ,action:no-op        #f)
-              (,guard:space?          ,action:no-op        search-state-transition-to)
-              (,guard:#t              ,action:no-op        read-state-right-arrow))
-             (search-state-transition-to
-              (,guard:eof-object?     ,action:no-op        #f)
-              (,guard:letter?         ,action:store-symbol read-state-transition-to)
-              (,guard:left-square-bracket? ,action:no-op        read-state-transition-to)
-              (,guard:#t              ,action:no-op        search-state-transition-to))
-             (read-state-transition-to
-              (,guard:eof-object?     ,action:no-op                        #f)
-              ;; (,guard:space?          ,action:no-op                        read-state-transition-guard)
-              (,guard:right-square-bracket? ,action:no-op read-state-transition-to)
-              (,guard:colon?          ,action:add-buffer-to-stanza         search-state-transition-guard)
-              (,guard:newline?        ,action:add-state-transition         read)
-              (,guard:#t              ,action:store-symbol                 read-state-transition-to))
-             (search-state-transition-guard
-              (,guard:eof-object?     ,action:no-op                           #f)
-              (,guard:letter?         ,action:store-symbol                    read-state-transition-guard)
-              (,guard:#t              ,action:no-op                           search-state-transition-guard))
-             (read-state-transition-guard
-              (,guard:eof-object?     ,action:no-op                           #f)
-              (,guard:space?          ,action:add-buffer-to-stanza            search-state-action-arrow)
-              (,guard:newline?        ,action:add-state-transition            read)
-              (,guard:#t              ,action:store-symbol                    read-state-transition-guard))
-             (search-state-action-arrow
-              (,guard:eof-object?     ,action:no-op                           #f)
-              (,guard:newline?        ,action:no-op                           read)
-              (,guard:dash?           ,action:no-op                           read-state-action-arrow)
-              (,guard:#t              ,action:no-op                           search-state-action-arrow))
-             (read-state-action-arrow
-              (,guard:eof-object?      ,action:unexpected-end-of-file-error   #f)
-              (,guard:newline?         ,action:no-op                          #f)
-              (,guard:arrow-right-end? ,action:no-op                          search-state-transition-action))
-             (search-state-transition-action
-              (,guard:eof-object?      ,action:unexpected-end-of-file-error   #f)
-              (,guard:letter?          ,action:store-symbol                   read-state-transition-action)
-              (,guard:newline?         ,action:no-op                          #f)
-              (,guard:#t               ,action:no-op                          search-state-transition-action))
-             (read-state-transition-action
-              (,guard:eof-object?      ,action:unexpected-end-of-file-error   #f)
-              (,guard:newline?         ,action:add-state-transition           read)
-              (,guard:#t               ,action:store-symbol                   read-state-transition-action))))))
+           #:transition-table %transition-table)))
 
     (let loop ((context (make <context> #:module module)))
       (receive (new-state new-context)
