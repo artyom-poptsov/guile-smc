@@ -13,6 +13,8 @@
             fsm-current-state-set!
             fsm-run!
 
+            fsm-state-count
+
             transition-list->hash-table
             hash-table->transition-list
 
@@ -76,7 +78,6 @@
                        (state      (hash-ref table state-name)))
                   (when state
                     (error "Duplicate state" state-name))
-                  (format #t "tr: ~a~%" (cdr transition))
                   (hash-set! table
                              state-name
                              (make <state>
@@ -194,6 +195,11 @@
             (fsm-current-state-set! self next-state)
             (values next-state new-context)))
         (values #f context))))
+
+
+
+(define-method (fsm-state-count (self <fsm>))
+  (hash-count (const #t) (fsm-transition-table self)))
 
 
 
