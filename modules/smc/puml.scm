@@ -172,11 +172,14 @@
 
 
 
-(define* (puml->fsm port #:key (module (current-module)))
-  (log-use-stderr! #t)
+(define* (puml->fsm port
+                    #:key
+                    (module (current-module))
+                    (debug-mode? #f))
+  (log-use-stderr! debug-mode?)
   (let ((reader-fsm
          (make <fsm>
-           #:debug-mode? #t
+           #:debug-mode? debug-mode?
            #:transition-table
            `((search-start-tag
               (,guard:eof-object?     ,action:no-op              #f)
