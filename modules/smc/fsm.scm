@@ -8,7 +8,7 @@
             fsm-transition-add!
             fsm-state-add!
             fsm-state
-	    fsm-state-description-add!
+            fsm-state-description-add!
             fsm-current-state
             fsm-current-state-set!
             fsm-run!
@@ -59,8 +59,8 @@
   (let ((name (state-name state)))
     (unless (fsm-state self name)
       (hash-set! (fsm-transition-table self)
-		 name
-		 state))))
+                 name
+                 state))))
 
 (define-method (fsm-state (self <fsm>)
                           (name <symbol>))
@@ -87,10 +87,10 @@
 
 (define-method (hash-table->transition-list table)
   (hash-map->list (lambda (state-name state)
-		    (if (null? (state-transitions state))
-			(list state-name)
-			(cons state-name (state-transitions state))))
-		  table))
+                    (if (null? (state-transitions state))
+                        (list state-name)
+                        (cons state-name (state-transitions state))))
+                  table))
 
 (define-method (initialize (self <fsm>) initargs)
   (next-method)
@@ -159,14 +159,14 @@
             transitions))
 
 (define-method (fsm-state-description-add! (self        <fsm>)
-					   (state-name  <symbol>)
-					   (description <string>))
+                                           (state-name  <symbol>)
+                                           (description <string>))
 
   (if (fsm-state self state-name)
       (state-description-set! (fsm-state self state-name) description)
       (fsm-state-add! self (make <state>
-			     #:name state-name
-			     #:description description))))
+                             #:name state-name
+                             #:description description))))
 
 
 
