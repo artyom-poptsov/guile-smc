@@ -8,6 +8,7 @@
             state-run
 	    state-description
 	    state-description-set!
+      state-transition-count
             state-transition-add!
             state-transitions))
 
@@ -62,6 +63,9 @@
                                       next-state)
   (state-transitions-set! self (append (state-transitions self)
                                        (list (list tguard action next-state)))))
+
+(define-method (state-transition-count (self <state>))
+  (length (state-transitions self)))
 
 
 
