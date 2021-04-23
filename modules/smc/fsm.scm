@@ -14,6 +14,7 @@
             fsm-run!
 
             fsm-state-count
+            fsm-transition-count
 
             transition-list->hash-table
             hash-table->transition-list
@@ -200,6 +201,12 @@
 
 (define-method (fsm-state-count (self <fsm>))
   (hash-count (const #t) (fsm-transition-table self)))
+
+(define-method (fsm-transition-count (self <fsm>))
+  (hash-fold (lambda (state-name state result)
+               (+ result (state-transition-count state)))
+             0
+             (fsm-transition-table self)))
 
 
 
