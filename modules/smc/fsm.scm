@@ -49,15 +49,7 @@
           (number->string (object-address self) 16)))
 
 (define-method (write (self <fsm>) (port <port>))
-  (display self port))
-
-(define-method (display (self <fsm>))
-  (next-method)
-  (display self (current-output-port)))
-
-(define-method (write (self <fsm>))
-  (next-method)
-  (display self (current-output-port)))
+  (display self))
 
 
 
