@@ -41,15 +41,6 @@
       (char-set-contains? char char-set:digit)
       (char=? #\_)))
 
-(define (guard:square-bracket? ch ctx)
-  (char=? ch #\[))
-
-(define (guard:closing-square-bracket? ch ctx)
-  (char=? ch #\]))
-
-(define (guard:at-symbol? ch ctx)
-  (char=? ch #\@))
-
 (define (guard:star? ch ctx)
   (char=? ch #\* ))
 
@@ -206,7 +197,7 @@
               (,guard:eof-object?     ,action:no-op              #f)
               (,guard:at-symbol?      ,action:no-op        read-end-tag)
               (,guard:single-quote?   ,action:no-op        read/skip-comment)
-              (,guard:square-bracket? ,action:no-op        read-state)
+              (,guard:left-square-bracket? ,action:no-op        read-state)
               (,guard:letter?         ,action:store-symbol read-state)
               (,guard:#t              ,action:no-op        read))
              (read-end-tag
@@ -220,7 +211,7 @@
              (read-state
               (,guard:eof-object?             ,action:no-op                #f)
               (,guard:newline?                ,action:syntax-error         #f)
-              (,guard:closing-square-bracket? ,action:add-buffer-to-stanza search-state-transition)
+              (,guard:right-square-bracket? ,action:add-buffer-to-stanza search-state-transition)
               (,guard:space?                  ,action:add-buffer-to-stanza search-state-transition)
               (,guard:colon?                  ,action:add-buffer-to-stanza read-state-description)
               (,guard:#t                      ,action:store-symbol         read-state))
@@ -241,12 +232,12 @@
              (search-state-transition-to
               (,guard:eof-object?     ,action:no-op        #f)
               (,guard:letter?         ,action:store-symbol read-state-transition-to)
-              (,guard:square-bracket? ,action:no-op        read-state-transition-to)
+              (,guard:left-square-bracket? ,action:no-op        read-state-transition-to)
               (,guard:#t              ,action:no-op        search-state-transition-to))
              (read-state-transition-to
               (,guard:eof-object?     ,action:no-op                        #f)
               ;; (,guard:space?          ,action:no-op                        read-state-transition-guard)
-              (,guard:closing-square-bracket? ,action:no-op read-state-transition-to)
+              (,guard:right-square-bracket? ,action:no-op read-state-transition-to)
               (,guard:colon?          ,action:add-buffer-to-stanza         search-state-transition-guard)
               (,guard:newline?        ,action:add-state-transition         read)
               (,guard:#t              ,action:store-symbol                 read-state-transition-to))

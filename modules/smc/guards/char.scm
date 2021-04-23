@@ -7,7 +7,10 @@
             guard:letter?
             guard:colon?
             guard:eof-object?
-            guard:single-quote?))
+            guard:single-quote?
+            guard:left-square-bracket?
+            guard:right-square-bracket?
+            guard:at-symbol?))
 
 (define (guard:#t event ctx)
   "This guard is always returns #t."
@@ -30,3 +33,12 @@
 
 (define (guard:colon? ch ctx)
   (char=? ch #\:))
+
+(define (guard:left-square-bracket? ch ctx)
+  (char=? ch #\[))
+
+(define (guard:right-square-bracket? ch ctx)
+  (char=? ch #\]))
+
+(define (guard:at-symbol? ch ctx)
+  (char=? ch #\@))
