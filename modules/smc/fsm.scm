@@ -214,6 +214,9 @@
              0
              (fsm-transition-table self)))
 
+;; Calculate the incoming transition count for a STATE. Optionally the procedure
+;; can include recurrent links of a STATE to itself in the calculation if
+;; INCLUDE-RECURRENT-LINKS? is set to #t.
 (define* (fsm-incoming-transition-count self state
                                         #:key (include-recurrent-links? #f))
   (hash-fold (lambda (name other-state result)
@@ -230,6 +233,7 @@
              0
              (fsm-transition-table self)))
 
+;; Check if a STATE is reachable in the SELF finite state machine.
 (define-method (fsm-state-reachable? (self <fsm>) (state <state>))
   (or (equal? (fsm-current-state self) state)
       (> (fsm-incoming-transition-count self state) 0)))
