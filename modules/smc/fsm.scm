@@ -4,6 +4,8 @@
   #:use-module (smc core log)
   #:use-module (smc core state)
   #:export (<fsm>
+            fsm-debug-mode-set!
+            fsm-debug-mode?
             fsm-transition-table
             fsm-transition-add!
             fsm-state-add!
@@ -28,6 +30,7 @@
   (debug-mode?
    #:init-value   #f
    #:init-keyword #:debug-mode?
+   #:setter       fsm-debug-mode-set!
    #:getter       fsm-debug-mode?)
 
   ;; <hash-table>
