@@ -17,29 +17,34 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Guile-SMC.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I build-aux
+SCM_TESTS = \
+	state.scm	\
+	guards.scm
 
-SUBDIRS = build-aux modules/smc tests
+TESTS = ${SCM_TESTS}
+
+TEST_EXTENSIONS = .scm
+
+AM_TESTS_ENVIRONMENT = \
+	abs_top_srcdir="$(abs_top_srcdir)"; export abs_top_srcdir; \
+	abs_top_builddir="$(abs_top_builddir)"; export abs_top_builddir; \
+	ORIGTERM=${TERM}; export ORIGTERM; \
+	TERM=xterm; export TERM; \
+	GUILE_AUTO_COMPILE=0; export GUILE_AUTO_COMPILE;
+
+# LOG_COMPILER was introduced in Automake 1.12; don't expect "make
+# check" or "make distcheck" to work with earlier versions.
+SCM_LOG_COMPILER = \
+	$(GUILE)
+
+AM_SCM_LOG_FLAGS = \
+	-L "$(top_srcdir)/modules" \
+	-s
 
 EXTRA_DIST = \
-	.dir-locals.el
-
-gen-ChangeLog:
-	if test -d .git; then				\
-	  $(top_srcdir)/build-aux/gitlog-to-changelog	\
-	    2bea8c70..HEAD > $(distdir)/cl-t;		\
-	  rm -f $(distdir)/ChangeLog;			\
-	  mv $(distdir)/cl-t $(distdir)/ChangeLog;	\
-	fi
-
-dist-hook: gen-ChangeLog
-.PHONY: gen-ChangeLog
-
-clean-go:
-	-$(RM) $(GOBJECTS)
-.PHONY: clean-go
+	${SCM_TESTS}
 
 CLEANFILES = \
-	$(GOBJECTS)
+	*.log
 
-# Makefile.am ends here
+## Makefile.am ends here
