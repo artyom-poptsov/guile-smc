@@ -10,10 +10,14 @@
             state-description
             state-description-set!
             state-transition-count
+            state-transition-count/foreign
             state-transition-add!
             state-transitions
+            state-final-transitions
             state-recurrent-links-count
-            state-has-recurrent-links?))
+            state-has-final-transitions?
+            state-has-recurrent-links?
+            state-dead-end?))
 
 
 ;; This class describes an FSM state.
@@ -85,6 +89,10 @@
         0
         (state-transitions self)))
 
+(define-method (state-transition-count/foreign (self <state>))
+  (- (state-transition-count self)
+     (state-recurrent-links-count self)))
+
 ;; Returns the number of recurrent links that the state SELF has. A recurrent
 ;; link is a transition of state to itself.
 (define-method (state-recurrent-links-count (self <state>))
@@ -99,6 +107,27 @@
 ;; itself.)
 (define-method (state-has-recurrent-links? (self <state>))
   (> (state-recurrent-links-count self) 0))
+
+;; Get the number of final transitions for a state SELF.
+(define-method (state-final-transitions (self <state>))
+  (fold (lambda (tr prev)
+          (if (not (list-ref tr 2))
+              (+ prev 0)
+              prev))
+        0
+        (state-transitions self)))
+
+;; Check if a state SELF has any final transitions.
+(define-method (state-has-final-transitions? (self <state>))
+  (> (state-final-transitions self) 0))
+
+;; Check if a state SELF is a dead-end state. A state is considered a dead-end
+;; if it has no foreign transitions, has recurrent links and has no final
+;; transitions.
+(define-method (state-dead-end? (self <state>))
+  (and (not (state-has-final-transitions? self))
+       (> (state-recurrent-links-count self) 0)
+       (zero? (state-transition-count/foreign self))))
 
 
 
