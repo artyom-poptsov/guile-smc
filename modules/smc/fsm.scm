@@ -199,9 +199,13 @@
 
 
 
+;; Calculate the number of states in a finite state machine SELF. Return the
+;; number of states.
 (define-method (fsm-state-count (self <fsm>))
   (hash-count (const #t) (fsm-transition-table self)))
 
+;; Calculate the total transition count for a finite state machine SELF. Return
+;; the number of transitions.
 (define-method (fsm-transition-count (self <fsm>))
   (hash-fold (lambda (state-name state result)
                (+ result (state-transition-count state)))
