@@ -9,9 +9,16 @@
 
 
 (define (main args)
-  (let ((fsm (puml->fsm (current-input-port))))
-    (format #t "output fsm: ~a~%" fsm)
-    (format #t "transition table:~%")
+  (let ((fsm (puml->fsm (current-input-port)
+                        #:module (list (resolve-module '(smc guards char))
+                                       (resolve-module '(smc puml))
+                                       (resolve-module '(smc fsm)))
+                        #:debug-mode? #f)))
+    (format #t "output fsm:             ~a~%" fsm)
+    (format #t "  state count: ~s~%" (fsm-state-count fsm))
+    (format #t "  validation result: ~%")
+    (pretty-print (fsm-validate fsm))
+    (format #t "transition table (count: ~a):~%" (fsm-transition-count fsm))
     (pretty-print
      (hash-table->transition-list (fsm-transition-table fsm))
      #:display? #t)))
