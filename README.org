@@ -21,4 +21,11 @@ GNU Guile state machine compiler.
      #:display? #t)))
 #+END_EXAMPLE
 
+State machine validation:
+#+BEGIN_EXAMPLE scheme
+(let ((fsm (puml->fsm (current-input-port)))
+  (format #t "validation report:~%")
+  (pretty-print (fsm-validate fsm)))
+#+END_EXAMPLE
+
    Also see the =examples= directory.
