@@ -11,7 +11,6 @@ GNU Guile state machine compiler.
 
 ** Usage
    PlantUML (<http://www.plantuml.com/>) state machine compiler:
-
 #+BEGIN_EXAMPLE scheme
   (let ((fsm (puml->fsm (current-input-port))))
     (format #t "output fsm: ~a~%" fsm)
@@ -21,11 +20,15 @@ GNU Guile state machine compiler.
      #:display? #t)))
 #+END_EXAMPLE
 
-State machine validation:
+  State machine validation:
 #+BEGIN_EXAMPLE scheme
 (let ((fsm (puml->fsm (current-input-port)))
   (format #t "validation report:~%")
   (pretty-print (fsm-validate fsm)))
 #+END_EXAMPLE
 
-   Also see the =examples= directory.
+   Want more finite-state machines? Now you can generate a FSM from the PlantUML
+   format that reads a FSM in the PlantUML format -- see
+   =examples/pumlpuml.scm=.
+
+   Also see other examples the =examples= directory.
