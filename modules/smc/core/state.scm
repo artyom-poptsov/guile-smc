@@ -1,5 +1,6 @@
 (define-module (smc core state)
   #:use-module (oop goops)
+  #:use-module (srfi srfi-1)
   #:use-module (ice-9 receive)
   #:use-module (smc core log)
   #:export (<state>
@@ -64,8 +65,20 @@
   (state-transitions-set! self (append (state-transitions self)
                                        (list (list tguard action next-state)))))
 
+
+
+(define-generic state-transition-count)
+
 (define-method (state-transition-count (self <state>))
   (length (state-transitions self)))
+
+(define-method (state-transition-count (self <state>) to)
+  (fold (lambda (tr prev)
+          (if (equal? (list-ref tr 2) to)
+              (+ prev 1)
+              prev))
+        0
+        (state-transitions self)))
 
 
 
