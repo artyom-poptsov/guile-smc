@@ -2,6 +2,7 @@
 
 (define-module (smc guards char)
   #:export (guard:#t
+            guard:asterisk?
             guard:newline?
             guard:space?
             guard:letter?
@@ -42,3 +43,6 @@
 
 (define (guard:at-symbol? ch ctx)
   (char=? ch #\@))
+
+(define (guard:asterisk? ch ctx)
+  (char=? ch #\*))
