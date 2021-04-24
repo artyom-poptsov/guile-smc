@@ -42,7 +42,6 @@ read_skip_comment ->  read_skip_comment
 
 ' Reading state name
 read_state --> [*]: guard:eof-object?
-read_state --> [*]: guard:#t -> action:syntax-error
 read_state --> search_state_transition: guard:right-square-bracket? -> action:add-buffer-to-stanza
 read_state --> search_state_transition: guard:space? -> action:add-buffer-to-stanza
 read_state --> read_state_description: guard:colon? -> action:add-buffer-to-stanza
