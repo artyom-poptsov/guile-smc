@@ -15,6 +15,8 @@
 
             fsm-state-count
             fsm-transition-count
+            fsm-state-reachable?
+            fsm-validate
 
             transition-list->hash-table
             hash-table->transition-list
@@ -207,10 +209,43 @@
 ;; Calculate the total transition count for a finite state machine SELF. Return
 ;; the number of transitions.
 (define-method (fsm-transition-count (self <fsm>))
-  (hash-fold (lambda (state-name state result)
+  (hash-fold (lambda (name state result)
                (+ result (state-transition-count state)))
              0
              (fsm-transition-table self)))
+
+(define* (fsm-incoming-transition-count self state
+                                        #:key (include-recurrent-links? #f))
+  (hash-fold (lambda (name other-state result)
+               (log-debug "  name:             ~a" name)
+               (log-debug "  other-state:      ~a" other-state)
+               (log-debug "  transition-count: ~a"
+                          (state-transition-count other-state state))
+               (if (and (equal? (state-name state) (state-name other-state))
+                        (not include-recurrent-links?))
+                   (begin
+                     (log-debug "    skip: ~a" other-state)
+                     result)
+                   (+ result (state-transition-count other-state state))))
+             0
+             (fsm-transition-table self)))
+
+(define-method (fsm-state-reachable? (self <fsm>) (state <state>))
+  (or (equal? (fsm-current-state self) state)
+      (> (fsm-incoming-transition-count self state) 0)))
+
+;; Validate the finite state machine and return the list of errors. If the list
+;; is empty then no errors were found.
+(define-method (fsm-validate (self <fsm>))
+  (let ((errors '()))
+    (log-debug "fsm-validate: begin ...")
+    (hash-map->list (lambda (state-name state)
+                      (log-debug "state: ~a" state)
+                      (unless (fsm-state-reachable? self state)
+                        (set! errors (cons (cons state-name "State is not reachable")
+                                           errors))))
+                    (fsm-transition-table self))
+    errors))
 
 
 
