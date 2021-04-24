@@ -7,6 +7,11 @@
   #:use-module (smc core log)
   #:use-module (smc guards char)
   #:export (<parser>
+            <context>
+            context-fsm
+            context-module
+            context-stanza
+            context-buffer
             puml->fsm
             parser-run))
 
