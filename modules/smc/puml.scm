@@ -82,6 +82,32 @@
       (context-buffer-set! ctx '()))
     ctx))
 
+;; This procedure tries to resolve a procedure PROC-NAME in the provided
+;; modules. When no procedure available with the given name, returns DEFAULT
+;; procedure.
+(define (resolve-procedure ctx proc-name default)
+  (let ((module (context-module ctx)))
+    (cond
+     ((not proc-name)
+      default)
+     ((list? module)
+      (let loop ((mods module))
+        (let ((proc (catch
+                      #t
+                      (lambda ()
+                        (module-ref (car mods) proc-name))
+                      (const #f))))
+          (cond
+           (proc
+            proc)
+           ((and (not proc) (null? mods))
+            (error "Could not find procedure in provided modules"
+                   proc-name))
+           (else
+            (loop (cdr mods)))))))
+     (else
+      (module-ref module proc-name)))))
+
 (define (action:add-state-transition ch ctx)
 
   (when (not (null? (context-buffer ctx)))
@@ -110,12 +136,8 @@
      (else
       (fsm-transition-add! fsm
                            from
-                           (if tguard
-                               (module-ref module tguard)
-                               guard:#t)
-                           (if action
-                               (module-ref module action)
-                               action:no-op)
+                           (resolve-procedure ctx tguard guard:#t)
+                           (resolve-procedure ctx action action:no-op)
                            (if (equal? to '*)
                                #f
                                to))))
