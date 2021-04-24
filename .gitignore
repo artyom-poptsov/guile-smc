@@ -1,0 +1,21 @@
+# -*- shell-script -*-
+
+# Compiled Guile modules
+*.go
+
+# Backup files
+*\~
+
+# Auto-generated files
+Makefile
+Makefile.in
+configure
+aclocal.m4
+
+config.log
+config.status
+.deps
+autom4te.cache
+
+TAGS
+tags
