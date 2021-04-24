@@ -56,6 +56,9 @@
 (define-method (state? x)
   (is-a? x <state>))
 
+(define-method (equal? (state-1 <state>) (state-2 <state>))
+  (equal? (state-name state-1) (state-name state-2)))
+
 
 
 (define-method (state-transition-add! (self       <state>)
