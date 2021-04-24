@@ -11,7 +11,9 @@
             state-description-set!
             state-transition-count
             state-transition-add!
-            state-transitions))
+            state-transitions
+            state-recurrent-links-count
+            state-has-recurrent-links?))
 
 
 ;; This class describes an FSM state.
@@ -82,6 +84,21 @@
               prev))
         0
         (state-transitions self)))
+
+;; Returns the number of recurrent links that the state SELF has. A recurrent
+;; link is a transition of state to itself.
+(define-method (state-recurrent-links-count (self <state>))
+  (fold (lambda (tr prev)
+          (if (equal? self (list-ref tr 2))
+              (+ prev 1)
+              prev))
+        0
+        (state-transitions self)))
+
+;; Check if the state SELF has any recurrent links (that is, transitions to
+;; itself.)
+(define-method (state-has-recurrent-links? (self <state>))
+  (> (state-recurrent-links-count self) 0))
 
 
 
