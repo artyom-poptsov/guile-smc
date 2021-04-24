@@ -1,0 +1,106 @@
+@startuml
+' Entry point
+[*] -> search_start_tag
+
+' Searching 
+search_start_tag --> [*]: guard:eof-object?
+search_start_tag --> read_start_tag: guard:at-symbol? -> action:store-symbol
+search_start_tag --> search_start_tag_skip_comment: guard:single-quote?
+search_start_tag --> [*]: guard:letter? -> action:no-start-tag-error
+search_start_tag -> search_start_tag
+
+' Skipping comments 
+search_start_tag_skip_comment --> [*]: guard:eof-object?
+search_start_tag_skip_comment --> search_start_tag: guard:newline?
+search_start_tag_skip_comment --> search_start_tag_skip_comment
+
+' Reading 
+read_start_tag --> [*]: guard:eof-object?
+read_start_tag --> read: guard:space? -> action:check-start-tag
+read_start_tag --> read: guard:newline? -> action:check-start-tag
+read_start_tag --> read_start_tag: guard:#t -> action:store-symbol
+read_start_tag -> read_start_tag
+
+' Main FSM reading state
+read -> [*]: guard:eof-object?
+read --> read_end_tag: guard:at-symbol?
+read --> read_skip_comment: guard:single-quote?
+read --> read_state: guard:left-square-bracket?
+read --> read_state: guard:letter? -> action:store-symbol
+read -> read
+
+' Read @enduml tag
+' TODO: Add end tag check.
+read_end_tag --> [*]: guard:eof-object?
+read_end_tag --> [*]: guard:newline?
+read_end_tag ->  read_end_tag
+
+' Skipping comments
+read_skip_comment --> [*]: guard:eof-object?
+read_skip_comment --> read: guard:newline?
+read_skip_comment ->  read_skip_comment
+
+' Reading state name
+read_state --> [*]: guard:eof-object?
+read_state --> [*]: guard:#t -> action:syntax-error
+read_state --> search_state_transition: guard:right-square-bracket? -> action:add-buffer-to-stanza
+read_state --> search_state_transition: guard:space? -> action:add-buffer-to-stanza
+read_state --> read_state_description: guard:colon? -> action:add-buffer-to-stanza
+read_state -> read_state: guard:#t -> action:store-symbol
+
+' Reading state transition
+search_state_transition --> [*]: guard:eof-object?
+search_state_transition --> read_state_description: guard:colon?
+search_state_transition --> read_state_right_arrow: guard:dash?
+search_state_transition --> read_state_left_arrow: guard:arrow-left-end?
+search_state_transition ->  search_state_transition
+
+' Reading state description
+read_state_description --> [*]: guard:eof-object?
+read_state_description --> read: guard:newline? -> action:add-state-description
+read_state_description ->  read_state_description
+
+read_state_right_arrow --> [*]: guard:eof-object?
+read_state_right_arrow --> search_state_transition_to: guard:space?
+read_state_right_arrow -> read_state_right_arrow
+
+search_state_transition_to --> [*]: guard:eof-object?
+search_state_transition_to --> read_state_transition_to: guard:letter? -> action:store-symbol
+search_state_transition_to --> read_state_transition_to: guard:left-square-bracket?
+search_state_transition_to -> search_state_transition_to
+
+read_state_transition_to --> [*]: guard:eof-object?
+read_state_transition_to --> read_state_transition_to: guard:right-square-bracket?
+read_state_transition_to --> search_state_transition_guard: guard:colon? -> action:add-buffer-to-stanza
+read_state_transition_to --> read: guard:newline? -> action:add-state-transition
+read_state_transition_to -> read_state_transition_to: guard:#t -> action:store-symbol
+
+search_state_transition_guard --> [*]: guard:eof-object?
+search_state_transition_guard --> read_state_transition_guard: guard:letter? -> action:store-symbol
+search_state_transition_guard -> search_state_transition_guard
+
+read_state_transition_guard --> [*]: guard:eof-object?
+read_state_transition_guard --> search_state_action_arrow: guard:space? -> action:add-buffer-to-stanza
+read_state_transition_guard --> read: guard:newline? -> action:add-state-transition
+read_state_transition_guard -> read_state_transition_guard: guard:#t -> action:store-symbol
+
+search_state_action_arrow --> [*]: guard:eof-object?
+search_state_action_arrow --> read: guard:newline?
+search_state_action_arrow --> read_state_action_arrow: guard:dash?
+search_state_action_arrow -> search_state_action_arrow
+
+read_state_action_arrow --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
+read_state_action_arrow --> [*]: guard:newline?
+read_state_action_arrow --> search_state_transition_action: guard:arrow-right-end?
+
+search_state_transition_action --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
+search_state_transition_action --> read_state_transition_action: guard:letter? -> action:store-symbol
+search_state_transition_action --> [*]: guard:newline?
+search_state_transition_action -> search_state_transition_action
+
+read_state_transition_action --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
+read_state_transition_action --> read: guard:newline? -> action:add-state-transition
+read_state_transition_action -> read_state_transition_action: guard:#t -> action:store-symbol
+
+
+@enduml
