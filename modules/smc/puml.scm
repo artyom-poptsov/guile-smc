@@ -6,6 +6,7 @@
   #:use-module (smc fsm)
   #:use-module (smc core log)
   #:use-module (smc core context)
+  #:use-module (smc core stack)
   #:use-module (smc guards char)
   #:export (<puml-context>
             puml-context-fsm
@@ -35,36 +36,6 @@
 
 
 
-(define (action:store-symbol ch ctx)
-  (log-debug "action:store-symbol: ch: ~a, buf: ~a" ch (context-buffer ctx))
-  (context-buffer-set! ctx (cons ch (context-buffer ctx)))
-  ctx)
-
-(define (action:add-state ch ctx)
-  (let ((fsm (puml-context-fsm ctx))
-        (buf (context-buffer ctx)))
-    (log-debug "action:add-state: buffer: ~a" buf)
-    (let ((state (make <state>
-                   #:name (list->symbol (reverse buf)))))
-      (log-debug "action:add-state: state: ~a" state)
-      (unless (fsm-current-state fsm)
-        (fsm-current-state-set! fsm state))
-      (fsm-state-add! fsm state)
-      (context-buffer-set! ctx '())
-      ctx)))
-
-(define (action:add-buffer-to-stanza ch ctx)
-  (let ((fsm (puml-context-fsm ctx))
-        (buf (context-buffer ctx)))
-    (unless (null? buf)
-      (log-debug "action:add-buffer-to-stanza: buffer: ~a" buf)
-      (log-debug "action:add-buffer-to-stanza: stanza: ~a" (context-stanza ctx))
-      (context-stanza-set! ctx (append (context-stanza ctx)
-                                       (list (list->symbol (reverse buf)))))
-      (log-debug "action:add-buffer-to-stanza: stanza: ~a" (context-stanza ctx))
-      (context-buffer-set! ctx '()))
-    ctx))
-
 ;; This procedure tries to resolve a procedure PROC-NAME in the provided
 ;; modules. When no procedure available with the given name, returns DEFAULT
 ;; procedure.
@@ -91,13 +62,18 @@
      (else
       (module-ref module proc-name)))))
 
+(define-method (stanza->list-of-symbols (stanza <stack>))
+  (map (lambda (elem)
+         (string->symbol (list->string elem)))
+       (stack-content/reversed stanza)))
+
 (define (action:add-state-transition ch ctx)
 
   (when (not (null? (context-buffer ctx)))
-    (action:add-buffer-to-stanza ch ctx))
+    (action:update-stanza ch ctx))
 
   (let* ((fsm     (puml-context-fsm ctx))
-         (stanza  (context-stanza ctx))
+         (stanza  (stanza->list-of-symbols (context-stanza ctx)))
          (module  (puml-context-module ctx))
          (from    (list-ref stanza 0))
          (to      (list-ref stanza 1))
@@ -125,19 +101,19 @@
                                #f
                                to))))
 
-    (context-stanza-set! ctx '())
+    (context-stanza-clear! ctx)
 
     ctx))
 
 (define (action:add-state-description ch ctx)
   (let* ((fsm             (puml-context-fsm ctx))
-         (stanza          (context-stanza ctx))
+         (stanza          (stanza->list-of-symbols (context-stanza ctx)))
          (buf             (context-buffer ctx))
          (state-name      (list-ref stanza 0))
          (description     (and (fsm-state fsm state-name)
                                (state-description
                                 (fsm-state fsm state-name))))
-         (new-description (list->string (reverse buf))))
+         (new-description (list->string (stack-content/reversed buf))))
 
     (when (equal? state-name (string->symbol "*"))
       (error "[*] cannot have description"))
@@ -151,16 +127,16 @@
         (fsm-state-description-add! fsm
                                     state-name
                                     new-description))
-    (context-buffer-set! ctx '())
-    (context-stanza-set! ctx '())
+    (context-buffer-clear! ctx)
+    (context-stanza-clear! ctx)
     ctx))
 
 (define (action:check-start-tag ch ctx)
   (let* ((buf (context-buffer ctx))
-         (str (list->string (reverse buf))))
+         (str (list->string (stack-content/reversed buf))))
     (unless (string=? str "@startuml")
       (error "Misspelled @startuml" str))
-    (context-buffer-set! ctx '())
+    (context-buffer-clear! ctx)
     ctx))
 
 (define (action:no-start-tag-error ch ctx)
@@ -177,7 +153,7 @@
 (define %transition-table
   `((search-start-tag
      (,guard:eof-object?     ,action:no-op              #f)
-     (,guard:at-symbol?      ,action:store-symbol       read-start-tag)
+     (,guard:at-symbol?      ,action:store       read-start-tag)
      (,guard:single-quote?   ,action:no-op              search-start-tag/skip-comment)
      (,guard:letter?         ,action:no-start-tag-error #f)
      (,guard:#t              ,action:no-op              search-start-tag))
@@ -189,13 +165,13 @@
      (,guard:eof-object?     ,action:no-op              #f)
      (,guard:space?          ,action:check-start-tag    read)
      (,guard:newline?        ,action:check-start-tag    read)
-     (,guard:#t              ,action:store-symbol       read-start-tag))
+     (,guard:#t              ,action:store       read-start-tag))
     (read
      (,guard:eof-object?          ,action:no-op        #f)
      (,guard:at-symbol?           ,action:no-op        read-end-tag)
      (,guard:single-quote?        ,action:no-op        read/skip-comment)
      (,guard:left-square-bracket? ,action:no-op        read-state)
-     (,guard:letter?              ,action:store-symbol read-state)
+     (,guard:letter?              ,action:store read-state)
      (,guard:#t                   ,action:no-op        read))
     (read-end-tag
      (,guard:eof-object?     ,action:no-op             #f)
@@ -208,10 +184,10 @@
     (read-state
      (,guard:eof-object?           ,action:no-op                #f)
      (,guard:newline?              ,action:syntax-error         #f)
-     (,guard:right-square-bracket? ,action:add-buffer-to-stanza search-state-transition)
-     (,guard:space?                ,action:add-buffer-to-stanza search-state-transition)
-     (,guard:colon?                ,action:add-buffer-to-stanza read-state-description)
-     (,guard:#t                    ,action:store-symbol         read-state))
+     (,guard:right-square-bracket? ,action:update-stanza search-state-transition)
+     (,guard:space?                ,action:update-stanza search-state-transition)
+     (,guard:colon?                ,action:update-stanza read-state-description)
+     (,guard:#t                    ,action:store         read-state))
     (search-state-transition
      (,guard:eof-object?     ,action:no-op        #f)
      (,guard:colon?          ,action:no-op        read-state-description)
@@ -221,32 +197,32 @@
     (read-state-description
      (,guard:eof-object?     ,action:no-op                 #f)
      (,guard:newline?        ,action:add-state-description read)
-     (,guard:#t              ,action:store-symbol          read-state-description))
+     (,guard:#t              ,action:store          read-state-description))
     (read-state-right-arrow
      (,guard:eof-object?     ,action:no-op        #f)
      (,guard:space?          ,action:no-op        search-state-transition-to)
      (,guard:#t              ,action:no-op        read-state-right-arrow))
     (search-state-transition-to
      (,guard:eof-object?          ,action:no-op        #f)
-     (,guard:letter?              ,action:store-symbol read-state-transition-to)
+     (,guard:letter?              ,action:store read-state-transition-to)
      (,guard:left-square-bracket? ,action:no-op        read-state-transition-to)
      (,guard:#t                   ,action:no-op        search-state-transition-to))
     (read-state-transition-to
      (,guard:eof-object?           ,action:no-op                #f)
      ;; (,guard:space?          ,action:no-op                        read-state-transition-guard)
      (,guard:right-square-bracket? ,action:no-op                read-state-transition-to)
-     (,guard:colon?                ,action:add-buffer-to-stanza search-state-transition-guard)
+     (,guard:colon?                ,action:update-stanza search-state-transition-guard)
      (,guard:newline?              ,action:add-state-transition read)
-     (,guard:#t                    ,action:store-symbol         read-state-transition-to))
+     (,guard:#t                    ,action:store         read-state-transition-to))
     (search-state-transition-guard
      (,guard:eof-object?     ,action:no-op                      #f)
-     (,guard:letter?         ,action:store-symbol               read-state-transition-guard)
+     (,guard:letter?         ,action:store               read-state-transition-guard)
      (,guard:#t              ,action:no-op                      search-state-transition-guard))
     (read-state-transition-guard
      (,guard:eof-object?     ,action:no-op                      #f)
-     (,guard:space?          ,action:add-buffer-to-stanza       search-state-action-arrow)
+     (,guard:space?          ,action:update-stanza       search-state-action-arrow)
      (,guard:newline?        ,action:add-state-transition       read)
-     (,guard:#t              ,action:store-symbol               read-state-transition-guard))
+     (,guard:#t              ,action:store               read-state-transition-guard))
     (search-state-action-arrow
      (,guard:eof-object?     ,action:no-op                      #f)
      (,guard:newline?        ,action:no-op                      read)
@@ -258,13 +234,13 @@
      (,guard:more-than-sign? ,action:no-op                        search-state-transition-action))
     (search-state-transition-action
      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
-     (,guard:letter?          ,action:store-symbol                 read-state-transition-action)
+     (,guard:letter?          ,action:store                 read-state-transition-action)
      (,guard:newline?         ,action:no-op                        #f)
      (,guard:#t               ,action:no-op                        search-state-transition-action))
     (read-state-transition-action
      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
      (,guard:newline?         ,action:add-state-transition         read)
-     (,guard:#t               ,action:store-symbol                 read-state-transition-action))))
+     (,guard:#t               ,action:store                 read-state-transition-action))))
 
 
 
