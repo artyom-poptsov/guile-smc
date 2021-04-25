@@ -16,19 +16,67 @@
   (make <state> #:name 'state-1)
   (make <state> #:name 'state-1))
 
-(test-assert "state-transition-count"
+(test-equal "state-transition-count"
+  2
   (let ((state (make <state>
                  #:name 'state-1
-                 #:transitions `((,guard:#t ,action:no-op state-2)))))
-    (-  (state-transition-count state) 1)))
+                 #:transitions `((,guard:#t ,action:no-op state-1)
+                                 (,guard:#t ,action:no-op state-2)))))
+    (state-transition-count state) 2))
 
-(test-assert "state-transition-add!"
+(test-equal "state-transition-count/foreign"
+  1
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-1)
+                                 (,guard:#t ,action:no-op state-2)))))
+    (state-transition-count/foreign state)))
+
+(test-equal "state-recurrent-links-count"
+  2
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-1)
+                                 (,guard:#t ,action:no-op state-1)
+                                 (,guard:#t ,action:no-op state-2)))))
+    (state-recurrent-links-count state)))
+
+(test-assert "state-has-recurrent-links?: #t"
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-1)
+                                 (,guard:#t ,action:no-op state-2)))))
+    (state-has-recurrent-links? state)))
+
+(test-assert "state-has-recurrent-links?: #f"
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-2)
+                                 (,guard:#t ,action:no-op state-3)))))
+    (not (state-has-recurrent-links? state))))
+
+(test-assert "state-has-final-transitions?: #t"
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-2)
+                                 (,guard:#t ,action:no-op ,#f)))))
+    (state-has-final-transitions? state)))
+
+(test-assert "state-has-final-transitions?: #f"
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-2)
+                                 (,guard:#t ,action:no-op state-3)))))
+    (not (state-has-final-transitions? state))))
+
+(test-equal "state-transition-add!"
+  1
   (let ((state (make <state> #:name 'state-1)))
     (state-transition-add! state
                            (const #t)
                            (const #t)
                            'state-2)
-    (= (state-transition-count state) 1)))
+    (state-transition-count state) 1))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
