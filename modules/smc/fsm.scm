@@ -47,13 +47,36 @@
    #:init-keyword #:current-state
    #:init-value   #f
    #:getter       fsm-current-state
-   #:setter       fsm-current-state-set!))
+   #:setter       fsm-current-state-set!)
+
+  ;; <number>
+  (step-counter
+   #:init-value   0
+   #:getter       fsm-step-counter
+   #:setter       fsm-step-counter-set!)
+
+  ;; <number>
+  (transition-counter
+   #:init-value   0
+   #:getter       fsm-transition-counter
+   #:setter       fsm-transition-counter-set!))
+
+
+
+(define-method (%step-counter-increment! (self <fsm>))
+  (fsm-step-counter-set! self (+ (fsm-step-counter self) 1)))
+
+(define-method (%transition-counter-increment! (self <fsm>))
+  (fsm-transition-counter-set! self (+ (fsm-transition-counter self) 1)))
 
 
 
 (define-method (display (self <fsm>) (port <port>))
-  (format port "#<fsm current-state: ~a ~a>"
-          (state-name (fsm-current-state self))
+  (format port "#<fsm current-state: ~a statistics: ~a/~a ~a>"
+          (and (fsm-current-state self)
+               (state-name (fsm-current-state self)))
+          (fsm-step-counter self)
+          (fsm-transition-counter self)
           (number->string (object-address self) 16)))
 
 (define-method (write (self <fsm>) (port <port>))
@@ -198,6 +221,9 @@
               (state-run state event context)
             (when (fsm-debug-mode? self)
               (log-debug-transition state next-state))
+            (%step-counter-increment! self)
+            (unless (equal? state next-state)
+              (%transition-counter-increment! self))
             (fsm-current-state-set! self next-state)
             (values next-state new-context)))
         (values #f context))))
