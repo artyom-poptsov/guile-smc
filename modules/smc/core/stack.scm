@@ -9,7 +9,8 @@
             stack-push!
             stack-pop!
             stack-clear!
-            stack-size))
+            stack-size
+            stack-empty?))
 
 
 
@@ -46,6 +47,9 @@
 ;; Get the stack depth (size.)
 (define-method (stack-size (stack <stack>))
   (length (stack-content stack)))
+
+(define-method (stack-empty? (stack <stack>))
+  (null? (stack-content stack)))
 
 ;; Get the content of the stack in reversed order.
 (define-method (stack-content/reversed (stack <stack>))
