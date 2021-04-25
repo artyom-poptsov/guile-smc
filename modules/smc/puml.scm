@@ -5,37 +5,26 @@
   #:use-module (smc core state)
   #:use-module (smc fsm)
   #:use-module (smc core log)
+  #:use-module (smc core context)
   #:use-module (smc guards char)
   #:export (<parser>
-            <context>
+            <puml-context>
             context-fsm
             context-module
-            context-stanza
-            context-buffer
             puml->fsm
             parser-run))
 
 
 
-(define-class <context> ()
+(define-class <puml-context> (<context>)
   (fsm
    #:init-value (make <fsm>)
-   #:getter     context-fsm)
+   #:getter     puml-context-fsm)
 
   ;; A module which contains state machine procedures.
   (module
-      #:init-keyword #:module
-    #:getter     context-module)
-
-  (buffer
-   #:init-value '()
-   #:getter     context-buffer
-   #:setter     context-buffer-set!)
-
-  (stanza
-   #:init-value '()
-   #:getter     context-stanza
-   #:setter     context-stanza-set!))
+   #:init-keyword #:module
+   #:getter     puml-context-module))
 
 
 (define (buffer->string buffer)
@@ -63,7 +52,7 @@
   ctx)
 
 (define (action:add-state ch ctx)
-  (let ((fsm (context-fsm ctx))
+  (let ((fsm (puml-context-fsm ctx))
         (buf (context-buffer ctx)))
     (log-debug "action:add-state: buffer: ~a" buf)
     (let ((state (make <state>
@@ -76,7 +65,7 @@
       ctx)))
 
 (define (action:add-buffer-to-stanza ch ctx)
-  (let ((fsm (context-fsm ctx))
+  (let ((fsm (puml-context-fsm ctx))
         (buf (context-buffer ctx)))
     (unless (null? buf)
       (log-debug "action:add-buffer-to-stanza: buffer: ~a" buf)
@@ -91,7 +80,7 @@
 ;; modules. When no procedure available with the given name, returns DEFAULT
 ;; procedure.
 (define (resolve-procedure ctx proc-name default)
-  (let ((module (context-module ctx)))
+  (let ((module (puml-context-module ctx)))
     (cond
      ((not proc-name)
       default)
@@ -118,9 +107,9 @@
   (when (not (null? (context-buffer ctx)))
     (action:add-buffer-to-stanza ch ctx))
 
-  (let* ((fsm     (context-fsm ctx))
+  (let* ((fsm     (puml-context-fsm ctx))
          (stanza  (context-stanza ctx))
-         (module  (context-module ctx))
+         (module  (puml-context-module ctx))
          (from    (list-ref stanza 0))
          (to      (list-ref stanza 1))
          (tguard  (and (> (length stanza) 2)
@@ -152,7 +141,7 @@
     ctx))
 
 (define (action:add-state-description ch ctx)
-  (let* ((fsm             (context-fsm ctx))
+  (let* ((fsm             (puml-context-fsm ctx))
          (stanza          (context-stanza ctx))
          (buf             (context-buffer ctx))
          (state-name      (list-ref stanza 0))
@@ -300,10 +289,10 @@
            #:debug-mode? debug-mode?
            #:transition-table %transition-table)))
 
-    (let loop ((context (make <context> #:module module)))
+    (let loop ((context (make <puml-context> #:module module)))
       (receive (new-state new-context)
           (fsm-run! reader-fsm (get-char port) context)
         (if new-state
             (loop new-context)
-            (context-fsm context))))))
+            (puml-context-fsm context))))))
 
