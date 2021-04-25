@@ -97,9 +97,11 @@
 ;; link is a transition of state to itself.
 (define-method (state-recurrent-links-count (self <state>))
   (fold (lambda (tr prev)
-          (if (equal? self (list-ref tr 2))
-              (+ prev 1)
-              prev))
+          (format (current-error-port) "self: ~a; other: ~a~%" self (list-ref tr 2))
+          (let ((to (list-ref tr 2)))
+            (if (equal? (state-name self) to)
+                (+ prev 1)
+                prev)))
         0
         (state-transitions self)))
 
