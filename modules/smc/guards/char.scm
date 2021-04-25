@@ -3,6 +3,7 @@
 (define-module (smc guards char)
   #:export (guard:#t
             guard:asterisk?
+            guard:equals-sign?
             guard:newline?
             guard:space?
             guard:letter?
@@ -17,6 +18,9 @@
 (define (guard:#t event ctx)
   "This guard is always returns #t."
   #t)
+
+(define (guard:equals-sign? ch ctx)
+  (char=? ch #\=))
 
 (define (guard:newline? ch ctx)
   (char=? ch #\newline))
