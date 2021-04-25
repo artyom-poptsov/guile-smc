@@ -49,14 +49,14 @@
 
 
 
-(define-method (action:store event (ctx <context>))
+(define (action:store event ctx)
   (when (context-debug-mode? ctx)
     (log-debug "action:store: event: ~a; buffer: ~a"
                event (context-buffer ctx)))
   (stack-push! (context-buffer ctx) event)
   ctx)
 
-(define-method (action:update-stanza event (ctx <context>))
+(define (action:update-stanza event ctx)
   (let ((buf    (context-buffer ctx))
         (stanza (context-stanza ctx)))
     (unless (null? buf)
