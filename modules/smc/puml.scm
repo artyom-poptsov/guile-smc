@@ -36,12 +36,6 @@
 (define (guard:dash? ch ctx)
   (char=? ch #\-))
 
-(define (guard:arrow-left-end? ch ctx)
-  (char=? ch #\<))
-
-(define (guard:arrow-right-end? ch ctx)
-  (char=? ch #\>))
-
 
 
 (define (action:store-symbol ch ctx)
@@ -225,7 +219,7 @@
      (,guard:eof-object?     ,action:no-op        #f)
      (,guard:colon?          ,action:no-op        read-state-description)
      (,guard:dash?           ,action:no-op        read-state-right-arrow)
-     (,guard:arrow-left-end? ,action:no-op        read-state-left-arrow)
+     (,guard:less-than-sign? ,action:no-op        read-state-left-arrow)
      (,guard:#t              ,action:no-op        search-state-transition))
     (read-state-description
      (,guard:eof-object?     ,action:no-op                 #f)
@@ -264,7 +258,7 @@
     (read-state-action-arrow
      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
      (,guard:newline?         ,action:no-op                        #f)
-     (,guard:arrow-right-end? ,action:no-op                        search-state-transition-action))
+     (,guard:more-than-sign? ,action:no-op                        search-state-transition-action))
     (search-state-transition-action
      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
      (,guard:letter?          ,action:store-symbol                 read-state-transition-action)

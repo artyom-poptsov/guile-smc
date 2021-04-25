@@ -6,7 +6,9 @@
             guard:equals-sign?
             guard:newline?
             guard:space?
+            guard:less-than-sign?
             guard:letter?
+            guard:more-than-sign?
             guard:colon?
             guard:semicolon?
             guard:eof-object?
@@ -27,6 +29,12 @@
 
 (define (guard:space? ch ctx)
   (char=? ch #\space))
+
+(define (guard:less-than-sign? ch ctx)
+  (char=? ch #\<))
+
+(define (guard:more-than-sign? ch ctx)
+  (char=? ch #\>))
 
 (define (guard:letter? ch ctx)
   (char-set-contains? char-set:letter ch))
