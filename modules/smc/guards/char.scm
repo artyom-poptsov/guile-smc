@@ -7,6 +7,7 @@
             guard:space?
             guard:letter?
             guard:colon?
+            guard:semicolon?
             guard:eof-object?
             guard:single-quote?
             guard:left-square-bracket?
@@ -34,6 +35,9 @@
 
 (define (guard:colon? ch ctx)
   (char=? ch #\:))
+
+(define (guard:semicolon? ch ctx)
+  (char=? ch #\;))
 
 (define (guard:left-square-bracket? ch ctx)
   (char=? ch #\[))
