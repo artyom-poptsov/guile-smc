@@ -38,6 +38,8 @@
         (if new-state
             (loop new-context)
             (let ((new-fsm (puml-context-fsm new-context)))
+              (format #t "~%-----statistics: ------~%")
+              (pretty-print (fsm-statistics fsm))
               (format #t "~%----- new FSM output: -----~%")
               (pretty-print
                (hash-table->transition-list (fsm-transition-table new-fsm))

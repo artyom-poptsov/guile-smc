@@ -14,6 +14,7 @@
             fsm-current-state
             fsm-current-state-set!
             fsm-run!
+            fsm-statistics
 
             fsm-state-count
             fsm-transition-count
@@ -68,6 +69,11 @@
 
 (define-method (%transition-counter-increment! (self <fsm>))
   (fsm-transition-counter-set! self (+ (fsm-transition-counter self) 1)))
+
+;; Get an alist of FSM statistics.
+(define-method (fsm-statistics (self <fsm>))
+  (list (cons 'step-counter       (fsm-step-counter self))
+        (cons 'transition-counter (fsm-transition-counter self))))
 
 
 
