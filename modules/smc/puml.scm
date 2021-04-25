@@ -69,7 +69,7 @@
 
 (define (action:add-state-transition ch ctx)
 
-  (when (not (null? (context-buffer ctx)))
+  (unless (stack-empty? (context-buffer ctx))
     (action:update-stanza ch ctx))
 
   (let* ((fsm     (puml-context-fsm ctx))
