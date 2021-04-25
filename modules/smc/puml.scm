@@ -33,9 +33,6 @@
       (char-set-contains? char char-set:digit)
       (char=? #\_)))
 
-(define (guard:dash? ch ctx)
-  (char=? ch #\-))
-
 
 
 (define (action:store-symbol ch ctx)
@@ -218,7 +215,7 @@
     (search-state-transition
      (,guard:eof-object?     ,action:no-op        #f)
      (,guard:colon?          ,action:no-op        read-state-description)
-     (,guard:dash?           ,action:no-op        read-state-right-arrow)
+     (,guard:hyphen-minus?           ,action:no-op        read-state-right-arrow)
      (,guard:less-than-sign? ,action:no-op        read-state-left-arrow)
      (,guard:#t              ,action:no-op        search-state-transition))
     (read-state-description
@@ -253,7 +250,7 @@
     (search-state-action-arrow
      (,guard:eof-object?     ,action:no-op                      #f)
      (,guard:newline?        ,action:no-op                      read)
-     (,guard:dash?           ,action:no-op                      read-state-action-arrow)
+     (,guard:hyphen-minus?           ,action:no-op                      read-state-action-arrow)
      (,guard:#t              ,action:no-op                      search-state-action-arrow))
     (read-state-action-arrow
      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)

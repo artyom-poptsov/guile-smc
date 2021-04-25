@@ -5,6 +5,7 @@
             guard:asterisk?
             guard:equals-sign?
             guard:newline?
+            guard:hyphen-minus?
             guard:space?
             guard:less-than-sign?
             guard:letter?
@@ -26,6 +27,9 @@
 
 (define (guard:newline? ch ctx)
   (char=? ch #\newline))
+
+(define (guard:hyphen-minus? ch ctx)
+  (char=? ch #\-))
 
 (define (guard:space? ch ctx)
   (char=? ch #\space))
