@@ -8,6 +8,7 @@
             stack-content/reversed
             stack-push!
             stack-pop!
+            stack-clear!
             stack-size))
 
 
@@ -19,6 +20,16 @@
    #:getter     stack-content
    #:setter     stack-content-set!))
 
+(define-method (display (stack <stack>) (port <port>))
+  (format port "#<stack depth: ~a ~a>"
+          (stack-size stack)
+          (number->string (object-address self) 16)))
+
+(define-method (write (stack <stack>) (port <port>))
+  (display self))
+
+
+
 ;; Push an ELEMENT to a STACK.
 (define-method (stack-push! (stack <stack>) element)
   (stack-content-set! stack (cons element (stack-content stack))))
@@ -28,6 +39,9 @@
   (let ((element (car (stack-content stack))))
     (stack-content-set! stack (cdr (stack-content stack)))
     element))
+
+(define-method (stack-clear! (stack <stack>))
+  (stack-content-set! stack '()))
 
 ;; Get the stack depth (size.)
 (define-method (stack-size (stack <stack>))
