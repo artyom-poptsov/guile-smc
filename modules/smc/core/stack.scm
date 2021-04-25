@@ -23,10 +23,10 @@
 (define-method (display (stack <stack>) (port <port>))
   (format port "#<stack depth: ~a ~a>"
           (stack-size stack)
-          (number->string (object-address self) 16)))
+          (number->string (object-address stack) 16)))
 
 (define-method (write (stack <stack>) (port <port>))
-  (display self))
+  (display stack))
 
 
 
