@@ -22,7 +22,7 @@
                  #:name 'state-1
                  #:transitions `((,guard:#t ,action:no-op state-1)
                                  (,guard:#t ,action:no-op state-2)))))
-    (state-transition-count state) 2))
+    (state-transition-count state)))
 
 (test-equal "state-transition-count/foreign"
   1
