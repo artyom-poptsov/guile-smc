@@ -76,7 +76,7 @@
                            (const #t)
                            (const #t)
                            'state-2)
-    (state-transition-count state) 1))
+    (state-transition-count state)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
