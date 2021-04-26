@@ -4,6 +4,7 @@
 (define-module (smc core stack)
   #:use-module (oop goops)
   #:export (<stack>
+            stack?
             stack-content
             stack-content/reversed
             stack-push!
@@ -20,6 +21,9 @@
    #:init-value '()
    #:getter     stack-content
    #:setter     stack-content-set!))
+
+(define (stack? x)
+  (is-a? x <stack>))
 
 (define-method (display (stack <stack>) (port <port>))
   (format port "#<stack depth: ~a ~a>"
