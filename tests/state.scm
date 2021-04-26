@@ -78,6 +78,12 @@
                            'state-2)
     (state-transition-count state)))
 
+(test-assert "state-dead-end?: #t"
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-1)))))
+    (state-dead-end? state)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
