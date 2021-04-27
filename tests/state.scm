@@ -1,5 +1,6 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
+             (ice-9 receive)
              (oop goops)
              (smc guards char)
              (smc fsm)
@@ -83,6 +84,13 @@
                  #:name 'state-1
                  #:transitions `((,guard:#t ,action:no-op state-1)))))
     (state-dead-end? state)))
+
+(test-assert "state-run: no transitions"
+  (let ((state (make <state> #:name 'state-1)))
+    (receive (next-state context)
+        (state-run state 'event '())
+      (and (not next-state)
+           (null? context)))))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
