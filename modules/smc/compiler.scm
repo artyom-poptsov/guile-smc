@@ -1,6 +1,7 @@
 (define-module (smc compiler)
   #:use-module (oop goops)
   #:use-module (ice-9 pretty-print)
+  #:use-module (smc core state)
   #:use-module (smc fsm)
   #:export (fsm-compile
             %write-module
@@ -63,7 +64,11 @@
 
     (pretty-print
      `(define-method (initialize (self ,class-name) initargs)
+        (fsm-transition-table-set!
+         self
+         (transition-list->hash-table %transition-table))
         (fsm-current-state-set! self
-                                (transition-list->hash-table %transition-table))))
+                                (fsm-state self
+                                           ,(state-name (fsm-current-state fsm))))))
 
     (newline output-port)))
