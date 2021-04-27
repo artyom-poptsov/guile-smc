@@ -23,7 +23,8 @@ SUBDIRS = core guards
 
 SOURCES = \
 	fsm.scm 	\
-	puml.scm
+	puml.scm	\
+	compiler.scm
 
 GOBJECTS = $(SOURCES:%.scm=%.go)
 
