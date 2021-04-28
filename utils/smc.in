@@ -1,0 +1,50 @@
+#!@GUILE@ \
+-e main
+!#
+
+(use-modules (ice-9 getopt-long)
+             (ice-9 pretty-print)
+             (smc fsm)
+             (smc puml)
+             (smc compiler))
+
+(define (print-help-and-exit)
+  (display "\
+Usage: smc [options]
+"))
+
+(define %option-spec
+  '((help                     (single-char #\h) (value #f))
+    (print-transition-table   (single-char #\p) (value #f))
+    (fsm-name                 (single-char #\n) (value #t))
+    (fsm-module               (single-char #\m) (value #t))
+    (validate                                   (value #f))))
+
+(define (main args)
+  (let* ((options (getopt-long args %option-spec)))
+    (when (option-ref options 'help #f)
+      (print-help-and-exit))
+    (let ((fsm (puml->fsm (current-input-port)
+                          #:module (list (resolve-module '(smc guards char))
+                                         (resolve-module '(smc puml))
+                                         (resolve-module '(smc fsm)))
+                          #:debug-mode? #f)))
+      (cond
+       ((option-ref options 'validate #f)
+        (pretty-print (fsm-validate fsm)))
+       ((option-ref options 'print-transition-table #f)
+        (pretty-print
+         (hash-table->transition-list (fsm-transition-table fsm))
+         #:display? #t))
+       (else
+        (let ((name   (option-ref options 'fsm-name 'custom-fsm))
+              (module (option-ref options 'fsm-module #f)))
+        (fsm-compile fsm #:fsm-name name #:module module)))))))
+
+;;;
+
+;; Local Variables:
+;; mode: Scheme
+;; End:
+
+;;; smc.in ends here
