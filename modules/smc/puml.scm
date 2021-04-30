@@ -11,7 +11,8 @@
   #:export (<puml-context>
             puml-context-fsm
             puml-context-module
-            puml->fsm))
+            puml->fsm
+            puml-string->fsm))
 
 
 
@@ -261,3 +262,13 @@
             (loop new-context)
             (puml-context-fsm context))))))
 
+(define* (puml-string->fsm string
+                           #:key
+                           (module (current-module))
+                           (debug-mode? #f))
+  (with-input-from-string
+      (lambda (port)
+        (puml->fsm port
+                   #:module      module
+                   #:debug-mode? debug-mode?))
+    string))
