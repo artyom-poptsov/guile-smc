@@ -29,9 +29,13 @@
                        (car state)
                        (map (lambda (tr)
                               (map (lambda (e)
-                                     (if (procedure? e)
-                                         (list 'unquote (procedure-name e))
-                                         e))
+                                     (cond
+                                      ((procedure? e)
+                                       (list 'unquote (procedure-name e)))
+                                      ((state? e)
+                                       (state-name e))
+                                      (else
+                                       e)))
                                    tr))
                             (cdr state))))
                     (hash-table->transition-list table))))
