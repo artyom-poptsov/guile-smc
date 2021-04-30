@@ -18,7 +18,6 @@
                                      (guard:#t ,action:no-op state-1))))))
     (fsm-state-count fsm)))
 
-
 (test-equal "fsm-transition-count"
   2
   (let ((fsm (make <fsm>
@@ -27,6 +26,56 @@
                                     (state-2
                                      (guard:#t ,action:no-op state-1))))))
     (fsm-transition-count fsm)))
+
+(test-equal "fsm-incoming-transition-count: without recurrent links"
+  2
+  (let ((fsm (make <fsm>
+               #:transition-table `((state-1
+                                     (guard:#t ,action:no-op state-2)
+                                     (guard:#t ,action:no-op state-1))
+                                    (state-2
+                                     (guard:#t ,action:no-op state-1)
+                                     (guard:#t ,action:no-op state-3))
+                                    (state-3
+                                     (guard:#t ,action:no-op state-1))))))
+    (fsm-incoming-transition-count fsm (fsm-state fsm 'state-1))))
+
+(test-equal "fsm-incoming-transition-count: with recurrent links"
+  3
+  (let ((fsm (make <fsm>
+               #:transition-table `((state-1
+                                     (,guard:#t ,action:no-op state-2)
+                                     (,guard:#t ,action:no-op state-1))
+                                    (state-2
+                                     (,guard:#t ,action:no-op state-1)
+                                     (,guard:#t ,action:no-op state-3))
+                                    (state-3
+                                     (,guard:#t ,action:no-op state-1))))))
+    (fsm-incoming-transition-count fsm (fsm-state fsm 'state-1)
+                                   #:include-recurrent-links? #t)))
+
+(test-assert "fsm-state-reachable?: #t"
+  (let ((fsm (make <fsm>
+               #:transition-table `((state-1
+                                     (,guard:#t ,action:no-op state-2)
+                                     (,guard:#t ,action:no-op state-1))
+                                    (state-2
+                                     (,guard:#t ,action:no-op state-1)
+                                     (,guard:#t ,action:no-op state-3))
+                                    (state-3
+                                     (,guard:#t ,action:no-op state-1))))))
+    (fsm-state-reachable? fsm (fsm-state fsm 'state-3))))
+
+(test-assert "fsm-state-reachable?: #f"
+  (let ((fsm (make <fsm>
+               #:transition-table `((state-1
+                                     (,guard:#t ,action:no-op state-1))
+                                    (state-2
+                                     (,guard:#t ,action:no-op state-1)
+                                     (,guard:#t ,action:no-op state-3))
+                                    (state-3
+                                     (,guard:#t ,action:no-op state-1))))))
+    (not (fsm-state-reachable? fsm (fsm-state fsm 'state-2)))))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
