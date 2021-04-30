@@ -267,8 +267,8 @@
                            (module (current-module))
                            (debug-mode? #f))
   (with-input-from-string
-      (lambda (port)
-        (puml->fsm port
+      string
+      (lambda ()
+        (puml->fsm (current-input-port)
                    #:module      module
-                   #:debug-mode? debug-mode?))
-    string))
+                   #:debug-mode? debug-mode?))))
