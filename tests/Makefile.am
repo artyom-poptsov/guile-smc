@@ -21,7 +21,8 @@ SCM_TESTS = \
 	state.scm	\
 	guards.scm	\
 	stack.scm	\
-	fsm.scm
+	fsm.scm		\
+	puml.scm
 
 TESTS = ${SCM_TESTS}
 
