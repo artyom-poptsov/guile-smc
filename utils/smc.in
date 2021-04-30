@@ -5,6 +5,7 @@
 (use-modules (ice-9 getopt-long)
              (ice-9 pretty-print)
              (ice-9 eval-string)
+             (smc core log)
              (smc fsm)
              (smc puml)
              (smc compiler))
@@ -22,11 +23,13 @@ Usage: smc [options]
     (modules                  (single-char #\U) (value #t))
     (fsm-name                 (single-char #\n) (value #t))
     (fsm-module               (single-char #\m) (value #t))
-    (validate                                   (value #f))))
+    (validate                                   (value #f))
+    (debug                                      (value #f))))
 
 (define (main args)
   (let* ((options (getopt-long args %option-spec))
-         (extra-load-paths (option-ref options 'load-path "")))
+         (extra-load-paths (option-ref options 'load-path ""))
+         (debug-mode?      (option-ref options 'debug     #f)))
 
     (when (option-ref options 'help #f)
       (print-help-and-exit))
@@ -34,6 +37,7 @@ Usage: smc [options]
     (for-each (lambda (dir) (add-to-load-path dir))
               (string-split extra-load-paths #\:))
 
+    (log-use-stderr! debug-mode?)
     (let* ((modules (option-ref options 'modules #f))
            (fsm     (puml->fsm (current-input-port)
                                #:module (if modules
@@ -46,7 +50,7 @@ Usage: smc [options]
                                             (list (resolve-module '(smc guards char))
                                                   (resolve-module '(smc puml))
                                                   (resolve-module '(smc fsm))))
-                               #:debug-mode? #f)))
+                               #:debug-mode? debug-mode?)))
       (cond
        ((option-ref options 'validate #f)
         (pretty-print (fsm-validate fsm)))
