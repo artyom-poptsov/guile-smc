@@ -12,29 +12,37 @@
 (define (print-help-and-exit)
   (display "\
 Usage: smc [options]
-"))
+")
+  (exit 0))
 
 (define %option-spec
   '((help                     (single-char #\h) (value #f))
     (print-transition-table   (single-char #\p) (value #f))
-    ;; (load-path                (single-char #\L) (value #t))
+    (load-path                (single-char #\L) (value #t))
     (modules                  (single-char #\U) (value #t))
     (fsm-name                 (single-char #\n) (value #t))
     (fsm-module               (single-char #\m) (value #t))
     (validate                                   (value #f))))
 
 (define (main args)
-  (let* ((options (getopt-long args %option-spec)))
+  (let* ((options (getopt-long args %option-spec))
+         (extra-load-paths (option-ref options 'load-path "")))
+
     (when (option-ref options 'help #f)
       (print-help-and-exit))
+
+    (for-each (lambda (dir) (add-to-load-path dir))
+              (string-split extra-load-paths #\:))
+
     (let* ((modules (option-ref options 'modules #f))
-           (a       (format #t "~a~%" (eval-string modules)))
            (fsm     (puml->fsm (current-input-port)
                                #:module (if modules
                                             (append (list (resolve-module '(smc guards char))
                                                           (resolve-module '(smc puml))
                                                           (resolve-module '(smc fsm)))
-                                                    (map resolve-module (eval-string (string-append "(list " modules ")"))))
+                                                    (map resolve-module
+                                                         (eval-string
+                                                          (string-append "(quote " modules ")"))))
                                             (list (resolve-module '(smc guards char))
                                                   (resolve-module '(smc puml))
                                                   (resolve-module '(smc fsm))))
