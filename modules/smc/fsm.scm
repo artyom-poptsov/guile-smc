@@ -18,6 +18,7 @@
 
             fsm-state-count
             fsm-transition-count
+            fsm-incoming-transition-count
             fsm-state-reachable?
             fsm-validate
 
