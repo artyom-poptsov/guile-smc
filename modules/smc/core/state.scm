@@ -83,7 +83,9 @@
 
 (define-method (state-transition-count (self <state>) to)
   (fold (lambda (tr prev)
-          (if (equal? (list-ref tr 2) to)
+          (if (equal? (list-ref tr 2) (if (symbol? to)
+                                          to
+                                          (state-name to)))
               (+ prev 1)
               prev))
         0
@@ -98,7 +100,9 @@
 (define-method (state-recurrent-links-count (self <state>))
   (fold (lambda (tr prev)
           (let ((to (list-ref tr 2)))
-            (if (equal? (state-name self) to)
+            (if (equal? (state-name self) (if (symbol? to)
+                                              to
+                                              (state-name to)))
                 (+ prev 1)
                 prev)))
         0
