@@ -82,14 +82,19 @@
   (length (state-transitions self)))
 
 (define-method (state-transition-count (self <state>) to)
-  (fold (lambda (tr prev)
-          (if (equal? (list-ref tr 2) (if (symbol? to)
-                                          to
-                                          (state-name to)))
-              (+ prev 1)
-              prev))
-        0
-        (state-transitions self)))
+  (let ((to-name (if (state? to)
+                     (state-name to)
+                     to)))
+    (fold (lambda (tr prev)
+            (let ((state (list-ref tr 2)))
+              (if (equal? (if (state? state)
+                              (state-name state)
+                              state)
+                          to-name)
+                  (+ prev 1)
+                  prev)))
+          0
+          (state-transitions self))))
 
 (define-method (state-transition-count/foreign (self <state>))
   (- (state-transition-count self)
