@@ -76,6 +76,7 @@
 
     (pretty-print
      `(define-method (initialize (self ,class-name) initargs)
+        (next-method)
         (fsm-transition-table-set!
          self
          (transition-list->hash-table %transition-table))
