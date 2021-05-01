@@ -48,13 +48,17 @@
 (define (stack? x)
   (is-a? x <stack>))
 
-(define-method (display (stack <stack>) (port <port>))
+
+(define-method (%display (stack <stack>) (port <port>))
   (format port "#<stack depth: ~a ~a>"
           (stack-size stack)
           (number->string (object-address stack) 16)))
 
+(define-method (display (stack <stack>) (port <port>))
+  (%display stack port))
+
 (define-method (write (stack <stack>) (port <port>))
-  (display stack))
+  (%display stack port))
 
 
 
