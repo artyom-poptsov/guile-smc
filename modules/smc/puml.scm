@@ -124,6 +124,7 @@
                                     state-name
                                     (string-append
                                      description
+                                     " "
                                      new-description))
         (fsm-state-description-add! fsm
                                     state-name
