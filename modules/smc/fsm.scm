@@ -211,12 +211,13 @@
 (define-method (fsm-state-description-add! (self        <fsm>)
                                            (state-name  <symbol>)
                                            (description <string>))
-
-  (if (fsm-state self state-name)
-      (state-description-set! (fsm-state self state-name) description)
-      (fsm-state-add! self (make <state>
-                             #:name state-name
-                             #:description description))))
+  (let ((trimmed-description (string-trim-both description)))
+    (if (fsm-state self state-name)
+        (state-description-set! (fsm-state self state-name)
+                                trimmed-description)
+        (fsm-state-add! self (make <state>
+                               #:name state-name
+                               #:description trimmed-description)))))
 
 
 
