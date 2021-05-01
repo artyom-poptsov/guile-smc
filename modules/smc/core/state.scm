@@ -47,7 +47,7 @@
 
 
 
-(define-method (display (self <state>) (port <port>))
+(define-method (%display (self <state>) (port <port>))
   (format port "#<state ~a~a ~a>"
           (state-name self)
           (if (state-description self)
@@ -55,8 +55,11 @@
               "")
           (number->string (object-address self) 16)))
 
+(define-method (display (self <state>) (port <port>))
+  (%display self port))
+
 (define-method (write (self <state>) (port <port>))
-  (display self))
+  (%display self port))
 
 
 
