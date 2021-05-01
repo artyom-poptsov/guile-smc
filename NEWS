@@ -7,7 +7,8 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
-
+* Version 0.1.0 (2021-05-01)
+  First version of Guile-SMC.
 
 Local Variables:
 mode: org
