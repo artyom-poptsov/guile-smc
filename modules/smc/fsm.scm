@@ -105,7 +105,7 @@
 
 
 
-(define-method (display (self <fsm>) (port <port>))
+(define-method (%display (self <fsm>) (port <port>))
   (format port "#<fsm current-state: ~a statistics: ~a/~a ~a>"
           (and (fsm-current-state self)
                (state-name (fsm-current-state self)))
@@ -113,8 +113,11 @@
           (fsm-transition-counter self)
           (number->string (object-address self) 16)))
 
+(define-method (display (self <fsm>) (port <port>))
+  (%display self port))
+
 (define-method (write (self <fsm>) (port <port>))
-  (display self))
+  (%display self port))
 
 
 
