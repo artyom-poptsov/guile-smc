@@ -121,6 +121,18 @@
                                #:name state-name
                                #:transitions (cdr transition)))))
               transition-list)
+    (hash-map->list (lambda (state-name state)
+                      (let ((tr-table
+                             (map (lambda (tr)
+                                    (let ((tguard     (list-ref tr 0))
+                                          (action     (list-ref tr 1))
+                                          (next-state (list-ref tr 2)))
+                                      (list tguard
+                                            action
+                                            (hash-ref table next-state))))
+                                  (state-transitions state))))
+                        (state-transitions-set! state tr-table)))
+                    table)
     table))
 
 (define-method (hash-table->transition-list table)
