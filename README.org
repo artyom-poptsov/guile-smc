@@ -32,3 +32,16 @@ GNU Guile state machine compiler.
    =examples/pumlpuml.scm=.
 
    Also see other examples the =examples= directory.
+
+   If you still wonder if there any practical use of that, please take a look at
+   Guile-INI: https://github.com/artyom-poptsov/guile-ini
+
+** Ideas
+   - Write a PlantUML generator that take a =<fsm>= instance and produces a
+     PlantUML state diagram.
+   - I think it's possible to implement some FSM profiling facilities that will,
+     for example, measure how much time it takes to go from the entry state of
+     an FSM to an end state and calculate how much time an FSM spends in each
+     state.  This measurements can be used to optimize an FSM.
+   - It is possible to add compilation to other languages aside from Scheme, but
+     it will be quite hard to implement indeed.
