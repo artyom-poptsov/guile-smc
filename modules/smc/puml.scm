@@ -1,3 +1,30 @@
+;;; puml.scm -- PlantUML parser written in Guile-SMC.
+
+;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; The program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with the program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+;;; Commentary:
+
+;; This file contains a parser implementation for PlantUML[1] format.
+;;
+;; 1: http://www.plantuml.com/
+
+
+;;; Code:
+
 (define-module (smc puml)
   #:use-module (oop goops)
   #:use-module (ice-9 receive)
@@ -291,3 +318,5 @@
         (puml->fsm (current-input-port)
                    #:module      module
                    #:debug-mode? debug-mode?))))
+
+;;; puml.scm ends here.
