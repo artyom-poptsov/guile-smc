@@ -154,7 +154,7 @@
 
 (define %transition-table
   `((search-start-tag
-     "Search the start @plantuml tag."
+     "Search the start @startuml tag."
      (,guard:eof-object?     ,action:no-op              #f)
      (,guard:at-symbol?      ,action:store       read-start-tag)
      (,guard:single-quote?   ,action:no-op              search-start-tag/skip-comment)
@@ -166,7 +166,7 @@
      (,guard:newline?        ,action:no-op              search-start-tag)
      (,guard:#t              ,action:no-op              search-start-tag/skip-comment))
     (read-start-tag
-     "Read the start @plantuml tag and check it for errors."
+     "Read the start @startuml tag and check it for errors."
      (,guard:eof-object?     ,action:no-op              #f)
      (,guard:space?          ,action:check-start-tag    read)
      (,guard:newline?        ,action:check-start-tag    read)
