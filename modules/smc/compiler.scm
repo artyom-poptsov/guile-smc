@@ -31,19 +31,35 @@
      `(define %transition-table
         ,(list 'quasiquote
                (map (lambda (state)
-                      (cons
-                       (car state)
-                       (map (lambda (tr)
-                              (map (lambda (e)
-                                     (cond
-                                      ((procedure? e)
-                                       (list 'unquote (procedure-name e)))
-                                      ((state? e)
-                                       (state-name e))
-                                      (else
-                                       e)))
-                                   tr))
-                            (cdr state))))
+                      (if (and (> (length state) 1)
+                               (string? (cadr state)))
+                          (cons
+                           (car state)
+                           (cons (cadr state)
+                                 (map (lambda (tr)
+                                        (map (lambda (e)
+                                               (cond
+                                                ((procedure? e)
+                                                 (list 'unquote (procedure-name e)))
+                                                ((state? e)
+                                                 (state-name e))
+                                                (else
+                                                 e)))
+                                             tr))
+                                      (caddr state))))
+                          (cons
+                           (car state)
+                           (map (lambda (tr)
+                                  (map (lambda (e)
+                                         (cond
+                                          ((procedure? e)
+                                           (list 'unquote (procedure-name e)))
+                                          ((state? e)
+                                           (state-name e))
+                                          (else
+                                           e)))
+                                       tr))
+                                (cdr state)))))
                     (hash-table->transition-list table))))
      port)))
 

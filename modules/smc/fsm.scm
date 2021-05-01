@@ -112,14 +112,20 @@
   (let ((table (make-hash-table)))
     (for-each (lambda (transition)
                 (let* ((state-name (car transition))
+                       (state-desc (and (> (length transition) 1)
+                                        (string? (cadr transition))
+                                        (cadr transition)))
                        (state      (hash-ref table state-name)))
                   (when state
                     (error "Duplicate state" state-name))
                   (hash-set! table
                              state-name
                              (make <state>
-                               #:name state-name
-                               #:transitions (cdr transition)))))
+                               #:name        state-name
+                               #:description state-desc
+                               #:transitions (if state-desc
+                                                 (cddr transition)
+                                                 (cdr transition))))))
               transition-list)
     (hash-map->list (lambda (state-name state)
                       (let ((tr-table
@@ -138,8 +144,15 @@
 (define-method (hash-table->transition-list table)
   (hash-map->list (lambda (state-name state)
                     (if (null? (state-transitions state))
-                        (list state-name)
-                        (cons state-name (state-transitions state))))
+                        (if (state-description state)
+                            (list state-name (state-description state))
+                            (list state-name))
+                        (if (state-description state)
+                            (list state-name
+                                  (state-description state)
+                                  (state-transitions state))
+                            (cons state-name
+                                  (state-transitions state)))))
                   table))
 
 (define-method (initialize (self <fsm>) initargs)
