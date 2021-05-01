@@ -7,6 +7,7 @@
             fsm-debug-mode-set!
             fsm-debug-mode?
             fsm-transition-table
+            fsm-transition-table-set!
             fsm-transition-add!
             fsm-state-add!
             fsm-state
