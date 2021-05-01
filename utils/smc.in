@@ -75,8 +75,10 @@ Options:
         (let ((name   (option-ref options 'fsm-name 'custom-fsm))
               (module (option-ref options 'fsm-module #f)))
           (fsm-compile fsm
-                       #:fsm-name name
-                       #:module (eval-string (string-append "(quote " module ")")))))))))
+                       #:fsm-name      name
+                       #:fsm-module    (eval-string (string-append "(quote " module ")"))
+                       #:extra-modules (eval-string
+                                        (string-append "(quote " modules ")")))))))))
 
 ;;;
 

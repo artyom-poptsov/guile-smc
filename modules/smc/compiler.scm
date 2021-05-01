@@ -52,12 +52,13 @@
 (define* (fsm-compile fsm
                       #:key
                       (fsm-name 'custom-fsm)
-                      (module   #f)
+                      (fsm-module    #f)
+                      (extra-modules '())
                       (output-port (current-output-port)))
   (%write-header output-port)
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
-    (if module
-        (%write-module module (list module) class-name output-port)
+    (if fsm-module
+        (%write-module fsm-module extra-modules class-name output-port)
         (display `(use-modules (smc fsm)
                                ,(quote module))
                  output-port))
