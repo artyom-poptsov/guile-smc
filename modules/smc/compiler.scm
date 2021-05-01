@@ -82,6 +82,6 @@
          (transition-list->hash-table %transition-table))
         (fsm-current-state-set! self
                                 (fsm-state self
-                                           ,(quote (state-name (fsm-current-state fsm)))))))
+                                           (quote ,(state-name (fsm-current-state fsm)))))))
 
     (newline output-port)))
