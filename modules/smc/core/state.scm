@@ -13,6 +13,7 @@
             state-transition-count/foreign
             state-transition-add!
             state-transitions
+            state-transitions-set!
             state-final-transitions
             state-recurrent-links-count
             state-has-final-transitions?
