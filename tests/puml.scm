@@ -35,7 +35,30 @@
     (and (equal? (fsm-current-state fsm) (fsm-state fsm 'state_1))
          (equal? guard:#t
                  (car (car (state-transitions
-                                   (fsm-state fsm 'state_1))))))))
+                            (fsm-state fsm 'state_1))))))))
+
+(test-assert "puml-string->fsm: a transition with an action"
+  (let* ((fsm (puml-string->fsm (string-join
+                                 (list
+                                  "@startuml\n"
+                                  "[*] -> state_1\n"
+                                  "state_1 --> state_1: guard:#t -> action:no-op\n"
+                                  "@enduml\n"))))
+         (state (fsm-state fsm 'state_1)))
+    (and (equal? (fsm-current-state fsm) state)
+         (equal? guard:#t (car (car (state-transitions state))))
+         (equal? action:no-op (cadr (car (state-transitions state)))))))
+
+(test-equal "puml-string->fsm: a state with description"
+  "A state description."
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml\n"
+                                 "[*] -> state_1\n"
+                                 "state_1: A state description.\n"
+                                 "state_1 --> state_1: guard:#t\n"
+                                 "@enduml\n")))))
+    (state-description (fsm-state fsm 'state_1))))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
