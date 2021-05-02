@@ -9,6 +9,14 @@
 
 (test-begin "fsm")
 
+(test-equal "a state in the transition table with description"
+  "This is a description."
+  (let ((fsm (make <fsm>
+               #:transition-table `((state-1
+                                     "This is a description."
+                                     (guard:#t ,action:no-op state-1))))))
+    (state-description (fsm-state fsm 'state-1))))
+
 (test-equal "fsm-state-count"
   2
   (let ((fsm (make <fsm>
