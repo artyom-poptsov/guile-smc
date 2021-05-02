@@ -44,5 +44,8 @@ GNU Guile state machine compiler.
      for example, measure how much time it takes to go from the entry state of
      an FSM to an end state and calculate how much time an FSM spends in each
      state.  This measurements can be used to optimize an FSM.
+   - Produce a timing diagram based on FSM log output in [[https://plantuml.com/timing-diagram][PlantUML format]].  That
+     would help with analyzing and optimizing an FSM.  It could be implemented
+     in the =smc= compiler as part of state machine benchmark suite.
    - It is possible to add compilation to other languages aside from Scheme, but
      it will be quite hard to implement indeed.
