@@ -50,6 +50,19 @@
         (loop (append lst `(#:use-module ,(car em)))
               (cdr em)))))
 
+(define-method (%serialize-transition-table (table <list>))
+  (map (lambda (tr)
+         (map (lambda (e)
+                (cond
+                 ((procedure? e)
+                  (list 'unquote (procedure-name e)))
+                 ((state? e)
+                  (state-name e))
+                 (else
+                  e)))
+              tr))
+       table))
+
 (define-method (%write-transition-table (fsm <fsm>) (port <port>))
   (let ((table (fsm-transition-table fsm)))
     (pretty-print
@@ -60,31 +73,12 @@
                                (string? (cadr state)))
                           (cons
                            (car state)
-                           (cons (cadr state)
-                                 (map (lambda (tr)
-                                        (map (lambda (e)
-                                               (cond
-                                                ((procedure? e)
-                                                 (list 'unquote (procedure-name e)))
-                                                ((state? e)
-                                                 (state-name e))
-                                                (else
-                                                 e)))
-                                             tr))
-                                      (caddr state))))
+                           (cons
+                            (cadr state)
+                            (%serialize-transition-table (caddr state))))
                           (cons
                            (car state)
-                           (map (lambda (tr)
-                                  (map (lambda (e)
-                                         (cond
-                                          ((procedure? e)
-                                           (list 'unquote (procedure-name e)))
-                                          ((state? e)
-                                           (state-name e))
-                                          (else
-                                           e)))
-                                       tr))
-                                (cdr state)))))
+                           (%serialize-transition-table (cdr state)))))
                     (hash-table->transition-list table))))
      port)))
 
