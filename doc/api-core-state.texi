@@ -1,0 +1,93 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node State
+@section State
+
+@deftp {Class} <state> #:name [#:description=#f] [#:transitions=#f]
+This class describes an FSM state.
+
+Constructor parameters:
+
+@table @asis
+@item #:name (name <string>)
+@strong{required} Name of this state.
+
+@item #:description (description <string>)
+Description of this state.
+
+@item #:transitions (transitions <list>)
+The transitions for this state.
+
+@end table
+
+@end deftp
+
+@deffn {Scheme Procedure} state? object
+Check if @var{object} is an instance of the @code{<state>} class.
+@end deffn
+
+@deffn {Scheme Procedure} state-name (state <state>)
+Get the state name as a @code{<string>}.
+@end deffn
+
+@deffn {Scheme Procedure} state-description (state <state>)
+Get the state description as a @code{<string>} if it is available, return
+@code{#f} otherwise.
+@end deffn
+
+@deffn {Scheme Procedure} state-transitions (state <state>)
+Get the state transitions as a list.
+@end deffn
+
+@deffn {Scheme Procedure} state-transition-add! @
+               (state <state>) @
+               (tguard <procedure>) @
+               (action <procedure>) @
+               next-state
+Add a new transition to the @var{state}.
+@end deffn
+
+@deffn {Scheme Procedure} state-transition-count (state <state>)
+@deffnx {Scheme Procedure} state-transition-count (state <state>) to
+Get the transitions count for a @var{state}.
+@end deffn
+
+@deffn {Scheme Procedure} state-transition-count/foreign (state <state>)
+Get the foreign transitions count for a @var{state}.  A foreign transition is
+a transition that points to another state.
+@end deffn
+
+@deffn {Scheme Procedure} state-recurrent-links-count (state <state>)
+Get the number of recurrent links (that is, links that point to the state
+itself) for a @var{state}.
+@end deffn
+
+@deffn {Scheme Procedure} state-has-recurrent-links? (state <state>)
+Check if a @var{state} has recurrent links.
+@end deffn
+
+@deffn {Scheme Procedure} state-final-transitions (state <state>)
+Get the number of final transitions for a @var{state}.
+@end deffn
+
+@deffn {Scheme Procedure} state-has-final-transitions? (state <state>)
+Check if a @var{state} has any final transitions.
+@end deffn
+
+@deffn {Scheme Procedure} state-dead-end? (state <state>)
+Check if a @var{state} is a dead-end state. A state is considered a dead-end
+if it has no foreign transitions, has recurrent links and has no final
+transitions.
+@end deffn
+
+@deffn {Scheme Procedure} state-run (state <state>) event context
+Run a @var{state}.  Returns two values: next state (or @code{#f}) and new
+context.
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:

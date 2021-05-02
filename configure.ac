@@ -62,6 +62,7 @@ AC_CONFIG_FILES([
         modules/smc/core/Makefile
         modules/smc/guards/Makefile
         utils/Makefile
+        doc/Makefile
         tests/Makefile
 ])
 

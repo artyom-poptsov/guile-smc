@@ -1,0 +1,50 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+Guile-SMC sources are available from GitHub at
+@url{https://github.com/artyom-poptsov/guile-smc/}. This section describes
+requirements of Guile-SMC and installation process.
+
+Guile-SMC depends on the following packages:
+
+@itemize
+@item @url{https://www.gnu.org/software/guile/, GNU Guile}, 2.2 or later
+@end itemize
+
+Get the sources of Guile-Deck from GitHub using Git (a good introduction to
+Git is @url{https://git-scm.com/book/en/v2, Pro Git} book, which is available
+online):
+
+@example
+$ git clone git@@github.com:artyom-poptsov/guile-smc.git
+@end example
+
+Configure the sources:
+
+@example
+$ cd guile-smc/
+$ autoreconf -vif
+$ ./configure
+@end example
+
+Build and install the library:
+
+@example
+$ make
+$ make install
+@end example
+
+For a basic explanation of the installation of the package, see the
+@file{INSTALL} file.
+
+@strong{important} You probably want to call @command{configure} with
+the @option{--with-guilesitedir} option so that this package is
+installed in Guile's default path.  But, if you don't know where your
+Guile site directory is, run @command{configure} without the option,
+and it will give you a suggestion.
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:

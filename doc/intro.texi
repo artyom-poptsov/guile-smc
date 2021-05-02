@@ -1,0 +1,11 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+Guile-SMC is a state machine compiler for
+@url{https://www.gnu.org/software/guile/, GNU Guile}.
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:
