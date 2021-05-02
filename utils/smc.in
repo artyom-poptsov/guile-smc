@@ -51,18 +51,17 @@ Options:
               (string-split extra-load-paths #\:))
 
     (log-use-stderr! debug-mode?)
-    (let* ((modules (option-ref options 'modules #f))
+    (let* ((modules      (option-ref options 'modules #f))
+           (core-modules (list (resolve-module '(smc guards char))
+                               (resolve-module '(smc puml))
+                               (resolve-module '(smc fsm))))
            (fsm     (puml->fsm (current-input-port)
                                #:module (if modules
-                                            (append (list (resolve-module '(smc guards char))
-                                                          (resolve-module '(smc puml))
-                                                          (resolve-module '(smc fsm)))
+                                            (append core-modules
                                                     (map resolve-module
                                                          (eval-string
                                                           (string-append "(quote " modules ")"))))
-                                            (list (resolve-module '(smc guards char))
-                                                  (resolve-module '(smc puml))
-                                                  (resolve-module '(smc fsm))))
+                                            core-modules)
                                #:debug-mode? debug-mode?)))
       (when (option-ref options 'validate #f)
         (let ((validation-result (fsm-validate fsm)))
