@@ -1,6 +1,7 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (ice-9 receive)
+             (ice-9 regex)
              (oop goops)
              (smc guards char)
              (smc fsm)
@@ -16,6 +17,28 @@
 (test-equal "equal?"
   (make <state> #:name 'state-1)
   (make <state> #:name 'state-1))
+
+(test-assert "display"
+  (let ((state (make <state> #:name 'state-1)))
+    (string-match "#<state state-1 [0-9a-z]+>"
+                  (with-output-to-string
+                    (lambda ()
+                      (display state))))))
+
+(test-assert "write"
+  (let ((state (make <state> #:name 'state-1)))
+    (string-match "#<state state-1 [0-9a-z]+>"
+                  (with-output-to-string
+                    (lambda ()
+                      (write state))))))
+
+(test-equal "state-transition-add!"
+  `((,guard:#t ,action:no-op state-1)
+    (,guard:#t ,action:no-op state-2))
+  (let ((state (make <state>
+                 #:transitions `((,guard:#t ,action:no-op state-1)))))
+    (state-transition-add! state guard:#t action:no-op 'state-2)
+    (state-transitions state)))
 
 (test-equal "state-transition-count"
   2
