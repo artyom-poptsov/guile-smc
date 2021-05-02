@@ -64,9 +64,12 @@ Options:
                                                   (resolve-module '(smc puml))
                                                   (resolve-module '(smc fsm))))
                                #:debug-mode? debug-mode?)))
+      (when (option-ref options 'validate #f)
+        (let ((validation-result (fsm-validate fsm)))
+          (unless (null? validation-result)
+            (pretty-print validation-result (current-error-port))
+            (exit 1))))
       (cond
-       ((option-ref options 'validate #f)
-        (pretty-print (fsm-validate fsm)))
        ((option-ref options 'print-transition-table #f)
         (pretty-print
          (hash-table->transition-list (fsm-transition-table fsm))
