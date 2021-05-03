@@ -6,7 +6,7 @@
 @node FSM
 @section FSM
 
-@subsection Loggging
+@subsection Logging
 @cindex FSM logging
 
 @deffn  {Scheme Procedure} fsm-log-transition (from <state>) (to <state>)
