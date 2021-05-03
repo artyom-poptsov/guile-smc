@@ -1,0 +1,45 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node Stack
+@section Stack
+
+@code{(smc core stack)} module contains a stack data structure implementation.
+
+@deftp {Class} <stack>
+The main class.
+@end deftp
+
+@deffn {Scheme Procedure} stack? object
+Check if an @var{object} is a stack instance.
+@end deffn
+
+@deffn {Scheme Procedure} stack-push! (stack <stack>) element
+Push an @var{element} to a @var{stack}.
+@end deffn
+
+@deffn {Scheme Procedure} stack-pop! (stack <stack>)
+Pop an element from a @var{stack}.
+@end deffn
+
+@deffn {Scheme Procedure} stack-clear! (stack <stack>)
+Delete all elements from a @var{stack}.
+@end deffn
+
+@deffn {Scheme Procedure} stack-size (stack <stack>)
+Get the stack depth (size.)
+@end deffn
+
+@deffn {Scheme Procedure} stack-empty? (stack <stack>)
+Check if a @var{stack} is empty.
+@end deffn
+
+@deffn {Scheme Procedure} stack-content/reversed (stack <stack>)
+Get the elements of a @var{stack} in the reversed order.
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:

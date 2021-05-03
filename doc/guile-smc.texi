@@ -90,11 +90,13 @@ Core:
 
 * Log::         Logging facilities.
 * State::       A FSM state.
+* Stack::       Stack data structure implementation.
 
 @end menu
 
 @include api-core-log.texi
 @include api-core-state.texi
+@include api-core-stack.texi
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License
