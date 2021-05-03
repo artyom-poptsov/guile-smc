@@ -1,0 +1,26 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node Log
+@section Log
+
+@code{(smc core log)} module contains Guile-SMC logging facilities.
+
+@deffn {Scheme Procedure} log-use-stderr! (value <boolean>)
+Change whether the logger must print messages to the stderr as well as to
+syslog, or not.
+@end deffn
+
+@deffn  {Scheme Procedure} log level fmt . args
+@deffnx {Scheme Procedure} log-error fmt . args
+@deffnx {Scheme Procedure} log-warning fmt . args
+@deffnx {Scheme Procedure} log-info fmt . args
+@deffnx {Scheme Procedure} log-debug fmt . args
+Log a formatted message of a specified logging @var{level} to syslog.
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:

@@ -84,6 +84,16 @@ Indices
 @node API Reference
 @chapter API Reference
 
+@menu
+
+Core:
+
+* Log::         Logging facilities.
+* State::       A FSM state.
+
+@end menu
+
+@include api-core-log.texi
 @include api-core-state.texi
 
 @node GNU Free Documentation License

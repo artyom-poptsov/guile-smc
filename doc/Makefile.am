@@ -24,6 +24,7 @@ info_TEXINFOS = guile-smc.texi
 guile_deck_TEXINFOS = \
 	intro.texi		\
 	installation.texi	\
+	api-core-log.texi	\
 	api-core-state.texi 	\
 	indices.texi		\
 	fdl.texi
