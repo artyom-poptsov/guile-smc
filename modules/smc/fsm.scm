@@ -53,7 +53,7 @@
             transition-list->hash-table
             hash-table->transition-list
 
-            log-debug-transition
+            fsm-log-transition
 
             action:no-op))
 
@@ -98,13 +98,13 @@
 
 
 
-(define-method (log-debug-transition (from <state>) (to <state>))
+(define-method (fsm-log-transition (from <state>) (to <state>))
   (log-debug "[~a] -> [~a]" (state-name from) (state-name to)))
 
-(define-method (log-debug-transition (from <state>) (to <symbol>))
+(define-method (fsm-log-transition (from <state>) (to <symbol>))
   (log-debug "[~a] -> [~a]" (state-name from) to))
 
-(define-method (log-debug-transition (from <state>) (to <boolean>))
+(define-method (fsm-log-transition (from <state>) (to <boolean>))
   (log-debug "[~a] -> [*]" (state-name from)))
 
 
@@ -289,7 +289,7 @@
           (receive (next-state new-context)
               (state-run state event context)
             (when (fsm-debug-mode? self)
-              (log-debug-transition state next-state))
+              (fsm-log-transition state next-state))
             (%step-counter-increment! self)
             (unless (equal? state next-state)
               (%transition-counter-increment! self))

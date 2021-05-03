@@ -9,9 +9,9 @@
 @subsection Loggging
 @cindex FSM logging
 
-@deffn  {Scheme Procedure} log-debug-transition (from <state>) (to <state>)
-@deffnx {Scheme Procedure} log-debug-transition (from <state>) (to <symbol>)
-@deffnx {Scheme Procedure} log-debug-transition (from <state>) (to <boolean>)
+@deffn  {Scheme Procedure} fsm-log-transition (from <state>) (to <state>)
+@deffnx {Scheme Procedure} fsm-log-transition (from <state>) (to <symbol>)
+@deffnx {Scheme Procedure} fsm-log-transition (from <state>) (to <boolean>)
 Log state transitions.
 @end deffn
 
