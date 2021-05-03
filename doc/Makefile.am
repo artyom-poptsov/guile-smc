@@ -25,6 +25,7 @@ guile_deck_TEXINFOS = \
 	intro.texi		\
 	installation.texi	\
 	api-core-log.texi	\
+	api-core-context.texi	\
 	api-core-stack.texi 	\
 	api-core-state.texi 	\
 	indices.texi		\

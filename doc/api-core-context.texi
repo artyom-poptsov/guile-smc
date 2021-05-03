@@ -1,0 +1,40 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node Context
+@section Context
+
+@code{(smc core context)} contains the implementation of a generic context
+that can be used with an FSM to provide a memory.
+
+@cindex Stanza
+@cindex Buffer
+@cindex Context
+@deftp {Class} <context> [#:debug-mode?=#f]
+The main class.
+
+This class holds two kinds of stack memory: a buffer to store events (data
+chunks) and a stanza that store a logical unit of data.
+@end deftp
+
+@deffn {Scheme Procedure} context-buffer-clear! (context <context>)
+Clear the @var{context} buffer.
+@end deffn
+
+@deffn {Scheme Procedure} context-stanza-clear! (context <context>)
+Clear the @var{context} stanza.
+@end deffn
+
+@deffn {Scheme Procedure} action:store event context
+Store an @var{event} into a @var{context} buffer.
+@end deffn
+
+@deffn {Scheme Procedure} action:update-stanza event ctx
+Store an @var{event} into a @var{context} stanza.
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:
