@@ -30,6 +30,7 @@
   #:use-module (smc core log)
   #:use-module (smc core state)
   #:export (<fsm>
+            fsm?
             fsm-debug-mode-set!
             fsm-debug-mode?
             fsm-transition-table
@@ -89,6 +90,9 @@
    #:init-value   0
    #:getter       fsm-transition-counter
    #:setter       fsm-transition-counter-set!))
+
+(define-method (fsm? object)
+  (is-a? object <fsm>))
 
 
 
