@@ -29,6 +29,7 @@
   #:use-module (smc core log)
   #:use-module (smc core stack)
   #:export (<context>
+            context?
             context-debug-mode?
             context-debug-mode-set!
             context-stanza
@@ -64,6 +65,9 @@
    #:init-value (make <stack>)
    #:getter     context-stanza
    #:setter     context-stanza-set!))
+
+(define-method (context? x)
+  (is-a? x <context>))
 
 
 
