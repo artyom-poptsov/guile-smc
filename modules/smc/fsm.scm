@@ -267,17 +267,6 @@
 
 
 
-(define-method (log-debug-transition (from <state>) (to <state>))
-  (log-debug "[~a] -> [~a]" (state-name from) (state-name to)))
-
-(define-method (log-debug-transition (from <state>) (to <symbol>))
-  (log-debug "[~a] -> [~a]" (state-name from) to))
-
-(define-method (log-debug-transition (from <state>) (to <boolean>))
-  (log-debug "[~a] -> [*]" (state-name from)))
-
-
-
 (define-method (fsm-run! (self <fsm>) event context)
   (let ((state (fsm-current-state self)))
     (if state

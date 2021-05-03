@@ -25,12 +25,14 @@
 
 (define-module (smc core log)
   #:use-module (oop goops)
+  #:use-module (smc core state)
   #:export (log
             log-error
             log-warning
             log-info
             log-debug
-            log-use-stderr!))
+            log-use-stderr!
+            log-debug-transition))
 
 (define %logger "/usr/bin/logger")
 (define %tag    "guile-smc")
@@ -71,5 +73,16 @@
 (define (log-debug fmt . args)
   "Log a formatted debug message."
   (apply log "debug" fmt args))
+
+
+
+(define-method (log-debug-transition (from <state>) (to <state>))
+  (log-debug "[~a] -> [~a]" (state-name from) (state-name to)))
+
+(define-method (log-debug-transition (from <state>) (to <symbol>))
+  (log-debug "[~a] -> [~a]" (state-name from) to))
+
+(define-method (log-debug-transition (from <state>) (to <boolean>))
+  (log-debug "[~a] -> [*]" (state-name from)))
 
 ;;; log.scm ends here.

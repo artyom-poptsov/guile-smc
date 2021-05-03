@@ -21,6 +21,12 @@ syslog, or not.
 Log a formatted message of a specified logging @var{level} to syslog.
 @end deffn
 
+@deffn  {Scheme Procedure} log-debug-transition (from <state>) (to <state>)
+@deffnx {Scheme Procedure} log-debug-transition (from <state>) (to <symbol>)
+@deffnx {Scheme Procedure} log-debug-transition (from <state>) (to <boolean>)
+Log state transitions.
+@end deffn
+
 @c Local Variables:
 @c TeX-master: "guile-smc.texi"
 @c End:
