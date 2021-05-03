@@ -45,10 +45,10 @@
 
 (define (log level fmt . args)
   (let* ((message (apply format #f fmt args))
-         (command (format #f "~a ~a --priority=user.~a --tag='~a' '~a'"
+         (command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
                           %logger
                           (if *use-stderr?*
-                              "--stderr"
+                              "-s"
                               "")
                           level
                           %tag
