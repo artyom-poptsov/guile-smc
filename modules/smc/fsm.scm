@@ -53,6 +53,8 @@
             transition-list->hash-table
             hash-table->transition-list
 
+            log-debug-transition
+
             action:no-op))
 
 
@@ -93,6 +95,17 @@
 
 (define-method (fsm? object)
   (is-a? object <fsm>))
+
+
+
+(define-method (log-debug-transition (from <state>) (to <state>))
+  (log-debug "[~a] -> [~a]" (state-name from) (state-name to)))
+
+(define-method (log-debug-transition (from <state>) (to <symbol>))
+  (log-debug "[~a] -> [~a]" (state-name from) to))
+
+(define-method (log-debug-transition (from <state>) (to <boolean>))
+  (log-debug "[~a] -> [*]" (state-name from)))
 
 
 

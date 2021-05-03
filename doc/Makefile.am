@@ -28,6 +28,7 @@ guile_deck_TEXINFOS = \
 	api-core-context.texi	\
 	api-core-stack.texi 	\
 	api-core-state.texi 	\
+	api-fsm.texi		\
 	indices.texi		\
 	fdl.texi
 

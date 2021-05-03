@@ -86,6 +86,8 @@ Indices
 
 @menu
 
+* FSM::         Finite State Machines
+
 Core:
 
 * Log::         Logging facilities.
@@ -95,6 +97,7 @@ Core:
 
 @end menu
 
+@include api-fsm.texi
 @include api-core-log.texi
 @include api-core-state.texi
 @include api-core-stack.texi
