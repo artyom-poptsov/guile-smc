@@ -54,6 +54,7 @@
             hash-table->transition-list
 
             fsm-log-transition
+            fsm-log-error
 
             action:no-op))
 
@@ -101,11 +102,17 @@
 (define-method (fsm-log-transition (from <state>) (to <state>))
   (log-debug "[~a] -> [~a]" (state-name from) (state-name to)))
 
+(define-method (fsm-log-transition (from <state>) (to <state>) event)
+  (log-debug "[~a] -> [~a]: ~a" (state-name from) (state-name to) event))
+
 (define-method (fsm-log-transition (from <state>) (to <symbol>))
   (log-debug "[~a] -> [~a]" (state-name from) to))
 
 (define-method (fsm-log-transition (from <state>) (to <boolean>))
   (log-debug "[~a] -> [*]" (state-name from)))
+
+(define (fsm-log-error state fmt . args)
+  (apply log-error (string-append "[~a]: " fmt) args))
 
 
 
@@ -163,6 +170,7 @@
                                         (cadr transition)))
                        (state      (hash-ref table state-name)))
                   (when state
+                    (log-error "Duplicate state: ~a" state-name)
                     (error "Duplicate state" state-name))
                   (hash-set! table
                              state-name
@@ -220,6 +228,7 @@
         (fsm-transition-table-set! self (transition-list->hash-table table))
         (fsm-current-state-set! self (fsm-state self (caar table))))
        (else
+        (log-error "Transition table must be a list: ~a" table)
         (error "Transition table must be a list"))))))
 
 
