@@ -32,8 +32,8 @@
   #:use-module (smc core state)
   #:use-module (smc fsm)
   #:use-module (smc core log)
-  #:use-module (smc core context)
   #:use-module (smc core stack)
+  #:use-module (smc context context)
   #:use-module (smc guards char)
   #:export (<puml-context>
             puml-context-fsm

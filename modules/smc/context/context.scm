@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(define-module (smc core context)
+(define-module (smc context context)
   #:use-module (oop goops)
   #:use-module (smc core log)
   #:use-module (smc core stack)
