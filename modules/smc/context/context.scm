@@ -38,6 +38,7 @@
             context-buffer
             context-buffer-set!
             context-buffer-clear!
+            guard:#t
             action:store
             action:update-stanza))
 
@@ -98,5 +99,9 @@
       (stack-push! stanza (stack-content/reversed buf))
       (stack-clear! buf))
     ctx))
+
+(define (guard:#t event ctx)
+  "This guard is always returns #t."
+  #t)
 
 ;;; context.scm ends here.
