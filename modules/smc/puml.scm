@@ -32,9 +32,8 @@
   #:use-module (smc core state)
   #:use-module (smc fsm)
   #:use-module (smc core log)
-  #:use-module (smc core context)
   #:use-module (smc core stack)
-  #:use-module (smc guards char)
+  #:use-module (smc context char-context)
   #:export (<puml-context>
             puml-context-fsm
             puml-context-module
@@ -43,7 +42,7 @@
 
 
 
-(define-class <puml-context> (<context>)
+(define-class <puml-context> (<char-context>)
   (fsm
    #:init-value (make <fsm>)
    #:getter     puml-context-fsm)
@@ -302,11 +301,13 @@
            #:transition-table %transition-table)))
 
     (let loop ((context (make <puml-context> #:module module)))
-      (receive (new-state new-context)
-          (fsm-run! reader-fsm (get-char port) context)
-        (if new-state
-            (loop new-context)
-            (puml-context-fsm context))))))
+      (let ((ch (get-char port)))
+        (char-context-update-counters! context ch)
+        (receive (new-state new-context)
+            (fsm-run! reader-fsm ch context)
+          (if new-state
+              (loop new-context)
+              (puml-context-fsm context)))))))
 
 (define* (puml-string->fsm string
                            #:key

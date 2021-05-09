@@ -19,7 +19,7 @@
 
 include $(top_srcdir)/build-aux/am/guilec
 
-SUBDIRS = core guards
+SUBDIRS = core context guards
 
 SOURCES = \
 	fsm.scm 	\
