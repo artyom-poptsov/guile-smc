@@ -1,7 +1,7 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (oop goops)
-             (smc guards char))
+             (smc context char-context))
 
 
 (test-begin "guards")
