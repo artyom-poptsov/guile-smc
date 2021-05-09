@@ -20,7 +20,8 @@
 include $(top_srcdir)/build-aux/am/guilec
 
 SOURCES = \
-	context.scm
+	context.scm		\
+	char-context.scm
 
 GOBJECTS = $(SOURCES:%.scm=%.go)
 moddir=$(guilesitedir)/smc/context/
