@@ -2,7 +2,7 @@
              (srfi srfi-26)
              (ice-9 receive)
              (oop goops)
-             (smc guards char)
+             (smc context char-context)
              (smc fsm)
              (smc puml)
              (smc core state))
