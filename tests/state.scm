@@ -3,7 +3,7 @@
              (ice-9 receive)
              (ice-9 regex)
              (oop goops)
-             (smc guards char)
+             (smc context char-context)
              (smc fsm)
              (smc core state))
 
