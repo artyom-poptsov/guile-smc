@@ -55,7 +55,7 @@
   ;;
   ;; <stack>
   (buffer
-   #:init-value (make <stack>)
+   #:init-thunk (lambda () (make <stack>))
    #:getter     context-buffer
    #:setter     context-buffer-set!)
 
@@ -63,7 +63,7 @@
   ;;
   ;;<stack>
   (stanza
-   #:init-value (make <stack>)
+   #:init-thunk (lambda () (make <stack>))
    #:getter     context-stanza
    #:setter     context-stanza-set!))
 
