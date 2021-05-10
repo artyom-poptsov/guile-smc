@@ -1,0 +1,50 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node Compiler
+@section Compiler
+
+The Guile-SMC finite state machines generated from a PlantUML format can be
+used for their purpose ``as is''.  But it can be costly to read the PlantUML
+each time a program run.
+
+To solve this problem Guile-SMC provides a compiler that can translate the
+internal representation of a state machine into a Scheme code.
+
+@deffn {Scheme Procedure} fsm-compile fsm @
+               [#:fsm-name='custom-fsm]   @
+               [#:fsm-module=#f]          @
+               [#:extra-modules='()]      @
+               [#:output-port=(current-output-port)]
+
+Compile a @var{fsm} into a Scheme module.
+
+Named parameters:
+
+@table @asis
+@item #:fsm-name (name <symbol>)
+Set the name for the output finite state machine. Basically the name turns to
+the FSM class (like @code{<custom-fsm>} for the default value.)
+
+@item #:fsm-module (module <list>)
+@itemx #:fsm-module (module <boolean>)
+The module to place the output FSM into. The value must be a list like
+@code{(my-parser my-fsm)} or #f if the @code{define-module} part should be
+omitted.
+
+@item #:extra-modules (modules-list <list>)
+A list of extra modules that required to run the output FSM.  These modules are
+added to to the output FSM module requirements.
+
+@item #:output-port (port <port>)
+The port to write the output FSM to.
+
+@end table
+
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:
