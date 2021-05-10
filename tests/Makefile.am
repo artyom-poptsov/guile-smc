@@ -19,7 +19,7 @@
 
 SCM_TESTS = \
 	state.scm	\
-	guards.scm	\
+	context.scm	\
 	stack.scm	\
 	fsm.scm		\
 	puml.scm

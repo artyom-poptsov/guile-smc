@@ -4,7 +4,7 @@
              (smc context char-context))
 
 
-(test-begin "guards")
+(test-begin "context")
 
 (test-assert "guard:#t"
   (guard:#t 'event 'context))
@@ -36,7 +36,7 @@
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
-(test-end "guards")
+(test-end "context")
 
 (exit exit-status)
 
