@@ -93,6 +93,9 @@ Core:
 * Log::         Logging facilities.
 * State::       A FSM state.
 * Stack::       Stack data structure implementation.
+
+Context:
+
 * Context::     A generic FSM context.
 
 @end menu
@@ -101,7 +104,7 @@ Core:
 @include api-core-log.texi
 @include api-core-state.texi
 @include api-core-stack.texi
-@include api-core-context.texi
+@include api-context.texi
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License

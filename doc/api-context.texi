@@ -35,7 +35,6 @@ Store an @var{event} into a @var{context} buffer.
 Store an @var{event} into a @var{context} stanza.
 @end deffn
 
-@node Character Context
 @subsection Character Context
 
 @code{(smc context char-context)} contains an implementation of a character
