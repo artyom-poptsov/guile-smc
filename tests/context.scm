@@ -3,8 +3,10 @@
              (oop goops)
              (smc context char-context))
 
+(define %test-suite-name "context")
+
 
-(test-begin "context")
+(test-begin %test-suite-name)
 
 (test-assert "guard:#t"
   (guard:#t 'event 'context))
@@ -36,7 +38,7 @@
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
-(test-end "context")
+(test-end %test-suite-name)
 
 (exit exit-status)
 
