@@ -10,6 +10,33 @@ GNU Guile state machine compiler.
     any later version.  Please see =COPYING= file for the terms of GNU General
     Public License.
 
+** Architecture
+   [[./doc/architecture.png]]
+
+   Internally a state machine represented by a hash table and a directed
+   graph. A hash table is used to keep track of all the states in a FSM that
+   enables fast state searching by a state name.
+
+   A directed graph is produced by the fact that each state keeps references
+   to all the states it can transition too.
+
+   There's also a reference to the current state of a FSM inside an =<fsm>=
+   instance; this reference changes each time the FSM transitions to a new
+   state.
+
+*** Transition table
+    Each state holds a transition table in a form of
+#+BEGIN_EXAMPLE scheme
+(list (list guard:some-guard action:some-action state1)
+      (list guard:#t         action:some-action state2))
+#+END_EXAMPLE
+
+    When =state-run= method is called on a state, the state loops over its
+    transition table and applies each transition guard to the incoming event
+    and current context. When a guard returns #t, the state applies a related
+    transition action to the event and the context and returns two values: a
+    reference to the next state and a new context returned by the action
+    procedure.
 ** Usage
    PlantUML (<http://www.plantuml.com/>) state machine compiler:
 #+BEGIN_EXAMPLE scheme
