@@ -53,15 +53,6 @@
    #:getter     puml-context-module))
 
 
-(define (buffer->string buffer)
-  (list->string (reverse buffer)))
-
-(define (state-name-symbol? char)
-  (or (char-set-contains? char char-set:letter)
-      (char-set-contains? char char-set:digit)
-      (char=? #\_)))
-
-
 
 ;; This procedure tries to resolve a procedure PROC-NAME in the provided
 ;; modules. When no procedure available with the given name, returns DEFAULT
