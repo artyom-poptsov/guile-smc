@@ -21,7 +21,7 @@ AUTOMAKE_OPTIONS = gnu
 
 info_TEXINFOS = guile-smc.texi
 
-guile_deck_TEXINFOS = \
+guile_smc_TEXINFOS = \
 	intro.texi		\
 	installation.texi	\
 	api-core-log.texi	\
