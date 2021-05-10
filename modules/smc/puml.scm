@@ -170,9 +170,6 @@
 (define (action:no-start-tag-error ch ctx)
   (error "No start tag found"))
 
-(define (action:syntax-error ch ctx)
-  (error "Syntax error"))
-
 (define (action:unexpected-end-of-file-error ch ctx)
   (error "Unexpected end of file"))
 
