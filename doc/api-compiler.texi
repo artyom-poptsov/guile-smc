@@ -5,6 +5,7 @@
 
 @node Compiler
 @section Compiler
+@cindex Compiler
 
 The Guile-SMC finite state machines generated from a PlantUML format can be
 used for their purpose ``as is''.  But it can be costly to read the PlantUML
