@@ -29,6 +29,7 @@
   #:use-module (oop goops)
   #:use-module (smc context context)
   #:re-export (;; From (smc context context)
+               <context>
                context?
                context-debug-mode?
                context-debug-mode-set!
