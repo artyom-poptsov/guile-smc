@@ -16,6 +16,12 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
    Thanks to Aleix Conchillo Flaqué.
 ** Expand the Texinfo documentation
 ** API changes
+*** =(smc context context)=: Bugfix
+    The =<context>= would always have unexpected side effects due to field
+    initialization with a single global instance of a <stack>. The instance
+    would become shared between all the context in an application.
+
+    Now the error is fixed.
 *** All transition guards are now a part of Guile-SMC contexts
     There are modules in =(smc context)= name space that contain the
     transition guards.
