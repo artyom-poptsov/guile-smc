@@ -59,13 +59,26 @@
             action:no-op))
 
 
+;; The main class that describes a finite state machine.
 (define-class <fsm> ()
+  ;; Is the debug mode enabled?
+  ;;
+  ;; <boolean>
   (debug-mode?
    #:init-value   #f
    #:init-keyword #:debug-mode?
    #:setter       fsm-debug-mode-set!
    #:getter       fsm-debug-mode?)
 
+  ;; A transition table in the following form:
+  ;;
+  ;;   key    | value         |
+  ;;   -------+---------------+
+  ;;   state1 | #<state ...>  |
+  ;;   state2 | #<state ...>  |
+  ;;   ...    | ...           |
+  ;;   stateN | #<state ...>  |
+  ;;
   ;; <hash-table>
   (transition-table
    #:getter     fsm-transition-table
@@ -82,18 +95,24 @@
    #:getter       fsm-current-state
    #:setter       fsm-current-state-set!)
 
+  ;; Counts the number of steps performed by the FSM during the execution.
+  ;;
   ;; <number>
   (step-counter
    #:init-value   0
    #:getter       fsm-step-counter
    #:setter       fsm-step-counter-set!)
 
+  ;; Counts the number of actual transitions between different states
+  ;; performed by the FSM during the execution.
+  ;;
   ;; <number>
   (transition-counter
    #:init-value   0
    #:getter       fsm-transition-counter
    #:setter       fsm-transition-counter-set!))
 
+;; Check if an OBJECT is an instance of <fsm> class.
 (define-method (fsm? object)
   (is-a? object <fsm>))
 
@@ -154,6 +173,7 @@
                  name
                  state))))
 
+;; Get a FSM state from the transition table of SELF by a NAME.
 (define-method (fsm-state (self <fsm>)
                           (name <symbol>))
   (hash-ref (fsm-transition-table self) name))
@@ -195,6 +215,17 @@
                     table)
     table))
 
+;; Convert a hash table to a transition list of the following form:
+;;
+;;   '((state1
+;;      "description"
+;;      (guard-procedure        action-procedure        next-state)
+;;      (guard-procedure        action-procedure        next-state)
+;;      ...
+;;      (guard-procedure        action-procedure        next-state))
+;;     (state1 ...))
+;;
+;; Return the transition list.
 (define-method (hash-table->transition-list table)
   (hash-map->list (lambda (state-name state)
                     (if (null? (state-transitions state))
@@ -208,6 +239,8 @@
                             (cons state-name
                                   (state-transitions state)))))
                   table))
+
+
 
 (define-method (initialize (self <fsm>) initargs)
   (next-method)
@@ -235,6 +268,8 @@
 
 (define-generic fsm-transition-add!)
 
+;; Add a new transition to a NEXT-STATE, guarded by a TGUARD with the
+;; specified transition ACTION.
 (define-method (fsm-transition-add! (self       <fsm>)
                                     (state      <state>)
                                     (tguard     <procedure>)
@@ -289,6 +324,7 @@
 
 
 
+;; Perform a single FSM step on the specified EVENT and a CONTEXT.
 (define-method (fsm-run! (self <fsm>) event context)
   (let ((state (fsm-current-state self)))
     (if state
