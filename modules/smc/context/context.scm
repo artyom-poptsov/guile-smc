@@ -39,6 +39,7 @@
             context-buffer-set!
             context-buffer-clear!
             guard:#t
+            action:no-op
             action:store
             action:update-stanza))
 
@@ -79,6 +80,9 @@
   (stack-clear! (context-stanza ctx)))
 
 
+
+(define (action:no-op event ctx)
+  ctx)
 
 (define (action:store event ctx)
   (when (context-debug-mode? ctx)

@@ -54,9 +54,7 @@
             hash-table->transition-list
 
             fsm-log-transition
-            fsm-log-error
-
-            action:no-op))
+            fsm-log-error))
 
 
 ;; The main class that describes a finite state machine.
@@ -396,11 +394,6 @@
                                            errors))))
                     (fsm-transition-table self))
     errors))
-
-
-
-(define (action:no-op event ctx)
-  ctx)
 
 ;;; fsm.scm ends here.
 

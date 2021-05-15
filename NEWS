@@ -22,6 +22,9 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
     would become shared between all the context in an application.
 
     Now the error is fixed.
+*** =action:no-op= procedure moved to the context
+    Now it's available from =(smc context char-context)= and =(smc context
+    context)=.
 *** All transition guards are now a part of Guile-SMC contexts
     There are modules in =(smc context)= name space that contain the
     transition guards.

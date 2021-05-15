@@ -40,6 +40,7 @@
                context-buffer-set!
                context-buffer-clear!
                guard:#t
+               action:no-op
                action:store
                action:update-stanza)
   #:export (<char-context>
