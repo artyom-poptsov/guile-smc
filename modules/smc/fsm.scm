@@ -129,7 +129,7 @@
   (log-debug "[~a] -> [*]" (state-name from)))
 
 (define (fsm-log-error state fmt . args)
-  (apply log-error (string-append "[~a]: " fmt) args))
+  (apply log-error (string-append "[~a]: ERROR: " fmt) args))
 
 
 
