@@ -6,6 +6,101 @@
 @node FSM
 @section FSM
 
+@deffn {Scheme Procedure} fsm? object
+Check if an @var{object} is an @code{<fsm>} instance.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-state-add! (fsm <fsm>) (state <state>)
+Add a new @var{state} to the @var{fsm} state table.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-state (fsm <fsm>) (name <symbol>)
+Lookup a state by its @var{name} from the state table of @var{fsm}.
+@end deffn
+
+@deffn {Scheme Procedure} transition-list->hash-table @
+               (transition-list <list>)
+Convert a @var{transition-list} to a hash table.
+@end deffn
+
+@deffn {Scheme Procedure} hash-table->transition-list table
+Convert a hash @var{table} to a transition list of the following form:
+
+@example lisp
+'((state1
+   "description"
+   (guard-procedure        action-procedure        next-state)
+   (guard-procedure        action-procedure        next-state)
+   ...
+   (guard-procedure        action-procedure        next-state))
+  (state1 ...))
+@end example
+
+Return the transition list.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-transition-add! @
+               (self   <fsm>) @
+               (state  <state>) @
+               (tguard <procedure>) @
+               (action <procedure>) @
+               next-state
+@deffnx {Scheme Procedure} fsm-transition-add! @
+               (self       <fsm>) @
+               (state-name <symbol>) @
+               (tguard     <procedure>) @
+               (action     <procedure>) @
+               next-state
+@deffnx {Scheme Procedure} fsm-transition-add! @
+               (self        <fsm>) @
+               (state-name  <symbol>) @
+               (transitions <list>)
+Add a new transition to a @var{next-state}, guarded by a @var{tguard} with the
+specified transition @var{action}.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-state-description-add! @
+               (self        <fsm>) @
+               (state-name  <symbol>) @
+               (description <string>)
+
+Add a new @var{description} to a state @var{state-name}.
+
+@end deffn
+
+@deffn {Scheme Procedure} fsm-run! (fsm <fsm>) event context
+Perform a single @var{fsm} step on the specified @var{event} and a
+@var{context}.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-state-count (fsm <fsm>)
+ Calculate the number of states in a finite state machine @var{fsm}. Return
+the number of states.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-transition-count (self <fsm>)
+Calculate the total transition count for a finite state machine @var{fsm}.
+Return the number of transitions.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-incoming-transition-count self state @
+               [#:include-recurrent-links?=#f]
+
+Calculate the incoming transition count for a @var{state}. Optionally the
+procedure can include recurrent links of a @var{state} to itself in the
+calculation if @var{include-recurrent-links?} is set to @code{#t}.
+
+@end deffn
+
+@deffn {Scheme Procedure} fsm-state-reachable? (fsm <fsm>) (state <state>)
+Check if a @var{state} is reachable in the finite state machine @var{fsm}.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-validate (fsm <fsm>)
+Validate the finite state machine @var{fsm} and return the list of errors. If
+the list is empty then no errors were found.
+@end deffn
+
 @subsection Logging
 @cindex FSM logging
 
