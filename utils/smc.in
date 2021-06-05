@@ -39,6 +39,11 @@ Options:
     (validate                                   (value #f))
     (debug                                      (value #f))))
 
+(define (add-to-load-path* dirs)
+  "Add all @var{dirs} to the load path list."
+  (for-each (lambda (dir) (add-to-load-path dir)) dirs))
+
+
 (define (main args)
   (let* ((options (getopt-long args %option-spec))
          (extra-load-paths (option-ref options 'load-path ""))
@@ -47,8 +52,7 @@ Options:
     (when (option-ref options 'help #f)
       (print-help-and-exit))
 
-    (for-each (lambda (dir) (add-to-load-path dir))
-              (string-split extra-load-paths #\:))
+    (add-to-load-path* (string-split extra-load-paths #\:))
 
     (log-use-stderr! debug-mode?)
     (let* ((modules      (option-ref options 'modules #f))
