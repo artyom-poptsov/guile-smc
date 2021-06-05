@@ -43,6 +43,12 @@ Options:
   "Add all @var{dirs} to the load path list."
   (for-each (lambda (dir) (add-to-load-path dir)) dirs))
 
+;; Core modules required to run the 'puml->fsm' converter.
+(define %core-modules
+  (list (resolve-module '(smc guards char))
+        (resolve-module '(smc puml))
+        (resolve-module '(smc fsm))))
+
 
 (define (main args)
   (let* ((options (getopt-long args %option-spec))
@@ -56,16 +62,13 @@ Options:
 
     (log-use-stderr! debug-mode?)
     (let* ((modules      (option-ref options 'modules #f))
-           (core-modules (list (resolve-module '(smc guards char))
-                               (resolve-module '(smc puml))
-                               (resolve-module '(smc fsm))))
            (fsm     (puml->fsm (current-input-port)
                                #:module (if modules
-                                            (append core-modules
+                                            (append %core-modules
                                                     (map resolve-module
                                                          (eval-string
                                                           (string-append "(quote " modules ")"))))
-                                            core-modules)
+                                            %core-modules)
                                #:debug-mode? debug-mode?)))
       (when (option-ref options 'validate #f)
         (let ((validation-result (fsm-validate fsm)))
