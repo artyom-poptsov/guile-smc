@@ -49,6 +49,11 @@ Options:
         (resolve-module '(smc puml))
         (resolve-module '(smc fsm))))
 
+(define (pretty-print-transition-table fsm)
+  "Pretty print the transition table for a specified @var{fsm}."
+  (pretty-print (hash-table->transition-list (fsm-transition-table fsm))
+                #:display? #t))
+
 
 (define (main args)
   (let* ((options (getopt-long args %option-spec))
@@ -77,9 +82,7 @@ Options:
             (exit 1))))
       (cond
        ((option-ref options 'print-transition-table #f)
-        (pretty-print
-         (hash-table->transition-list (fsm-transition-table fsm))
-         #:display? #t))
+        (pretty-print-transition-table fsm))
        (else
         (let ((name   (option-ref options 'fsm-name 'custom-fsm))
               (module (option-ref options 'fsm-module #f)))
