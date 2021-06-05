@@ -78,9 +78,11 @@ Options:
               (module (option-ref options 'fsm-module #f)))
           (fsm-compile fsm
                        #:fsm-name      name
-                       #:fsm-module    (eval-string (string-append "(quote " module ")"))
-                       #:extra-modules (eval-string
-                                        (string-append "(quote " modules ")")))))))))
+                       #:fsm-module    (and module
+                                            (eval-string (string-append "(quote " module ")")))
+                       #:extra-modules (and modules
+                                            (eval-string
+                                             (string-append "(quote " modules ")"))))))))))
 
 ;;;
 
