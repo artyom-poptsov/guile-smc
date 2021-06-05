@@ -54,6 +54,10 @@ Options:
   (pretty-print (hash-table->transition-list (fsm-transition-table fsm))
                 #:display? #t))
 
+(define (eval-string/quote string)
+  "Quote and evaluate a @var{string}."
+  (eval-string (string-append "(quote " string ")")))
+
 
 (define (main args)
   (let* ((options (getopt-long args %option-spec))
@@ -71,8 +75,7 @@ Options:
                                #:module (if modules
                                             (append %core-modules
                                                     (map resolve-module
-                                                         (eval-string
-                                                          (string-append "(quote " modules ")"))))
+                                                         (eval-string/quote modules)))
                                             %core-modules)
                                #:debug-mode? debug-mode?)))
       (when (option-ref options 'validate #f)
@@ -89,10 +92,9 @@ Options:
           (fsm-compile fsm
                        #:fsm-name      name
                        #:fsm-module    (and module
-                                            (eval-string (string-append "(quote " module ")")))
+                                            (eval-string/quote module))
                        #:extra-modules (and modules
-                                            (eval-string
-                                             (string-append "(quote " modules ")"))))))))))
+                                            (eval-string/quote modules)))))))))
 
 ;;;
 
