@@ -278,6 +278,14 @@
 
 
 
+(define (fsm-pretty-print-statistics fsm port)
+  (display ";;; Statistics:\n" port)
+  (for-each (lambda (record)
+              (format port ";;;   ~10a: ~10a~%"
+                      (car record)
+                      (cdr record)))
+            (fsm-statistics fsm)))
+
 (define* (puml->fsm port
                     #:key
                     (module (current-module))
@@ -295,7 +303,10 @@
             (fsm-run! reader-fsm ch context)
           (if new-state
               (loop new-context)
-              (puml-context-fsm context)))))))
+              (let ((output-fsm (puml-context-fsm context)))
+                (when debug-mode?
+                  (fsm-pretty-print-statistics reader-fsm (current-error-port)))
+                output-fsm)))))))
 
 (define* (puml-string->fsm string
                            #:key
