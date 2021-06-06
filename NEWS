@@ -7,7 +7,7 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
-* Unreleased
+* Version 0.2.0 (2021-06-06)
 ** Fix installation paths for source and compiled and files
    - Compiled files are now installed to the right 'site-ccache' path.
    - Guile modules are now installed to the current Guile site directory by
