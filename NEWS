@@ -28,6 +28,8 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
 *** All transition guards are now a part of Guile-SMC contexts
     There are modules in =(smc context)= name space that contain the
     transition guards.
+
+    =(smc guards char)= is removed.
 *** =(smc context char-context)=: New module
     This module contains a context for handling streams of characters.
 *** In =(smc fsm)=
@@ -35,11 +37,14 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
      - =fsm?=
 **** Renames
      - =log-debug-transition= -> =fsm-log-transition=
-*** smc: Handle FSM validation independently
+** Changes in =smc= program
+*** Handle FSM validation independently
     The =smc= tool now handles FSM validation (=--validation= flag)
     independently from e.g. compilation. Compilation stops when any problems in
     the output FSM are found.
-
+*** Handle empty =modules= and =fsm-module= options
+    The program does not throw an error when the options left empty -- it uses
+    default values instead.
 * Version 0.1.0 (2021-05-01)
   First version of Guile-SMC.
 
