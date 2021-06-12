@@ -45,8 +45,8 @@
                action:update-stanza)
   #:export (<char-context>
             char-context-counter
-            char-context-row-number
-            char-context-col-number
+            char-context-row
+            char-context-col
             char-context-update-counters!
             guard:asterisk?
             guard:equals-sign?
