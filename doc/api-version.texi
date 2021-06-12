@@ -1,0 +1,52 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node Version
+@section Version
+
+@code{(smc version)} contains procedures that allow to acquire information
+about the Guile-SMC version in the @url{https://semver.org/, Semantic
+Versioning format}.
+
+Guile-SMC version consists of three parts: MAJOR.MINOR.PATCH
+
+The procedures below allow to get any of the version part or the version as a
+whole.
+
+@cindex Versioning
+@deffn {Scheme Procedure} smc-version
+Return the Guile-SMC version as multiple values: ``MAJOR'', ``MINOR'', ``PATCH''.
+
+Usage example:
+
+@example lisp
+(use-modules (ice-9 receive))
+
+(receive (major minor patch)
+    (smc-version)
+  ..)
+@end example
+
+@end deffn
+
+@deffn {Scheme Procedure} smc-version/string
+Get the raw Guile-SMC version as a string.
+@end deffn
+
+@deffn {Scheme Procedure} smc-version/major
+Get the ``MAJOR'' part of the Guile-SMC version.
+@end deffn
+
+@deffn {Scheme Procedure} smc-version/minor
+Get the ``MINOR'' part of the Guile-SMC version.
+@end deffn
+
+@deffn {Scheme Procedure} smc-version/patch
+Get the ``PATCH'' part of the Guile-SMC version.
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:

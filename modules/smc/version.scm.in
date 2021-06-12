@@ -1,0 +1,83 @@
+;;; version.scm -- Guile-SMC version.
+
+;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; The program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with the program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+;;; Commentary:
+
+;; This module contains procedures that allow to acquire information about the
+;; Guile-SMC version in the Semantic Versioning format. [1]
+;;
+;; Guile-SMC version consists of three parts:
+;;   MAJOR.MINOR.PATCH
+;;
+;; The procedures below allow to get any of the version part or the version as
+;; a whole.
+;;
+;; References:
+;; 1: https://semver.org/
+
+
+;;; Code:
+
+
+(define-module (smc version)
+  #:use-module (ice-9 receive)
+  #:export (smc-version
+            smc-version/string
+            smc-version/major
+            smc-version/minor
+            smc-version/patch))
+
+
+(define %smc-version "@VERSION@")
+
+
+(define (smc-version/string)
+  "Get the raw Guile-SMC version as a string."
+  %smc-version)
+
+(define (smc-version)
+  "Return the Guile-SMC version as multiple values: MAJOR, MINOR, PATCH."
+  (let ((lst (map string->number
+                  (string-split %smc-version #\.))))
+    (values (list-ref lst 0) (list-ref lst 1) (list-ref lst 2))))
+
+(define (smc-version/major)
+  "Get the MAJOR part of the Guile-SMC version."
+  (receive (major minor patch)
+      (smc-version)
+    major))
+
+(define (smc-version/minor)
+  "Get the MINOR part of the Guile-SMC version."
+  (receive (major minor patch)
+      (smc-version)
+    minor))
+
+(define (smc-version/patch)
+  "Get the PATCH part of the Guile-SMC version."
+  (receive (major minor patch)
+      (smc-version)
+    patch))
+
+;;;
+
+;; Local Variables:
+;; mode: Scheme
+;; End:
+
+;;; version.in ends here
