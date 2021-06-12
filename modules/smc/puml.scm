@@ -73,7 +73,20 @@
            (proc
             proc)
            ((and (not proc) (null? mods))
+            (log-error
+             "input:~a:~a: Could not find \"~a\" procedure in provided modules: ~a"
+             (char-context-row ctx)
+             (char-context-col ctx)
+             proc-name
+             (puml-context-module ctx))
+            (log-error
+             "input:~a:~a: Stanza: ~a"
+             (char-context-row ctx)
+             (char-context-col ctx)
+             (stanza->list-of-symbols (context-stanza ctx)))
             (error "Could not find procedure in provided modules"
+                   (char-context-row ctx)
+                   (char-context-col ctx)
                    proc-name))
            (else
             (loop (cdr mods)))))))
@@ -99,16 +112,24 @@
                        (list-ref stanza 2)))
          (action  (and (= (length stanza) 4)
                        (list-ref stanza 3))))
-    (log-debug "action:add-state-transition: [~a] -> [~a]: ~a -> ~a"
+    (log-debug "input:~a:~a: action:add-state-transition: [~a] -> [~a]: ~a -> ~a"
+               (char-context-row ctx)
+               (char-context-col ctx)
                from to
                tguard action)
     (cond
      ((equal? from '*)
-      (log-debug "action:add-state-transition: Adding first state...")
+      (log-debug "input:~a:~a: action:add-state-transition: Adding first state..."
+                 (char-context-row ctx)
+                 (char-context-col ctx))
       (let ((state (make <state> #:name to)))
         (fsm-state-add! fsm state)
         (fsm-current-state-set! fsm state)))
      ((and (equal? from '*) (equal? to '*))
+      (log-error
+       "input~a:~a: Meaningless transition: [*] -> [*]"
+       (char-context-row ctx)
+       (char-context-col ctx))
       (error "Meaningless transition: [*] -> [*]"))
      (else
       (fsm-transition-add! fsm
@@ -134,6 +155,10 @@
          (new-description (list->string (stack-content/reversed buf))))
 
     (when (equal? state-name (string->symbol "*"))
+      (log-error
+       "input:~a:~a: [*] cannot have description"
+       (char-context-row ctx)
+       (char-context-col ctx))
       (error "[*] cannot have description"))
 
     (if description
@@ -154,14 +179,26 @@
   (let* ((buf (context-buffer ctx))
          (str (list->string (stack-content/reversed buf))))
     (unless (string=? str "@startuml")
+      (log-error
+       "input:~a:~a: Misspelled @startuml"
+       (char-context-row ctx)
+       (char-context-col ctx))
       (error "Misspelled @startuml" str))
     (context-buffer-clear! ctx)
     ctx))
 
 (define (action:no-start-tag-error ch ctx)
+  (log-error
+   "input:~a:~a: No start tag found"
+   (char-context-row ctx)
+   (char-context-col ctx))
   (error "No start tag found"))
 
 (define (action:unexpected-end-of-file-error ch ctx)
+  (log-error
+   "input:~a:~a: Unexpected end of file"
+   (char-context-row ctx)
+   (char-context-col ctx))
   (error "Unexpected end of file"))
 
 
