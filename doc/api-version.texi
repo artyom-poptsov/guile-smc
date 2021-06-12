@@ -17,16 +17,9 @@ whole.
 
 @cindex Versioning
 @deffn {Scheme Procedure} smc-version
-Return the Guile-SMC version as multiple values: ``MAJOR'', ``MINOR'', ``PATCH''.
-
-Usage example:
-
+Return the Guile-SMC version as a list of the following form:
 @example lisp
-(use-modules (ice-9 receive))
-
-(receive (major minor patch)
-    (smc-version)
-  ..)
+'(MAJOR MINOR PATCH)
 @end example
 
 @end deffn

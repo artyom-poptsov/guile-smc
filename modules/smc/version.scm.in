@@ -35,7 +35,6 @@
 
 
 (define-module (smc version)
-  #:use-module (ice-9 receive)
   #:export (smc-version
             smc-version/string
             smc-version/major
@@ -51,28 +50,21 @@
   %smc-version)
 
 (define (smc-version)
-  "Return the Guile-SMC version as multiple values: MAJOR, MINOR, PATCH."
-  (let ((lst (map string->number
-                  (string-split %smc-version #\.))))
-    (values (list-ref lst 0) (list-ref lst 1) (list-ref lst 2))))
+  "Return the Guile-SMC version as a list of the following form:
+'(MAJOR MINOR PATCH)"
+  (map string->number (string-split %smc-version #\.)))
 
 (define (smc-version/major)
   "Get the MAJOR part of the Guile-SMC version."
-  (receive (major minor patch)
-      (smc-version)
-    major))
+  (list-ref (smc-version) 0))
 
 (define (smc-version/minor)
   "Get the MINOR part of the Guile-SMC version."
-  (receive (major minor patch)
-      (smc-version)
-    minor))
+  (list-ref (smc-version) 1))
 
 (define (smc-version/patch)
   "Get the PATCH part of the Guile-SMC version."
-  (receive (major minor patch)
-      (smc-version)
-    patch))
+  (list-ref (smc-version) 2))
 
 ;;;
 
