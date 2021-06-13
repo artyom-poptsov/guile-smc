@@ -43,7 +43,7 @@ AC_ARG_WITH([guilesitedir],
              esac],
              [guilesitedir=""])
 
-GUILE_PKG([3.0 2.2])
+GUILE_PKG([3.0.4 3.0 2.2])
 GUILE_PROGS
 GUILE_SITE_DIR
 
