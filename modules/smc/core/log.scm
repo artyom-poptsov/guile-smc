@@ -33,7 +33,12 @@
             log-debug
             log-use-stderr!))
 
-(define %logger "/usr/bin/logger")
+(define %logger
+  (begin
+    (use-modules (ice-9 popen)
+                 (ice-9 rdelim))
+    (read-line (open-input-pipe "which logger"))))
+
 (define %tag    "guile-smc")
 
 (define *use-stderr?* #f)
