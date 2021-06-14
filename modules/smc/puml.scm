@@ -29,6 +29,8 @@
   #:use-module (oop goops)
   #:use-module (ice-9 receive)
   #:use-module (ice-9 textual-ports)
+  #:use-module ((ice-9 format)
+                #:prefix ice-9)
   #:use-module (smc core state)
   #:use-module (smc fsm)
   #:use-module (smc core log)
@@ -318,9 +320,9 @@
 (define (fsm-pretty-print-statistics fsm port)
   (display ";;; Statistics:\n" port)
   (for-each (lambda (record)
-              (format port ";;;   ~10a: ~10a~%"
-                      (car record)
-                      (cdr record)))
+              (ice-9:format port ";;;   ~10a: ~10a~%"
+                            (car record)
+                            (cdr record)))
             (fsm-statistics fsm)))
 
 (define* (puml->fsm port
