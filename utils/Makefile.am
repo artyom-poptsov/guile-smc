@@ -28,7 +28,8 @@ SUFFIXES = .in
 substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 
 .in:
-	$(substitute) "$^" > "$@.tmp" && 	\
+	@echo "  GEN      $@"
+	@$(substitute) "$^" > "$@.tmp" && 	\
 	chmod +x "$@.tmp" &&			\
 	mv "$@.tmp" "$@"
 
