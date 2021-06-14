@@ -50,6 +50,9 @@ GUILE_WARNINGS = -Wunbound-variable -Warity-mismatch -Wformat
 SUFFIXES = .scm .go .in
 
 guilec_opts = --load-path=$(abs_top_srcdir)/modules/
+
+guilec_env = GUILE_AUTO_COMPILE=0
+
 .scm.go:
 	$(AM_V_GUILEC)$(guilec_env) $(GUILEC) $(guilec_opts) \
 	--output=$@ $<
