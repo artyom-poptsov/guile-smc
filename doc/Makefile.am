@@ -29,6 +29,7 @@ guile_smc_TEXINFOS = \
 	api-core-state.texi 	\
 	api-context.texi	\
 	api-fsm.texi		\
+	api-puml.texi		\
 	api-compiler.texi	\
 	api-version.texi	\
 	indices.texi		\

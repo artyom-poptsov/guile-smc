@@ -1,0 +1,47 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2021 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node PlantUML
+@section PlantUML
+
+The @code{(smc puml)} module contains a parser implementation for
+@url{http://www.plantuml.com/, PlantUML} format.
+
+@deftp {Class} <puml-context> #:module
+
+@table @asis
+@item #:module
+A module which contains state machine procedures.
+@end table
+
+@end deftp
+
+@deffn {Scheme Procedure} puml-context-fsm (context <puml-context>)
+Get the @var{context} output finite state machine.
+@end deffn
+
+@deffn {Scheme Procedure} puml-context-module (context <puml-context>)
+Get the @var{context} module.
+@end deffn
+
+@deffn {Scheme Procedure} puml->fsm port @
+              [#:module=(current-module)] @
+              [#:debug-mode?=#f]
+
+Read a FSM description from a @var{port} in the PlantUML format and convert it
+to Guile-SMC @code{<fsm>} instance.
+@end deffn
+
+@deffn {Scheme Procedure} puml-string->fsm port @
+              [#:module=(current-module)] @
+              [#:debug-mode?=#f]
+
+Convert a @var{string} in the PlantUML format and to Guile-SMC @code{<fsm>}
+instance.
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:

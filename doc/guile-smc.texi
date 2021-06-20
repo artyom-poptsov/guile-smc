@@ -87,6 +87,7 @@ Indices
 @menu
 
 * FSM::         Finite State Machines
+* PlantUML::    PlantUML reader.
 * Compiler::    The state machine compiler.
 * Version::     Guile-SMC version.
 
@@ -103,6 +104,7 @@ Context:
 @end menu
 
 @include api-fsm.texi
+@include api-puml.texi
 @include api-compiler.texi
 @include api-version.texi
 @include api-core-log.texi
