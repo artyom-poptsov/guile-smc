@@ -100,10 +100,10 @@
          (string->symbol (list->string elem)))
        (stack-content/reversed stanza)))
 
-(define (action:add-state-transition ch ctx)
+(define (action:add-state-transition ctx ch)
 
   (unless (stack-empty? (context-buffer ctx))
-    (action:update-stanza ch ctx))
+    (action:update-stanza ctx ch))
 
   (let* ((fsm     (puml-context-fsm ctx))
          (stanza  (stanza->list-of-symbols (context-stanza ctx)))
@@ -146,7 +146,7 @@
 
     ctx))
 
-(define (action:add-state-description ch ctx)
+(define (action:add-state-description ctx ch)
   (let* ((fsm             (puml-context-fsm ctx))
          (stanza          (stanza->list-of-symbols (context-stanza ctx)))
          (buf             (context-buffer ctx))
@@ -177,7 +177,7 @@
     (context-stanza-clear! ctx)
     ctx))
 
-(define (action:check-start-tag ch ctx)
+(define (action:check-start-tag ctx ch)
   (let* ((buf (context-buffer ctx))
          (str (list->string (stack-content/reversed buf))))
     (unless (string=? str "@startuml")
@@ -189,14 +189,14 @@
     (context-buffer-clear! ctx)
     ctx))
 
-(define (action:no-start-tag-error ch ctx)
+(define (action:no-start-tag-error ctx ch)
   (log-error
    "input:~a:~a: No start tag found"
    (char-context-row ctx)
    (char-context-col ctx))
   (error "No start tag found"))
 
-(define (action:unexpected-end-of-file-error ch ctx)
+(define (action:unexpected-end-of-file-error ctx ch)
   (log-error
    "input:~a:~a: Unexpected end of file"
    (char-context-row ctx)

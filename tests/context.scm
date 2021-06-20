@@ -14,31 +14,31 @@
 ;;; Guards.
 
 (test-assert "guard:#t"
-  (guard:#t 'event 'context))
+  (guard:#t 'context 'event))
 
 (test-assert "guard:newline?"
-  (guard:newline? #\newline '()))
+  (guard:newline? '() #\newline))
 
 (test-assert "guard:space?"
-  (guard:space? #\space '()))
+  (guard:space? '() #\space))
 
 (test-assert "guard:letter?"
-  (guard:letter? #\a '()))
+  (guard:letter? '() #\a))
 
 (test-assert "guard:single-quote?"
-  (guard:single-quote? #\' '()))
+  (guard:single-quote? '() #\'))
 
 (test-assert "guard:colon?"
-  (guard:colon? #\: '()))
+  (guard:colon? '() #\:))
 
 (test-assert "guard:left-square-bracket?"
-  (guard:left-square-bracket? #\[ '()))
+  (guard:left-square-bracket? '() #\[))
 
 (test-assert "guard:right-square-bracket?"
-  (guard:right-square-bracket? #\] '()))
+  (guard:right-square-bracket? '() #\]))
 
 (test-assert "guard:at-symbol?"
-  (guard:at-symbol? #\@ '()))
+  (guard:at-symbol? '() #\@))
 
 
 ;;; Generic context.
@@ -57,13 +57,13 @@
 (test-equal "action:store"
   '("world" "hello")
   (let ((ctx (make <context>)))
-    (action:store "world" (action:store "hello" ctx))
+    (action:store (action:store ctx "hello") "world")
     (smc:stack-content (context-buffer ctx))))
 
 (test-assert "action:update-stanza"
   (let ((ctx (make <context>)))
-    (action:store "world" (action:store "hello" ctx))
-    (action:update-stanza #f ctx)
+    (action:store (action:store ctx "hello") "world")
+    (action:update-stanza ctx #f)
     (and (equal? (smc:stack-content (context-stanza ctx))
                  '(("hello" "world")))
          (smc:stack-empty? (context-buffer ctx)))))

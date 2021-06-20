@@ -27,11 +27,11 @@ Clear the @var{context} buffer.
 Clear the @var{context} stanza.
 @end deffn
 
-@deffn {Scheme Procedure} action:store event context
+@deffn {Scheme Procedure} action:store context event
 Store an @var{event} into a @var{context} buffer.
 @end deffn
 
-@deffn {Scheme Procedure} action:update-stanza event ctx
+@deffn {Scheme Procedure} action:update-stanza context event
 Store an @var{event} into a @var{context} stanza.
 @end deffn
 
@@ -58,27 +58,27 @@ Returns the current column number for a context @var{ctx}.
 
 @subsubsection Guards
 
-@deffn  {Scheme Procedure} guard:asterisk? ch ctx
-@deffnx {Scheme Procedure} guard:equals-sign? ch ctx
-@deffnx {Scheme Procedure} guard:newline? ch ctx
-@deffnx {Scheme Procedure} guard:hyphen-minus? ch ctx
-@deffnx {Scheme Procedure} guard:space? ch ctx
-@deffnx {Scheme Procedure} guard:less-than-sign? ch ctx
-@deffnx {Scheme Procedure} guard:letter? ch ctx
-@deffnx {Scheme Procedure} guard:more-than-sign? ch ctx
-@deffnx {Scheme Procedure} guard:colon? ch ctx
-@deffnx {Scheme Procedure} guard:semicolon? ch ctx
-@deffnx {Scheme Procedure} guard:eof-object? ch ctx
-@deffnx {Scheme Procedure} guard:single-quote? ch ctx
-@deffnx {Scheme Procedure} guard:left-square-bracket? ch ctx
-@deffnx {Scheme Procedure} guard:right-square-bracket? ch ctx
-@deffnx {Scheme Procedure} guard:at-symbol? ch ctx
+@deffn  {Scheme Procedure} guard:asterisk? ctx ch
+@deffnx {Scheme Procedure} guard:equals-sign? ctx ch
+@deffnx {Scheme Procedure} guard:newline? ctx ch
+@deffnx {Scheme Procedure} guard:hyphen-minus? ctx ch
+@deffnx {Scheme Procedure} guard:space? ctx ch
+@deffnx {Scheme Procedure} guard:less-than-sign? ctx ch
+@deffnx {Scheme Procedure} guard:letter? ctx ch
+@deffnx {Scheme Procedure} guard:more-than-sign? ctx ch
+@deffnx {Scheme Procedure} guard:colon? ctx ch
+@deffnx {Scheme Procedure} guard:semicolon? ctx ch
+@deffnx {Scheme Procedure} guard:eof-object? ctx ch
+@deffnx {Scheme Procedure} guard:single-quote? ctx ch
+@deffnx {Scheme Procedure} guard:left-square-bracket? ctx ch
+@deffnx {Scheme Procedure} guard:right-square-bracket? ctx ch
+@deffnx {Scheme Procedure} guard:at-symbol? ctx ch
 These procedures check if a @var{ch} is a specific symbol.
 @end deffn
 
 @subsubsection Actions
 
-@deffn {Scheme Procedure} action:syntax-error ch ctx
+@deffn {Scheme Procedure} action:syntax-error ctx ch
 Throw a syntactic error with the current symbol @var{ch}, row, column and the
 context @var{ctx}.
 @end deffn

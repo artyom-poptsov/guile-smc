@@ -81,17 +81,17 @@
 
 
 
-(define (action:no-op event ctx)
+(define (action:no-op ctx event)
   ctx)
 
-(define (action:store event ctx)
+(define (action:store ctx event)
   (when (context-debug-mode? ctx)
     (log-debug "action:store: event: ~a; buffer: ~a"
                event (context-buffer ctx)))
   (stack-push! (context-buffer ctx) event)
   ctx)
 
-(define (action:update-stanza event ctx)
+(define (action:update-stanza ctx event)
   (let ((buf    (context-buffer ctx))
         (stanza (context-stanza ctx)))
     (unless (null? buf)
@@ -104,7 +104,7 @@
       (stack-clear! buf))
     ctx))
 
-(define (guard:#t event ctx)
+(define (guard:#t ctx event)
   "This guard is always returns #t."
   #t)
 

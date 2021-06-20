@@ -120,54 +120,54 @@
 
 ;;; Guards.
 
-(define (guard:equals-sign? ch ctx)
+(define (guard:equals-sign? ctx ch)
   (char=? ch #\=))
 
-(define (guard:newline? ch ctx)
+(define (guard:newline? ctx ch)
   (char=? ch #\newline))
 
-(define (guard:hyphen-minus? ch ctx)
+(define (guard:hyphen-minus? ctx ch)
   (char=? ch #\-))
 
-(define (guard:space? ch ctx)
+(define (guard:space? ctx ch)
   (char=? ch #\space))
 
-(define (guard:less-than-sign? ch ctx)
+(define (guard:less-than-sign? ctx ch)
   (char=? ch #\<))
 
-(define (guard:more-than-sign? ch ctx)
+(define (guard:more-than-sign? ctx ch)
   (char=? ch #\>))
 
-(define (guard:letter? ch ctx)
+(define (guard:letter? ctx ch)
   (char-set-contains? char-set:letter ch))
 
-(define (guard:eof-object? ch ctx)
+(define (guard:eof-object? ctx ch)
   (eof-object? ch))
 
-(define (guard:single-quote? ch ctx)
+(define (guard:single-quote? ctx ch)
   (char=? ch #\'))
 
-(define (guard:colon? ch ctx)
+(define (guard:colon? ctx ch)
   (char=? ch #\:))
 
-(define (guard:semicolon? ch ctx)
+(define (guard:semicolon? ctx ch)
   (char=? ch #\;))
 
-(define (guard:left-square-bracket? ch ctx)
+(define (guard:left-square-bracket? ctx ch)
   (char=? ch #\[))
 
-(define (guard:right-square-bracket? ch ctx)
+(define (guard:right-square-bracket? ctx ch)
   (char=? ch #\]))
 
-(define (guard:at-symbol? ch ctx)
+(define (guard:at-symbol? ctx ch)
   (char=? ch #\@))
 
-(define (guard:asterisk? ch ctx)
+(define (guard:asterisk? ctx ch)
   (char=? ch #\*))
 
 
 
-(define (action:syntax-error ch ctx)
+(define (action:syntax-error ctx ch)
   (error "Syntax error"
          (char-context-row ctx)
          (char-context-col ctx)

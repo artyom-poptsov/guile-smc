@@ -179,8 +179,8 @@
                (tguard     (list-ref transition 0))
                (action     (list-ref transition 1))
                (next-state (list-ref transition 2)))
-          (if (tguard event context)
-              (values next-state (action event context))
+          (if (tguard context event)
+              (values next-state (action context event))
               (loop (cdr transition-alist)))))))
 
 ;;; state.scm ends here.
