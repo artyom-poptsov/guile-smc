@@ -42,6 +42,12 @@ Convert a @var{string} in the PlantUML format and to Guile-SMC @code{<fsm>}
 instance.
 @end deffn
 
+@deffn {Scheme Procedure} resolve-procedure context proc-name default
+This procedure tries to resolve a procedure @var{proc-name} in the provided
+modules of a @var{context}. When no procedure available with the given name,
+returns @var{default} procedure.
+@end deffn
+
 @c Local Variables:
 @c TeX-master: "guile-smc.texi"
 @c End:

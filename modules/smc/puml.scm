@@ -37,6 +37,7 @@
   #:use-module (smc core stack)
   #:use-module (smc context char-context)
   #:export (<puml-context>
+            resolve-procedure
             puml-context-fsm
             puml-context-module
             puml->fsm
