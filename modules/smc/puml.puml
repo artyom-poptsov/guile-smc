@@ -1,25 +1,12 @@
 @startuml
 ' Entry point
-[*] -> search_start_tag
-
-' Searching 
-search_start_tag --> [*]: guard:eof-object? -> action:unexpected-end-of-file
-search_start_tag --> read_start_tag: guard:at-symbol? -> action:store
-search_start_tag --> search_start_tag_skip_comment: guard:single-quote?
-search_start_tag --> [*]: guard:letter? -> action:no-start-tag-error
-search_start_tag -> search_start_tag
-
-' Skipping comments 
-search_start_tag_skip_comment --> [*]: guard:eof-object?
-search_start_tag_skip_comment --> search_start_tag: guard:newline?
-search_start_tag_skip_comment --> search_start_tag_skip_comment
+[*] -> read_start_tag
 
 ' Reading 
-read_start_tag --> [*]: guard:eof-object?
+read_start_tag --> [*]: guard:eof-object? -> action:unexpected-end-of-file
 read_start_tag --> read: guard:space? -> action:check-start-tag
 read_start_tag --> read: guard:newline? -> action:check-start-tag
-read_start_tag --> read_start_tag: guard:#t -> action:store
-read_start_tag -> read_start_tag
+read_start_tag -> read_start_tag: guard:#t -> action:store
 
 ' Main FSM reading state
 read -> [*]: guard:eof-object?

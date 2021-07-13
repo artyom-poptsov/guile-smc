@@ -207,21 +207,9 @@
 
 
 (define %transition-table
-  `((search-start-tag
-     "Search the start @startuml tag."
-     (,guard:eof-object?     ,action:unexpected-end-of-file-error #f)
-     (,guard:at-symbol?      ,action:store       read-start-tag)
-     (,guard:single-quote?   ,action:no-op              search-start-tag/skip-comment)
-     (,guard:letter?         ,action:no-start-tag-error #f)
-     (,guard:#t              ,action:no-op              search-start-tag))
-    (search-start-tag/skip-comment
-     "Skip all comments that are present at the top of the file."
-     (,guard:eof-object?     ,action:no-op              #f)
-     (,guard:newline?        ,action:no-op              search-start-tag)
-     (,guard:#t              ,action:no-op              search-start-tag/skip-comment))
-    (read-start-tag
+  `((read-start-tag
      "Read the start @startuml tag and check it for errors."
-     (,guard:eof-object?     ,action:no-op              #f)
+     (,guard:eof-object?     ,action:unexpected-end-of-file-error #f)
      (,guard:space?          ,action:check-start-tag    read)
      (,guard:newline?        ,action:check-start-tag    read)
      (,guard:#t              ,action:store       read-start-tag))
