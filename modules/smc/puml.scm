@@ -209,7 +209,7 @@
 (define %transition-table
   `((search-start-tag
      "Search the start @startuml tag."
-     (,guard:eof-object?     ,action:no-op              #f)
+     (,guard:eof-object?     ,action:unexpected-end-of-file-error #f)
      (,guard:at-symbol?      ,action:store       read-start-tag)
      (,guard:single-quote?   ,action:no-op              search-start-tag/skip-comment)
      (,guard:letter?         ,action:no-start-tag-error #f)
