@@ -31,6 +31,8 @@
   #:use-module (smc core state)
   #:export (<fsm>
             fsm?
+            fsm-description
+            fsm-description-set!
             fsm-debug-mode-set!
             fsm-debug-mode?
             fsm-transition-table
@@ -59,6 +61,16 @@
 
 ;; The main class that describes a finite state machine.
 (define-class <fsm> ()
+
+  ;; Optional custom human-readable description for the finite-state machine.
+  ;;
+  ;; <string>
+  (description
+   #:init-value   #f
+   #:init-keyword #:description
+   #:getter       fsm-description
+   #:setter       fsm-description-set!)
+
   ;; Is the debug mode enabled?
   ;;
   ;; <boolean>
