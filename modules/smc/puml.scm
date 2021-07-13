@@ -321,6 +321,10 @@
   (log-use-stderr! debug-mode?)
   (let ((reader-fsm
          (make <fsm>
+           #:description (string-append
+                          "PlantUML <http://www.plantuml.com> Reader Finite-State Machine.\n"
+                          "This FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n"
+                          "<https://github.com/artyom-poptsov/guile-smc>")
            #:debug-mode? debug-mode?
            #:transition-table %transition-table)))
 
