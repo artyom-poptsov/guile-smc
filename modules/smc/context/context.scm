@@ -41,6 +41,7 @@
             guard:#t
             action:no-op
             action:store
+            action:clear-buffer
             action:update-stanza))
 
 ;; This class describes a generic parser context.
@@ -89,6 +90,11 @@
     (log-debug "action:store: event: ~a; buffer: ~a"
                event (context-buffer ctx)))
   (stack-push! (context-buffer ctx) event)
+  ctx)
+
+;; Clear the context CTX buffer.
+(define (action:clear-buffer ctx event)
+  (stack-clear! (context-buffer ctx))
   ctx)
 
 (define (action:update-stanza ctx event)
