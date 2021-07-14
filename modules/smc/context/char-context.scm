@@ -42,6 +42,7 @@
                guard:#t
                action:no-op
                action:store
+               action:clear-buffer
                action:update-stanza)
   #:export (<char-context>
             char-context-counter
