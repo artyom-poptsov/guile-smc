@@ -15,7 +15,7 @@
 
 (define (main args)
   (let ((fsm (puml->fsm (open-input-file (list-ref args 1))
-                        #:module (list (resolve-module '(smc guards char))
+                        #:module (list (resolve-module '(smc context char-context))
                                        (resolve-module '(smc puml))
                                        (resolve-module '(smc fsm)))
                         #:debug-mode? #t))
@@ -30,7 +30,7 @@
      #:display? #t)
     ;; (log-use-stderr! #t)
     ;; (fsm-debug-mode-set! fsm #t)
-    (let loop ((context (make <puml-context> #:module (list (resolve-module '(smc guards char))
+    (let loop ((context (make <puml-context> #:module (list (resolve-module '(smc context char-context))
                                                             (resolve-module '(smc puml))
                                                             (resolve-module '(smc fsm))))))
       (receive (new-state new-context)
