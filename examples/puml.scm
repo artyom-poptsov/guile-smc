@@ -10,7 +10,7 @@
 
 (define (main args)
   (let ((fsm (puml->fsm (current-input-port)
-                        #:module (list (resolve-module '(smc guards char))
+                        #:module (list (resolve-module '(smc context char-context))
                                        (resolve-module '(smc puml))
                                        (resolve-module '(smc fsm)))
                         #:debug-mode? #f)))
