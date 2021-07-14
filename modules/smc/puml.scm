@@ -30,7 +30,7 @@
   #:use-module (ice-9 receive)
   #:use-module (ice-9 textual-ports)
   #:use-module ((ice-9 format)
-                #:prefix ice-9)
+                #:prefix ice-9:)
   #:use-module (smc core state)
   #:use-module (smc fsm)
   #:use-module (smc core log)
