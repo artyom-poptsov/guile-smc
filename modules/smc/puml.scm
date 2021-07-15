@@ -199,6 +199,18 @@
     (context-buffer-clear! ctx)
     ctx))
 
+(define (action:check-end-tag ctx ch)
+  (let* ((buf (context-buffer ctx))
+         (str (list->string (stack-content/reversed buf))))
+    (unless (string=? str "@enduml")
+      (log-error
+       "input:~a:~a: Misspelled @enduml"
+       (char-context-row ctx)
+       (char-context-col ctx))
+      (error "Misspelled @end" str))
+    (context-buffer-clear! ctx)
+    ctx))
+
 (define (action:no-start-tag-error ctx ch)
   (log-error
    "input:~a:~a: No start tag found"
@@ -231,17 +243,18 @@
      (,guard:#t              ,action:store       read-start-tag))
     (read
      "Read the PlantUML transition table."
-     (,guard:eof-object?          ,action:no-op        #f)
-     (,guard:at-symbol?           ,action:no-op        read-end-tag)
+     (,guard:eof-object?          ,action:unexpected-end-of-file-error #f)
+     (,guard:at-symbol?           ,action:store        read-end-tag)
      (,guard:single-quote?        ,action:no-op        read/skip-comment)
      (,guard:left-square-bracket? ,action:no-op        read-state)
      (,guard:letter?              ,action:store        read-word)
      (,guard:#t                   ,action:no-op        read))
     (read-end-tag
      "Read the @enduml tag."
-     (,guard:eof-object?     ,action:no-op             #f)
-     (,guard:newline?        ,action:no-op             #f)
-     (,guard:#t              ,action:no-op             read-end-tag))
+     (,guard:eof-object?     ,action:check-end-tag     #f)
+     (,guard:newline?        ,action:check-end-tag     #f)
+     (,guard:space?          ,action:check-end-tag     #f)
+     (,guard:#t              ,action:store             read-end-tag))
     (read/skip-comment
      "Skip commentaries that are written between stanzas."
      (,guard:eof-object?     ,action:no-op             #f)

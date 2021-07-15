@@ -11,8 +11,8 @@ read_start_tag --> read: guard:newline? -> action:check-start-tag
 read_start_tag -> read_start_tag: guard:#t -> action:store
 
 ' Main FSM reading state
-read -> [*]: guard:eof-object?
-read --> read_end_tag: guard:at-symbol?
+read -> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
+read --> read_end_tag: guard:at-symbol? -> action:store
 read --> read_skip_comment: guard:single-quote?
 read --> read_state: guard:left-square-bracket?
 read --> read_word: guard:letter? -> action:store
@@ -20,9 +20,10 @@ read -> read
 
 ' Read 
 ' TODO: Add end tag check.
-read_end_tag --> [*]: guard:eof-object?
-read_end_tag --> [*]: guard:newline?
-read_end_tag ->  read_end_tag
+read_end_tag --> [*]: guard:eof-object? -> action:check-end-tag
+read_end_tag --> [*]: guard:newline? -> action:check-end-tag
+read_end_tag --> [*]: guard:space? -> action:check-end-tag
+read_end_tag ->  read_end_tag: guard:#t -> action:store
 
 ' Skipping comments
 read_skip_comment --> [*]: guard:eof-object?
