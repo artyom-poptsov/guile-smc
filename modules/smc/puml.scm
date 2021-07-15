@@ -207,7 +207,7 @@
        "input:~a:~a: Misspelled @enduml"
        (char-context-row ctx)
        (char-context-col ctx))
-      (error "Misspelled @end" str))
+      (error "Misspelled @enduml" str))
     (context-buffer-clear! ctx)
     ctx))
 
