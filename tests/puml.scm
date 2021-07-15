@@ -10,6 +10,9 @@
 
 (test-begin "puml")
 
+
+;; read-start-tag errors
+
 (test-error "puml-string->fsm: error: empty file"
   #t
   (puml-string->fsm ""))
@@ -19,6 +22,28 @@
   (puml-string->fsm (string-join
                      (list
                       "[*] -> state_1\n"
+                      "@enduml\n"))))
+
+(test-error "puml-string->fsm: error: @startuml is misspelled"
+  #t
+  (puml-string->fsm (string-join
+                     (list
+                      "@statruml"
+                      "[*] -> state_1\n"
+                      "@enduml\n"))))
+
+
+
+(test-assert "puml-string->fsm: minimal example, @startuml ends with a newline"
+  (puml-string->fsm (string-join
+                     (list
+                      "@startuml\n"
+                      "@enduml\n"))))
+
+(test-assert "puml-string->fsm: minimal example, @startuml ends with a space and newline"
+  (puml-string->fsm (string-join
+                     (list
+                      "@startuml \n"
                       "@enduml\n"))))
 
 (test-assert "puml-string->fsm: first state"
