@@ -29,6 +29,7 @@ read_skip_comment --> [*]: guard:eof-object?
 read_skip_comment --> read: guard:newline?
 read_skip_comment ->  read_skip_comment
 
+read_word --> [*]: guard:eof-object?
 read_word --> read_title: guard:title? -> action:update-stanza
 read_word --> search_state_transition: guard:space? -> action:update-stanza
 read_word --> read_state_description: guard:colon? -> action:update-stanza
