@@ -13,7 +13,18 @@
              (smc core log)
              (smc fsm))
 
+
+(define (print-help-and-exit prog)
+  "Print the help message and exit from the program."
+  (format #t "Usage: ~a <source-puml-file> <file-to-parse>~%" prog)
+  (exit 1))
+
+
 (define (main args)
+
+  (when (< (length args) 3)
+    (print-help-and-exit (car args)))
+
   (let ((fsm (puml->fsm (open-input-file (list-ref args 1))
                         #:module (list (resolve-module '(smc context char-context))
                                        (resolve-module '(smc puml))
