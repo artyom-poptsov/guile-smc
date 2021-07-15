@@ -60,6 +60,18 @@
                                  "@enduml\n")))))
     (state-description (fsm-state fsm 'state_1))))
 
+(test-equal "puml-string->fsm: an FSM with description"
+  "This is an FSM description."
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml\n"
+                                 "title This is an FSM description.\n"
+                                 "[*] -> state_1\n"
+                                 "state_1: A state description.\n"
+                                 "state_1 --> state_1: guard:#t\n"
+                                 "@enduml\n")))))
+    (fsm-description fsm)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
