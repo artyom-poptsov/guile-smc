@@ -251,6 +251,7 @@
      "Read a word."
      (,guard:eof-object?    ,action:no-op              #f)
      (,guard:title?         ,action:clear-buffer       read-title)
+     (,guard:colon?         ,action:update-stanza      read-state-description)
      (,guard:space?         ,action:update-stanza      search-state-transition)
      (,guard:#t             ,action:store              read-word))
     (read-title
