@@ -10,6 +10,10 @@
 
 (test-begin "puml")
 
+(test-error "puml-string->fsm: error: empty file"
+  #t
+  (puml-string->fsm ""))
+
 (test-error "puml-string->fsm: error: no @startuml"
   #t
   (puml-string->fsm (string-join
