@@ -230,12 +230,11 @@
     (hash-map->list (lambda (state-name state)
                       (let ((tr-table
                              (map (lambda (tr)
-                                    (let ((tguard     (transition:guard      tr))
-                                          (action     (transition:action     tr))
-                                          (next-state (transition:next-state tr)))
-                                      (list tguard
-                                            action
-                                            (hash-ref table next-state))))
+                                    (list
+                                     (transition:guard  tr)
+                                     (transition:action tr)
+                                     (hash-ref table
+                                               (transition:next-state tr))))
                                   (state-transitions state))))
                         (state-transitions-set! state tr-table)))
                     table)
