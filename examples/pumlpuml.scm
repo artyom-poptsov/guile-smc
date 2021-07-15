@@ -32,6 +32,8 @@
                         #:debug-mode? #t))
         (p (open-input-file (list-ref args 2))))
     (format #t "output fsm:             ~a~%" fsm)
+    (when (fsm-description fsm)
+      (format #t "  description:          ~a~%" (fsm-description fsm)))
     (format #t "  state count: ~s~%" (fsm-state-count fsm))
     (format #t "  validation result: ~%")
     (pretty-print (fsm-validate fsm))

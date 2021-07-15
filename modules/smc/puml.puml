@@ -1,9 +1,11 @@
 @startuml
+title PlantUML <plantuml.com> Reader FSM. This diagram is a part of Guile-SMC <github.com/artyom-poptsov/guile-smc>
+
 ' Entry point
 [*] -> read_start_tag
 
 ' Reading 
-read_start_tag --> [*]: guard:eof-object? -> action:unexpected-end-of-file
+read_start_tag --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
 read_start_tag --> read: guard:space? -> action:check-start-tag
 read_start_tag --> read: guard:newline? -> action:check-start-tag
 read_start_tag -> read_start_tag: guard:#t -> action:store
@@ -13,10 +15,10 @@ read -> [*]: guard:eof-object?
 read --> read_end_tag: guard:at-symbol?
 read --> read_skip_comment: guard:single-quote?
 read --> read_state: guard:left-square-bracket?
-read --> read_state: guard:letter? -> action:store
+read --> read_word: guard:letter? -> action:store
 read -> read
 
-' Read @enduml tag
+' Read 
 ' TODO: Add end tag check.
 read_end_tag --> [*]: guard:eof-object?
 read_end_tag --> [*]: guard:newline?
@@ -26,6 +28,15 @@ read_end_tag ->  read_end_tag
 read_skip_comment --> [*]: guard:eof-object?
 read_skip_comment --> read: guard:newline?
 read_skip_comment ->  read_skip_comment
+
+read_word --> read_title: guard:title? -> action:update-stanza
+read_word --> search_state_transition: guard:space? -> action:update-stanza
+read_word --> read_state_description: guard:colon? -> action:update-stanza
+read_word -> read_word: guard:#t -> action:store
+
+read_title --> [*]: guard:eof-object?
+read_title --> read: guard:newline? -> action:add-description
+read_title -> read_title: guard:#t -> action:store
 
 ' Reading state name
 read_state --> [*]: guard:eof-object?

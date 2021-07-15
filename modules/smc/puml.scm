@@ -178,6 +178,15 @@
     (context-stanza-clear! ctx)
     ctx))
 
+(define (action:add-description ctx ch)
+  (let ((fsm (puml-context-fsm ctx))
+        (buf (context-buffer ctx)))
+    (fsm-description-set! fsm (list->string (stack-content/reversed buf)))
+    (context-buffer-clear! ctx)
+    (context-stanza-clear! ctx)
+    ctx))
+
+
 (define (action:check-start-tag ctx ch)
   (let* ((buf (context-buffer ctx))
          (str (list->string (stack-content/reversed buf))))
@@ -205,6 +214,13 @@
   (error "Unexpected end of file"))
 
 
+(define (guard:title? ctx ch)
+  (let ((buf (context-buffer ctx)))
+    (and (char=? ch #\space)
+         (string=? (list->string (stack-content/reversed buf))
+                   "title"))))
+
+
 
 (define %transition-table
   `((read-start-tag
@@ -219,7 +235,7 @@
      (,guard:at-symbol?           ,action:no-op        read-end-tag)
      (,guard:single-quote?        ,action:no-op        read/skip-comment)
      (,guard:left-square-bracket? ,action:no-op        read-state)
-     (,guard:letter?              ,action:store read-state)
+     (,guard:letter?              ,action:store        read-word)
      (,guard:#t                   ,action:no-op        read))
     (read-end-tag
      "Read the @enduml tag."
@@ -231,6 +247,17 @@
      (,guard:eof-object?     ,action:no-op             #f)
      (,guard:newline?        ,action:no-op             read)
      (,guard:#t              ,action:no-op             read/skip-comment))
+    (read-word
+     "Read a word."
+     (,guard:eof-object?    ,action:no-op              #f)
+     (,guard:title?         ,action:clear-buffer       read-title)
+     (,guard:space?         ,action:update-stanza      search-state-transition)
+     (,guard:#t             ,action:store              read-word))
+    (read-title
+     "Read a diagram title."
+     (,guard:eof-object?    ,action:no-op              #f)
+     (,guard:newline?       ,action:add-description    read)
+     (,guard:#t             ,action:store              read-title))
     (read-state
      "Read a PlantUML stanza."
      (,guard:eof-object?           ,action:no-op                #f)
