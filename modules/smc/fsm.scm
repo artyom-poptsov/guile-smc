@@ -52,6 +52,10 @@
             fsm-state-reachable?
             fsm-validate
 
+            transition:action
+            transition:guard
+            transition:next-state
+
             transition-list->hash-table
             hash-table->transition-list
 
@@ -189,6 +193,18 @@
   (hash-ref (fsm-transition-table self) name))
 
 
+;; Transition accessors.
+
+(define (transition:guard tr)
+  (list-ref tr 0))
+
+(define (transition:action tr)
+  (list-ref tr 1))
+
+(define (transition:next-state tr)
+  (list-ref tr 2))
+
+
 
 ;; Convert a TRANSITION-LIST to a hash table.
 (define-method (transition-list->hash-table (transition-list <list>))
@@ -214,9 +230,9 @@
     (hash-map->list (lambda (state-name state)
                       (let ((tr-table
                              (map (lambda (tr)
-                                    (let ((tguard     (list-ref tr 0))
-                                          (action     (list-ref tr 1))
-                                          (next-state (list-ref tr 2)))
+                                    (let ((tguard     (transition:guard      tr))
+                                          (action     (transition:action     tr))
+                                          (next-state (transition:next-state tr)))
                                       (list tguard
                                             action
                                             (hash-ref table next-state))))
@@ -316,9 +332,9 @@
   (for-each (lambda (transition)
               (fsm-transition-add! self
                                    state-name
-                                   (list-ref transition 0)
-                                   (list-ref transition 1)
-                                   (list-ref transition 2)))
+                                   (transition:action     transition)
+                                   (transition:guard      transition)
+                                   (transition:next-state transition)))
             transitions))
 
 (define-method (fsm-state-description-add! (self        <fsm>)
