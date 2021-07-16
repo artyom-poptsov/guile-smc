@@ -10,9 +10,11 @@
              (smc puml)
              (smc compiler))
 
-(define (print-help-and-exit)
+
+
+(define (print-compile-help)
   (display "\
-Usage: smc [options]
+Usage: smc compile [options]
 
 The program reads a PlantUML transition diagram from the standard input.
 
@@ -26,6 +28,20 @@ Options:
   --fsm-module, -m  Set the module for the output FSM.
   --validate        Validate the output FSM and print the validation result.
   --debug           Enable the debug mode.
+
+"))
+
+(define (print-help-and-exit)
+  (display "\
+Usage: smc <command> [options]
+
+Commands:
+  compile        Compile a PlantUML state diagram to a Guile finite-state machine.
+  help           Print this help message.
+
+For each command there's '--help' option (or '-h' for short) that prints a
+help message for the given command.
+
 ")
   (exit 0))
 
@@ -58,18 +74,19 @@ Options:
   "Quote and evaluate a @var{string}."
   (eval-string (string-append "(quote " string ")")))
 
-
-(define (main args)
-  (let* ((options (getopt-long args %option-spec))
+(define (compile args)
+  (let* ((options          (getopt-long args %option-spec))
          (extra-load-paths (option-ref options 'load-path ""))
          (debug-mode?      (option-ref options 'debug     #f)))
 
     (when (option-ref options 'help #f)
-      (print-help-and-exit))
+      (print-compile-help)
+      (exit 0))
+
+    (log-use-stderr! debug-mode?)
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
-    (log-use-stderr! debug-mode?)
     (let* ((modules      (option-ref options 'modules #f))
            (fsm     (puml->fsm (current-input-port)
                                #:module (if modules
@@ -95,6 +112,26 @@ Options:
                                             (eval-string/quote module))
                        #:extra-modules (and modules
                                             (eval-string/quote modules)))))))))
+
+
+
+(define (main args)
+
+  (when (< (length args) 2)
+    (print-help-and-exit))
+
+  (let ((command (cadr args))
+        (rest    (cons (car args) (cddr args))))
+  (cond
+   ((equal? command "compile")
+    (compile rest))
+   ((or (equal? command "help")
+        (equal? command "-h")
+        (equal? command "--help"))
+    (print-help-and-exit))
+   (else
+    (format (current-error-port) "Unknown command: ~a~%" command)
+    (print-help-and-exit)))))
 
 ;;;
 
