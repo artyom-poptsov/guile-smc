@@ -101,6 +101,22 @@
          (string->symbol (list->string elem)))
        (stack-content/reversed stanza)))
 
+
+(define (%puml-transition:from tr)
+  (list-ref tr 0))
+
+(define (%puml-transition:to tr)
+  (list-ref tr 1))
+
+(define (%puml-transition:tguard tr)
+  (and (> (length tr) 2)
+       (list-ref tr 2)))
+
+(define (%puml-transition:action tr)
+  (and (= (length tr) 4)
+       (list-ref tr 3)))
+
+
 (define (action:add-state-transition ctx ch)
 
   (unless (stack-empty? (context-buffer ctx))
@@ -109,12 +125,10 @@
   (let* ((fsm     (puml-context-fsm ctx))
          (stanza  (stanza->list-of-symbols (context-stanza ctx)))
          (module  (puml-context-module ctx))
-         (from    (list-ref stanza 0))
-         (to      (list-ref stanza 1))
-         (tguard  (and (> (length stanza) 2)
-                       (list-ref stanza 2)))
-         (action  (and (= (length stanza) 4)
-                       (list-ref stanza 3))))
+         (from    (puml-transition:from   stanza))
+         (to      (puml-transition:to     stanza))
+         (tguard  (puml-transition:tguard stanza))
+         (action  (puml-transition:action stanza)))
     (log-debug "input:~a:~a: action:add-state-transition: [~a] -> [~a]: ~a -> ~a"
                (char-context-row ctx)
                (char-context-col ctx)
