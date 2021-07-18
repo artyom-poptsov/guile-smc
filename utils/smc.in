@@ -8,7 +8,8 @@
              (smc core log)
              (smc fsm)
              (smc puml)
-             (smc compiler))
+             (smc compiler)
+             (smc cli common))
 
 
 
@@ -55,25 +56,6 @@ help message for the given command.
     (validate                                   (value #f))
     (debug                                      (value #f))))
 
-(define (add-to-load-path* dirs)
-  "Add all @var{dirs} to the load path list."
-  (for-each (lambda (dir) (add-to-load-path dir)) dirs))
-
-;; Core modules required to run the 'puml->fsm' converter.
-(define %core-modules
-  (list (resolve-module '(smc guards char))
-        (resolve-module '(smc puml))
-        (resolve-module '(smc fsm))))
-
-(define (pretty-print-transition-table fsm)
-  "Pretty print the transition table for a specified @var{fsm}."
-  (pretty-print (hash-table->transition-list (fsm-transition-table fsm))
-                #:display? #t))
-
-(define (eval-string/quote string)
-  "Quote and evaluate a @var{string}."
-  (eval-string (string-append "(quote " string ")")))
-
 (define (compile args)
   (let* ((options          (getopt-long args %option-spec))
          (extra-load-paths (option-ref options 'load-path ""))
@@ -89,11 +71,7 @@ help message for the given command.
 
     (let* ((modules      (option-ref options 'modules #f))
            (fsm     (puml->fsm (current-input-port)
-                               #:module (if modules
-                                            (append %core-modules
-                                                    (map resolve-module
-                                                         (eval-string/quote modules)))
-                                            %core-modules)
+                               #:module      (puml-modules modules)
                                #:debug-mode? debug-mode?)))
       (when (option-ref options 'validate #f)
         (let ((validation-result (fsm-validate fsm)))
@@ -108,8 +86,7 @@ help message for the given command.
               (module (option-ref options 'fsm-module #f)))
           (fsm-compile fsm
                        #:fsm-name      name
-                       #:fsm-module    (and module
-                                            (eval-string/quote module))
+                       #:fsm-module    (puml-modules module)
                        #:extra-modules (and modules
                                             (eval-string/quote modules)))))))))
 

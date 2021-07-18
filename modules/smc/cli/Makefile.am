@@ -19,23 +19,14 @@
 
 include $(top_srcdir)/build-aux/am/guilec
 
-SUBDIRS = core context cli
-
 SOURCES = \
-	version.scm	\
-	fsm.scm 	\
-	puml.scm	\
-	compiler.scm
-
-EXTRA_DIST = \
-	version.scm.in
+	common.scm
 
 GOBJECTS = $(SOURCES:%.scm=%.go)
-
-moddir=$(guilesitedir)/smc/
+moddir=$(guilesitedir)/smc/cli/
 nobase_dist_mod_DATA = $(SOURCES)
 
-ccachedir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc
+ccachedir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/cli/
 nobase_nodist_ccache_DATA = $(GOBJECTS)
 
 # Make sure source files are installed first, so that the mtime of
@@ -47,26 +38,20 @@ guile_smc_install_go_files = install-nobase_dist_ccacheDATA
 $(guile_smc_install_go_files): install-nobase_dist_modDATA
 
 GUILE_WARNINGS = -Wunbound-variable -Warity-mismatch -Wformat
-SUFFIXES = .scm .go .in
-
-guilec_opts = --load-path=$(abs_top_srcdir)/modules/
+SUFFIXES = .scm .go
 
 guilec_env = GUILE_AUTO_COMPILE=0
-
+guilec_opts = --load-path=$(abs_top_srcdir)/modules/
 .scm.go:
 	$(AM_V_GUILEC)$(guilec_env) $(GUILEC) $(guilec_opts) \
-	--output=$@ $<
-
-substitute = sed -e 's,[@]VERSION[@],$(PACKAGE_VERSION),g'
-
-version.scm: version.scm.in
-	@echo "  GEN      $@"
-	@$(substitute) "$^" > "$@"
+		--output=$@ $<
 
 clean-go:
 	-$(RM) $(GOBJECTS)
 .PHONY: clean-go
 
 CLEANFILES = \
-	$(GOBJECTS)	\
-	version.scm
+	$(GOBJECTS)
+
+# Makefile.am ends here
+
