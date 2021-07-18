@@ -81,7 +81,8 @@
              "Could not find \"~a\" procedure in provided modules: ~a"
              proc-name
              (puml-context-module ctx))
-            (context-log-error "Stanza: ~a"
+            (context-log-error ctx
+                               "Stanza: ~a"
                                (stanza->list-of-symbols (context-stanza ctx)))
             (error "Could not find procedure in provided modules"
                    (char-context-row ctx)
