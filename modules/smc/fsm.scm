@@ -53,10 +53,6 @@
             fsm-state-reachable?
             fsm-validate
 
-            transition:action
-            transition:guard
-            transition:next-state
-
             transition-list->hash-table
             hash-table->transition-list
 
@@ -194,18 +190,6 @@
   (hash-ref (fsm-transition-table self) name))
 
 
-;; Transition accessors.
-
-(define (transition:guard tr)
-  (list-ref tr 0))
-
-(define (transition:action tr)
-  (list-ref tr 1))
-
-(define (transition:next-state tr)
-  (list-ref tr 2))
-
-
 
 ;; Convert a TRANSITION-LIST to a hash table.
 (define-method (transition-list->hash-table (transition-list <list>))
@@ -221,10 +205,10 @@
                       (let ((tr-table
                              (map (lambda (tr)
                                     (list
-                                     (transition:guard  tr)
-                                     (transition:action tr)
+                                     (state-transition:guard  tr)
+                                     (state-transition:action tr)
                                      (hash-ref table
-                                               (transition:next-state tr))))
+                                               (state-transition:next-state tr))))
                                   (state-transitions state))))
                         (state-transitions-set! state tr-table)))
                     table)
@@ -311,9 +295,9 @@
   (for-each (lambda (transition)
               (fsm-transition-add! self
                                    state-name
-                                   (transition:action     transition)
-                                   (transition:guard      transition)
-                                   (transition:next-state transition)))
+                                   (state-transition:action     transition)
+                                   (state-transition:guard      transition)
+                                   (state-transition:next-state transition)))
             transitions))
 
 (define-method (fsm-state-description-add! (self        <fsm>)
