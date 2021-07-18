@@ -353,18 +353,15 @@
 (define-method (fsm-run! (self <fsm>) event context)
   (let ((state (fsm-current-state self)))
     (if state
-        (let ((state (if (symbol? state)
-                         (fsm-state self state)
-                         state)))
-          (receive (next-state new-context)
-              (state-run state event context)
-            (when (fsm-debug-mode? self)
-              (fsm-log-transition state next-state))
-            (%step-counter-increment! self)
-            (unless (equal? state next-state)
-              (%transition-counter-increment! self))
-            (fsm-current-state-set! self next-state)
-            (values next-state new-context)))
+        (receive (next-state new-context)
+            (state-run state event context)
+          (when (fsm-debug-mode? self)
+            (fsm-log-transition state next-state))
+          (%step-counter-increment! self)
+          (unless (equal? state next-state)
+            (%transition-counter-increment! self))
+          (fsm-current-state-set! self next-state)
+          (values next-state new-context))
         (values #f context))))
 
 
