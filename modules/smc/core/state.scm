@@ -236,7 +236,7 @@
           (list name description)
           (list name))
       (if description
-          (list name description transitions)
+          (cons name (cons description transitions))
           (cons name transitions)))))
 
 ;;; state.scm ends here.
