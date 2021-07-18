@@ -45,6 +45,9 @@
             state-has-recurrent-links?
             state-dead-end?
 
+            state:name
+            state:description
+            state:transitions
             state-transition:guard
             state-transition:action
             state-transition:next-state
@@ -204,24 +207,24 @@
 
 
 
-(define (%state:name state)
+(define (state:name state)
   (car state))
 
-(define (%state:description state)
+(define (state:description state)
   (and (> (length state) 1)
        (string? (cadr state))
        (cadr state)))
 
-(define (%state:transitions state-description state)
+(define (state:transitions state-description state)
   (if state-description
       (cddr state)
       (cdr state)))
 
 ;; Convert a list LST to a <state> instance, return the new state.
 (define-method (list->state (lst <list>))
-  (let* ((name        (%state:name        lst))
-         (description (%state:description lst))
-         (transitions (%state:transitions description lst)))
+  (let* ((name        (state:name        lst))
+         (description (state:description lst))
+         (transitions (state:transitions description lst)))
     (make <state>
       #:name        name
       #:description description
