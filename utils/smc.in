@@ -86,7 +86,8 @@ help message for the given command.
               (module (option-ref options 'fsm-module #f)))
           (fsm-compile fsm
                        #:fsm-name      name
-                       #:fsm-module    (puml-modules module)
+                       #:fsm-module    (and module
+                                            (eval-string/quote module))
                        #:extra-modules (and modules
                                             (eval-string/quote modules)))))))))
 
