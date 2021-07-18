@@ -43,7 +43,9 @@
             state-recurrent-links-count
             state-has-final-transitions?
             state-has-recurrent-links?
-            state-dead-end?))
+            state-dead-end?
+
+            list->state))
 
 
 ;; This class describes an FSM state.
@@ -182,5 +184,30 @@
           (if (tguard context event)
               (values next-state (action context event))
               (loop (cdr transition-alist)))))))
+
+
+
+(define (%state:name state)
+  (car state))
+
+(define (%state:description state)
+  (and (> (length state) 1)
+       (string? (cadr state))
+       (cadr state)))
+
+(define (%state:transitions state-description state)
+  (if state-description
+      (cddr state)
+      (cdr state)))
+
+;; Convert a list LST to a <state> instance, return the new state.
+(define-method (list->state (lst <list>))
+  (let* ((name        (%state:name        lst))
+         (description (%state:description lst))
+         (transitions (%state:transitions description lst)))
+    (make <state>
+      #:name        name
+      #:description description
+      #:transitions transitions)))
 
 ;;; state.scm ends here.
