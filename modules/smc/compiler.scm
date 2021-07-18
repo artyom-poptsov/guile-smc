@@ -79,16 +79,16 @@
      `(define %transition-table
         ,(list 'quasiquote
                (map (lambda (state)
-                      (if (and (> (length state) 1)
-                               (string? (cadr state)))
-                          (cons
-                           (car state)
-                           (cons
-                            (cadr state)
-                            (%serialize-transition-table (caddr state))))
-                          (cons
-                           (car state)
-                           (%serialize-transition-table (cdr state)))))
+                      (let* ((name        (state:name        state))
+                             (description (state:description state))
+                             (transitions (state:transitions description state)))
+                        (if description
+                            (cons name
+                                  (cons
+                                   description
+                                   (%serialize-transition-table transitions)))
+                            (cons name
+                                  (%serialize-transition-table transitions)))))
                     (hash-table->transition-list table))))
      port)))
 
