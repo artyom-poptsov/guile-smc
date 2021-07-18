@@ -196,6 +196,19 @@
 
 ;; Transition accessors.
 
+(define (state:name state)
+  (car state))
+
+(define (state:description state)
+  (and (> (length state) 1)
+       (string? (cadr state))
+       (cadr state)))
+
+(define (state:transitions state-description state)
+  (if state-description
+      (cddr state)
+      (cdr state)))
+
 (define (transition:guard tr)
   (list-ref tr 0))
 
@@ -211,10 +224,8 @@
 (define-method (transition-list->hash-table (transition-list <list>))
   (let ((table (make-hash-table)))
     (for-each (lambda (transition)
-                (let* ((state-name (car transition))
-                       (state-desc (and (> (length transition) 1)
-                                        (string? (cadr transition))
-                                        (cadr transition)))
+                (let* ((state-name (state:name        transition))
+                       (state-desc (state:description transition))
                        (state      (hash-ref table state-name)))
                   (when state
                     (log-error "Duplicate state: ~a" state-name)
@@ -224,9 +235,8 @@
                              (make <state>
                                #:name        state-name
                                #:description state-desc
-                               #:transitions (if state-desc
-                                                 (cddr transition)
-                                                 (cdr transition))))))
+                               #:transitions (state:transitions state-desc
+                                                                transition)))))
               transition-list)
     (hash-map->list (lambda (state-name state)
                       (let ((tr-table
