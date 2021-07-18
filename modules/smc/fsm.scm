@@ -43,6 +43,7 @@
             fsm-state-description-add!
             fsm-current-state
             fsm-current-state-set!
+            fsm-step!
             fsm-run!
             fsm-statistics
 
@@ -350,7 +351,7 @@
 
 
 ;; Perform a single FSM step on the specified EVENT and a CONTEXT.
-(define-method (fsm-run! (self <fsm>) event context)
+(define-method (fsm-step! (self <fsm>) event context)
   (let ((state (fsm-current-state self)))
     (if state
         (receive (next-state new-context)
@@ -363,6 +364,22 @@
           (fsm-current-state-set! self next-state)
           (values next-state new-context))
         (values #f context))))
+
+;; Run an FSM with the given EVENT-SOURCE and a CONTEXT and return the new
+;; context.
+;;
+;; EVENT-SOURCE must be a procedure that accepts a CONTEXT as a single
+;; parameter.
+;;
+;; CONTEXT can be any Scheme object.
+(define-method (fsm-run! (fsm          <fsm>)
+                         (event-source <procedure>)
+                         context)
+  (receive (new-state new-context)
+      (fsm-step! fsm (event-source context) context)
+    (if new-state
+        (fsm-run! fsm event-source new-context)
+        context)))
 
 
 

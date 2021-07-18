@@ -360,17 +360,17 @@
            #:debug-mode? debug-mode?
            #:transition-table %transition-table)))
 
-    (let loop ((context (make <puml-context> #:module module)))
-      (let ((ch (get-char port)))
-        (char-context-update-counters! context ch)
-        (receive (new-state new-context)
-            (fsm-run! reader-fsm ch context)
-          (if new-state
-              (loop new-context)
-              (let ((output-fsm (puml-context-fsm context)))
-                (when debug-mode?
-                  (fsm-pretty-print-statistics reader-fsm (current-error-port)))
-                output-fsm)))))))
+    (let* ((context (make <puml-context> #:module module))
+           (new-context (fsm-run! reader-fsm
+                                  (lambda (context)
+                                    (let ((ch (get-char port)))
+                                      (char-context-update-counters! context ch)
+                                      ch))
+                                  context)))
+      (let ((output-fsm (puml-context-fsm new-context)))
+        (when debug-mode?
+          (fsm-pretty-print-statistics reader-fsm (current-error-port)))
+        output-fsm))))
 
 (define* (puml-string->fsm string
                            #:key
