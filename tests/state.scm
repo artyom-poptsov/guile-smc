@@ -124,6 +124,36 @@
            (null? context)))))
 
 
+;;; state->list
+
+(test-equal "state->list: W/o description and transitions"
+  `(state-1)
+  (state->list (make <state> #:name 'state-1)))
+
+(test-equal "state->list: With description"
+  `(state-1
+    "This is a description")
+  (state->list (make <state>
+                 #:name 'state-1
+                 #:description "This is a description")))
+
+(test-equal "state->list: With transitions"
+  `(state-1
+    (,guard:#t ,action:no-op state-2))
+  (state->list (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-2)))))
+
+(test-equal "state->list: With description and transitions"
+  `(state-1
+    "This is a description"
+    (,guard:#t ,action:no-op state-2))
+  (state->list (make <state>
+                 #:name 'state-1
+                 #:description "This is a description"
+                 #:transitions `((,guard:#t ,action:no-op state-2)))))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end "state")
