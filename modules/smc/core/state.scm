@@ -45,7 +45,8 @@
             state-has-recurrent-links?
             state-dead-end?
 
-            list->state))
+            list->state
+            state->list))
 
 
 ;; This class describes an FSM state.
@@ -209,5 +210,17 @@
       #:name        name
       #:description description
       #:transitions transitions)))
+
+(define-method (state->list (state <state>))
+  (let ((name        (state-name        state))
+        (description (state-description state))
+        (transitions (state-transitions state)))
+  (if (null? transitions)
+      (if description
+          (list name description)
+          (list name))
+      (if description
+          (list name description transitions)
+          (cons name transitions)))))
 
 ;;; state.scm ends here.
