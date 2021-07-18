@@ -76,17 +76,13 @@
            (proc
             proc)
            ((and (not proc) (null? mods))
-            (log-error
-             "input:~a:~a: Could not find \"~a\" procedure in provided modules: ~a"
-             (char-context-row ctx)
-             (char-context-col ctx)
+            (context-log-error
+             ctx
+             "Could not find \"~a\" procedure in provided modules: ~a"
              proc-name
              (puml-context-module ctx))
-            (log-error
-             "input:~a:~a: Stanza: ~a"
-             (char-context-row ctx)
-             (char-context-col ctx)
-             (stanza->list-of-symbols (context-stanza ctx)))
+            (context-log-error "Stanza: ~a"
+                               (stanza->list-of-symbols (context-stanza ctx)))
             (error "Could not find procedure in provided modules"
                    (char-context-row ctx)
                    (char-context-col ctx)
@@ -129,24 +125,19 @@
          (to      (%puml-transition:to     stanza))
          (tguard  (%puml-transition:tguard stanza))
          (action  (%puml-transition:action stanza)))
-    (log-debug "input:~a:~a: action:add-state-transition: [~a] -> [~a]: ~a -> ~a"
-               (char-context-row ctx)
-               (char-context-col ctx)
-               from to
-               tguard action)
+    (context-log-debug ctx
+                       "action:add-state-transition: [~a] -> [~a]: ~a -> ~a"
+                       from to
+                       tguard action)
     (cond
      ((equal? from '*)
-      (log-debug "input:~a:~a: action:add-state-transition: Adding first state..."
-                 (char-context-row ctx)
-                 (char-context-col ctx))
+      (context-log-debug ctx
+                         "action:add-state-transition: Adding first state...")
       (let ((state (make <state> #:name to)))
         (fsm-state-add! fsm state)
         (fsm-current-state-set! fsm state)))
      ((and (equal? from '*) (equal? to '*))
-      (log-error
-       "input~a:~a: Meaningless transition: [*] -> [*]"
-       (char-context-row ctx)
-       (char-context-col ctx))
+      (context-log-error ctx "Meaningless transition: [*] -> [*]")
       (error "Meaningless transition: [*] -> [*]"))
      (else
       (fsm-transition-add! fsm
@@ -172,10 +163,7 @@
          (new-description (list->string (stack-content/reversed buf))))
 
     (when (equal? state-name (string->symbol "*"))
-      (log-error
-       "input:~a:~a: [*] cannot have description"
-       (char-context-row ctx)
-       (char-context-col ctx))
+      (context-log-error ctx "[*] cannot have description")
       (error "[*] cannot have description"))
 
     (if description
@@ -205,10 +193,7 @@
   (let* ((buf (context-buffer ctx))
          (str (list->string (stack-content/reversed buf))))
     (unless (string=? str "@startuml")
-      (log-error
-       "input:~a:~a: Misspelled @startuml"
-       (char-context-row ctx)
-       (char-context-col ctx))
+      (context-log-error ctx "Misspelled @startuml")
       (error "Misspelled @startuml" str))
     (context-buffer-clear! ctx)
     ctx))
@@ -217,26 +202,17 @@
   (let* ((buf (context-buffer ctx))
          (str (list->string (stack-content/reversed buf))))
     (unless (string=? str "@enduml")
-      (log-error
-       "input:~a:~a: Misspelled @enduml"
-       (char-context-row ctx)
-       (char-context-col ctx))
+      (context-log-error ctx "Misspelled @enduml")
       (error "Misspelled @enduml" str))
     (context-buffer-clear! ctx)
     ctx))
 
 (define (action:no-start-tag-error ctx ch)
-  (log-error
-   "input:~a:~a: No start tag found"
-   (char-context-row ctx)
-   (char-context-col ctx))
+  (context-log-error ctx "No start tag found")
   (error "No start tag found"))
 
 (define (action:unexpected-end-of-file-error ctx ch)
-  (log-error
-   "input:~a:~a: Unexpected end of file"
-   (char-context-row ctx)
-   (char-context-col ctx))
+  (context-log-error ctx "Unexpected end of file")
   (error "Unexpected end of file"))
 
 

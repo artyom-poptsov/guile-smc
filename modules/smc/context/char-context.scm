@@ -28,6 +28,7 @@
 (define-module (smc context char-context)
   #:use-module (oop goops)
   #:use-module (smc context context)
+  #:use-module (smc core log)
   #:re-export (;; From (smc context context)
                <context>
                context?
@@ -64,7 +65,13 @@
             guard:left-square-bracket?
             guard:right-square-bracket?
             guard:at-symbol?
-            action:syntax-error))
+            action:syntax-error
+
+            ;; Logging procedures
+            context-log-error
+            context-log-warning
+            context-log-info
+            context-log-debug))
 
 (define-class <char-context> (<context>)
   ;; Total number of characters consumed.
@@ -174,5 +181,32 @@
          (char-context-col ctx)
          ch
          ctx))
+
+
+
+(define (%current-position-prefix ctx)
+  (format #f "input:~a:~a: "
+          (char-context-row ctx)
+          (char-context-col ctx)))
+
+(define (context-log-error ctx fmt . rest)
+  (apply log-error
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
+
+(define (context-log-warning ctx fmt . rest)
+  (apply log-warning
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
+
+(define (context-log-info ctx fmt . rest)
+  (apply log-info
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
+
+(define (context-log-debug ctx fmt . rest)
+  (apply log-debug
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
 
 ;;; char-context.scm ends here.
