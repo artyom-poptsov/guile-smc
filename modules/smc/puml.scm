@@ -57,41 +57,33 @@
 
 
 
+(define (%safe-module-ref module proc-name)
+  (catch #t
+    (lambda ()
+      (module-ref module proc-name))
+    (const #f)))
+
 ;; This procedure tries to resolve a procedure PROC-NAME in the provided
-;; modules. When no procedure available with the given name, returns DEFAULT
-;; procedure.
-(define (resolve-procedure ctx proc-name default)
-  (let ((module (puml-context-module ctx)))
-    (cond
-     ((not proc-name)
-      default)
-     ((list? module)
-      (let loop ((mods module))
-        (let ((proc (catch
-                      #t
-                      (lambda ()
-                        (module-ref (car mods) proc-name))
-                      (const #f))))
-          (cond
-           (proc
-            proc)
-           ((and (not proc) (null? mods))
-            (context-log-error
-             ctx
-             "Could not find \"~a\" procedure in provided modules: ~a"
-             proc-name
-             (puml-context-module ctx))
-            (context-log-error ctx
-                               "Stanza: ~a"
-                               (stanza->list-of-symbols (context-stanza ctx)))
-            (error "Could not find procedure in provided modules"
-                   (char-context-row ctx)
-                   (char-context-col ctx)
-                   proc-name))
-           (else
-            (loop (cdr mods)))))))
-     (else
-      (module-ref module proc-name)))))
+;; modules.
+(define (resolve-procedure ctx proc-name)
+  (and proc-name
+       (let ((modules (puml-context-module ctx)))
+         (let loop ((mods modules))
+           (if (null? mods)
+               (begin
+                 (context-log-error ctx
+                                    "Could not find \"~a\" procedure in provided modules: ~a"
+                                    proc-name
+                                    modules)
+                 (context-log-error ctx
+                                    "Stanza: ~a"
+                                    (stanza->list-of-symbols
+                                     (context-stanza ctx)))
+                 #f)
+               (let ((proc (%safe-module-ref (car mods) proc-name)))
+                 (if proc
+                     proc
+                     (loop (cdr mods)))))))))
 
 (define-method (stanza->list-of-symbols (stanza <stack>))
   (map (lambda (elem)
@@ -141,13 +133,14 @@
       (context-log-error ctx "Meaningless transition: [*] -> [*]")
       (error "Meaningless transition: [*] -> [*]"))
      (else
-      (fsm-transition-add! fsm
-                           from
-                           (resolve-procedure ctx tguard guard:#t)
-                           (resolve-procedure ctx action action:no-op)
-                           (if (equal? to '*)
-                               #f
-                               to))))
+      (let ((tguard (or (resolve-procedure ctx tguard)
+                        guard:#t))
+            (action (or (resolve-procedure ctx action)
+                        action:no-op))
+            (to     (if (equal? to '*)
+                        #f
+                        to)))
+        (fsm-transition-add! fsm from tguard action to))))
 
     (context-stanza-clear! ctx)
 
