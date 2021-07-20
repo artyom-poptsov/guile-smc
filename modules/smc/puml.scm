@@ -367,7 +367,7 @@
 
 (define* (puml-string->fsm string
                            #:key
-                           (module (current-module))
+                           (module (list (current-module)))
                            (debug-mode? #f))
   (with-input-from-string
       string
