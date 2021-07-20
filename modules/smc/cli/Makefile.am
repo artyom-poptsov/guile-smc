@@ -20,7 +20,8 @@
 include $(top_srcdir)/build-aux/am/guilec
 
 SOURCES = \
-	common.scm
+	common.scm		\
+	command-compile.scm
 
 GOBJECTS = $(SOURCES:%.scm=%.go)
 moddir=$(guilesitedir)/smc/cli/
