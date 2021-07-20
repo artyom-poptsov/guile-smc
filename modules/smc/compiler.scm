@@ -57,6 +57,17 @@
         (loop (append lst `(#:use-module ,(car em)))
               (cdr em)))))
 
+;; Write 'use-modules' section to the @var{port}.
+(define (%write-use-modules extra-modules port)
+  (let loop ((lst `(use-modules (smc fsm) (oop goops)))
+             (em  extra-modules))
+    (if (null? em)
+        (begin
+          (display lst port)
+          (newline port))
+        (loop (append lst (list (car em)))
+              (cdr em)))))
+
 ;; This procedure serializes a transition @var{table}. It returns the
 ;; transition table as a list.
 (define-method (%serialize-transition-table (table <list>))
@@ -104,9 +115,7 @@
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
     (if fsm-module
         (%write-module fsm-module extra-modules class-name output-port)
-        (display `(use-modules (smc fsm)
-                               ,(quote module))
-                 output-port))
+        (%write-use-modules extra-modules output-port))
 
     (newline output-port)
 
