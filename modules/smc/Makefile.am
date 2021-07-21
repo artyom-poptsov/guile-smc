@@ -19,7 +19,7 @@
 
 include $(top_srcdir)/build-aux/am/guilec
 
-SUBDIRS = core context cli
+SUBDIRS = core . context cli
 
 SOURCES = \
 	version.scm	\
