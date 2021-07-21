@@ -22,7 +22,8 @@ include $(top_srcdir)/build-aux/am/guilec
 SOURCES = \
 	log.scm		\
 	state.scm	\
-	stack.scm
+	stack.scm	\
+	set.scm
 
 GOBJECTS = $(SOURCES:%.scm=%.go)
 moddir=$(guilesitedir)/smc/core/
