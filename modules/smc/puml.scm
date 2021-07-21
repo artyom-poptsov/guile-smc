@@ -136,13 +136,24 @@
       (context-log-error ctx "Meaningless transition: [*] -> [*]")
       (error "Meaningless transition: [*] -> [*]"))
      (else
-      (let ((tguard (or (resolve-procedure ctx tguard)
+      (let ((tguard (if tguard
+                        (resolve-procedure ctx tguard)
                         guard:#t))
-            (action (or (resolve-procedure ctx action)
+            (action (if action
+                        (resolve-procedure ctx action)
                         action:no-op))
             (to     (if (equal? to '*)
                         #f
                         to)))
+
+        (unless tguard
+          (context-log-error ctx "Could not resolve procedure: ~a" tguard)
+          (error "Could not resolve procedure" tguard ctx))
+
+        (unless tguard
+          (context-log-error ctx "Could not resolve procedure: ~a" action)
+          (error "Could not resolve procedure" action ctx))
+
         (fsm-transition-add! fsm from tguard action to))))
 
     (context-stanza-clear! ctx)
