@@ -47,7 +47,7 @@
 
 (define-class <puml-context> (<char-context>)
   (fsm
-   #:init-value (make <fsm>)
+   #:init-thunk (lambda () (make <fsm>))
    #:getter     puml-context-fsm)
 
   ;; A module which contains state machine procedures.
