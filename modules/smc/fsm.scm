@@ -95,7 +95,7 @@
    #:getter     fsm-transition-table
    #:setter     fsm-transition-table-set!
    #:init-keyword #:transition-table
-   #:init-value (make-hash-table))
+   #:init-thunk (lambda () (make-hash-table)))
 
   ;; REQUIRED.  Name of the current state.
   ;;
