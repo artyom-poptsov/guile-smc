@@ -46,14 +46,17 @@
 
 
 (define-class <puml-context> (<char-context>)
+  ;; The output FSM of the PUML parser.
+  ;;
+  ;; <fsm>
   (fsm
-   #:init-thunk (lambda () (make <fsm>))
-   #:getter     puml-context-fsm)
+   #:init-thunk   (lambda () (make <fsm>))
+   #:getter       puml-context-fsm)
 
-  ;; A module which contains state machine procedures.
+  ;; Modules that contain state machine procedures.
   (module
    #:init-keyword #:module
-   #:getter     puml-context-module))
+   #:getter       puml-context-module))
 
 
 
