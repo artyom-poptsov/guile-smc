@@ -112,6 +112,15 @@
                       (extra-modules '())
                       (output-port (current-output-port)))
   (%write-header output-port)
+
+  (when (fsm-parent fsm)
+    (display ";;; This finite-state machine is produced by:\n" output-port)
+    (for-each (lambda (line) (format output-port ";;;   ~a~%" line))
+              (string-split (fsm-description (fsm-parent fsm)) #\newline))
+    (display ";;;\n" output-port)
+    (fsm-pretty-print-statistics (fsm-parent fsm) output-port)
+    (newline output-port))
+
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
     (if fsm-module
         (%write-module fsm-module extra-modules class-name output-port)
