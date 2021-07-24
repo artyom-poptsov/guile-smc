@@ -97,6 +97,9 @@
 
 ;; This procedure tries to resolve a procedure PROC-NAME in the provided
 ;; modules.
+;;
+;; Return a pair which 'car' is the resolved procedure and 'cdr' -- the
+;; procedure module.  When a procedure cannot be resolved, return #f.
 (define (resolve-procedure ctx proc-name)
   (and proc-name
        (let ((modules (puml-context-module ctx)))
@@ -114,7 +117,7 @@
                  #f)
                (let ((proc (%safe-module-ref (car mods) proc-name)))
                  (if proc
-                     proc
+                     (cons proc (car mods))
                      (loop (cdr mods)))))))))
 
 (define-method (stanza->list-of-symbols (stanza <stack>))
@@ -167,10 +170,10 @@
      (else
       (let ((resolved-tguard (if tguard
                                  (resolve-procedure ctx tguard)
-                                 guard:#t))
+                                 (resolve-procedure ctx 'guard:#t)))
             (resolved-action (if action
                                  (resolve-procedure ctx action)
-                                 action:no-op))
+                                 (resolve-procedure ctx 'action:no-op)))
             (to     (if (equal? to '*)
                         #f
                         to)))
@@ -192,8 +195,12 @@
                   (error "Could not resolve procedure" action ctx))))
 
         (fsm-transition-add! fsm from
-                             (or resolved-tguard guard:#t)
-                             (or resolved-action action:no-op)
+                             (if resolved-tguard
+                                 (car resolved-tguard)
+                                 guard:#t)
+                             (if resolved-action
+                                 (car resolved-action)
+                                 action:no-op)
                              to))))
 
     (context-stanza-clear! ctx)
