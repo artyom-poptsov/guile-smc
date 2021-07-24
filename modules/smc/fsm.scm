@@ -288,7 +288,7 @@
 
   (fsm-transition-add! self (fsm-state self state-name) tguard action next-state))
 
-
+;; Add TRANSITIONS list to the state specified by a STATE-NAME.
 (define-method (fsm-transition-add! (self       <fsm>)
                                     (state-name <symbol>)
                                     (transitions <list>))
@@ -300,6 +300,7 @@
                                    (state-transition:next-state transition)))
             transitions))
 
+;; Add a DESCRIPTION to the state specified by a STATE-NAME.
 (define-method (fsm-state-description-add! (self        <fsm>)
                                            (state-name  <symbol>)
                                            (description <string>))
@@ -335,6 +336,8 @@
 ;; parameter.
 ;;
 ;; CONTEXT can be any Scheme object.
+;;
+;; Return the CONTEXT after FSM execution.
 (define-method (fsm-run! (fsm          <fsm>)
                          (event-source <procedure>)
                          context)
