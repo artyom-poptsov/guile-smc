@@ -179,7 +179,7 @@
                         to)))
 
         (if resolved-tguard
-            (set-add! (puml-context-resolved-procedures ctx) tguard)
+            (set-add! (puml-context-resolved-procedures ctx) resolved-tguard)
             (begin
               (context-log-error ctx "Could not resolve procedure: ~a" tguard)
               (if (puml-context-keep-going? ctx)
@@ -187,7 +187,7 @@
                   (error "Could not resolve procedure" tguard ctx))))
 
         (if resolved-action
-            (set-add! (puml-context-resolved-procedures ctx) action)
+            (set-add! (puml-context-resolved-procedures ctx) resolved-action)
             (begin
               (context-log-error ctx "Could not resolve procedure: ~a" action)
               (if (puml-context-keep-going? ctx)
