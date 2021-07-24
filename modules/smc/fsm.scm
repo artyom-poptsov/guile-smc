@@ -27,6 +27,8 @@
 (define-module (smc fsm)
   #:use-module (oop goops)
   #:use-module (ice-9 receive)
+  #:use-module ((ice-9 format)
+                #:prefix ice-9:)
   #:use-module (smc core log)
   #:use-module (smc core state)
   #:export (<fsm>
