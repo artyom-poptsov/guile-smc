@@ -35,11 +35,15 @@
   #:use-module (smc fsm)
   #:use-module (smc core log)
   #:use-module (smc core stack)
+  #:use-module (smc core set)
   #:use-module (smc context char-context)
   #:export (<puml-context>
             resolve-procedure
             puml-context-fsm
             puml-context-module
+            puml-context-keep-going?
+            puml-context-resolved-procedures
+            puml-context-unresolved-procedures
             puml->fsm
             puml-string->fsm))
 
@@ -56,7 +60,34 @@
   ;; Modules that contain state machine procedures.
   (module
    #:init-keyword #:module
-   #:getter       puml-context-module))
+   #:getter       puml-context-module)
+
+  ;; Whether the parser should keep going when a procedure cannot be resolved
+  ;; or not.
+  ;;
+  ;; When set to #t, the parser remembers all unresolved procedures but keeps
+  ;; going without issuing an error.  All unresolved procedures are replaced
+  ;; with default variants ('guard:t' for guards, 'action:no-op' for actions.)
+  ;;
+  ;; <boolean>
+  (keep-going?
+   #:init-value   #f
+   #:init-keyword #:keep-going?
+   #:getter       puml-context-keep-going?)
+
+  ;; This set contains resolved procedures.
+  ;;
+  ;; <set>
+  (resolved-procedures
+   #:getter       puml-context-resolved-procedures
+   #:init-thunk   (lambda () (make <set>)))
+
+  ;; This set contains unresolved procedures.
+  ;;
+  ;; <set>
+  (unresolved-procedures
+   #:getter       puml-context-unresolved-procedures
+   #:init-thunk   (lambda () (make <set>))))
 
 
 
@@ -136,25 +167,36 @@
       (context-log-error ctx "Meaningless transition: [*] -> [*]")
       (error "Meaningless transition: [*] -> [*]"))
      (else
-      (let ((tguard (if tguard
-                        (resolve-procedure ctx tguard)
-                        guard:#t))
-            (action (if action
-                        (resolve-procedure ctx action)
-                        action:no-op))
+      (let ((resolved-tguard (if tguard
+                                 (resolve-procedure ctx tguard)
+                                 guard:#t))
+            (resolved-action (if action
+                                 (resolve-procedure ctx action)
+                                 action:no-op))
             (to     (if (equal? to '*)
                         #f
                         to)))
 
-        (unless tguard
-          (context-log-error ctx "Could not resolve procedure: ~a" tguard)
-          (error "Could not resolve procedure" tguard ctx))
+        (if resolved-tguard
+            (set-add! (puml-context-resolved-procedures ctx) tguard)
+            (begin
+              (context-log-error ctx "Could not resolve procedure: ~a" tguard)
+              (if (puml-context-keep-going? ctx)
+                  (set-add! (puml-context-unresolved-procedures ctx) tguard)
+                  (error "Could not resolve procedure" tguard ctx))))
 
-        (unless tguard
-          (context-log-error ctx "Could not resolve procedure: ~a" action)
-          (error "Could not resolve procedure" action ctx))
+        (if resolved-action
+            (set-add! (puml-context-resolved-procedures ctx) action)
+            (begin
+              (context-log-error ctx "Could not resolve procedure: ~a" action)
+              (if (puml-context-keep-going? ctx)
+                  (set-add! (puml-context-unresolved-procedures ctx) action)
+                  (error "Could not resolve procedure" action ctx))))
 
-        (fsm-transition-add! fsm from tguard action to))))
+        (fsm-transition-add! fsm from
+                             (or resolved-tguard guard:#t)
+                             (or resolved-action action:no-op)
+                             to))))
 
     (context-stanza-clear! ctx)
 
@@ -353,9 +395,28 @@
                             (cdr record)))
             (fsm-statistics fsm)))
 
+;; Read state machine description in PlantUML format from a PORT and parse it.
+;;
+;; Required parameters:
+;;   port               A port from which PlantUML data is read.
+;;
+;; Keyword parameters:
+;;   module             A list of modules that needed to resolve output FSM
+;;                      procedures.
+;;                      Default value: (current-module)
+;;   keep-going?        If this parameter is set to #t, the parser ignores
+;;                      unresolved procedure errors.  All unresolved procedures
+;;                      are replaced with default values.
+;;                      Beware that the output FSM in this case may be invalid.
+;;                      Default value: #f
+;;   debug-mode?        If set to #t, the debug mode is enabled.
+;;                      Default value: #f
+;;
+;; Return a finite-state machine produced from the input data.
 (define* (puml->fsm port
                     #:key
                     (module (current-module))
+                    (keep-going? #f)
                     (debug-mode? #f))
   (log-use-stderr! debug-mode?)
   (let ((reader-fsm
@@ -367,7 +428,9 @@
            #:debug-mode? debug-mode?
            #:transition-table %transition-table)))
 
-    (let* ((context (make <puml-context> #:module module))
+    (let* ((context (make <puml-context>
+                      #:module      module
+                      #:keep-going? keep-going?))
            (new-context (fsm-run! reader-fsm
                                   (lambda (context)
                                     (let ((ch (get-char port)))
@@ -375,6 +438,8 @@
                                       ch))
                                   context)))
       (let ((output-fsm (puml-context-fsm new-context)))
+        (fsm-parent-set! output-fsm reader-fsm)
+        (fsm-parent-context-set! output-fsm new-context)
         (when debug-mode?
           (fsm-pretty-print-statistics reader-fsm (current-error-port)))
         output-fsm))))
@@ -382,12 +447,14 @@
 (define* (puml-string->fsm string
                            #:key
                            (module (list (current-module)))
+                           (keep-going? #f)
                            (debug-mode? #f))
   (with-input-from-string
       string
       (lambda ()
         (puml->fsm (current-input-port)
                    #:module      module
+                   #:keep-going? keep-going?
                    #:debug-mode? debug-mode?))))
 
 ;;; puml.scm ends here.

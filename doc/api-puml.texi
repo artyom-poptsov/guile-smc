@@ -28,6 +28,7 @@ Get the @var{context} module.
 
 @deffn {Scheme Procedure} puml->fsm port @
               [#:module=(current-module)] @
+              [#:keep-going?=#f] @
               [#:debug-mode?=#f]
 
 Read a FSM description from a @var{port} in the PlantUML format and convert it
@@ -36,6 +37,7 @@ to Guile-SMC @code{<fsm>} instance.
 
 @deffn {Scheme Procedure} puml-string->fsm port @
               [#:module=(current-module)] @
+              [#:keep-going?=#f] @
               [#:debug-mode?=#f]
 
 Convert a @var{string} in the PlantUML format and to Guile-SMC @code{<fsm>}
