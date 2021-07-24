@@ -8,7 +8,8 @@
              (smc core log)
              (smc fsm)
              (smc cli common)
-             (smc cli command-compile))
+             (smc cli command-compile)
+             (smc cli command-context))
 
 
 
@@ -38,6 +39,8 @@ help message for the given command.
   (cond
    ((equal? command "compile")
     (command-compile rest))
+   ((equal? command "context")
+    (command-context rest))
    ((or (equal? command "help")
         (equal? command "-h")
         (equal? command "--help"))
