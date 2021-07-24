@@ -387,14 +387,6 @@
 
 
 
-(define (fsm-pretty-print-statistics fsm port)
-  (display ";;; Statistics:\n" port)
-  (for-each (lambda (record)
-              (ice-9:format port ";;;   ~10a: ~10a~%"
-                            (car record)
-                            (cdr record)))
-            (fsm-statistics fsm)))
-
 ;; Read state machine description in PlantUML format from a PORT and parse it.
 ;;
 ;; Required parameters:

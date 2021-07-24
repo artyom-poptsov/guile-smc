@@ -46,6 +46,7 @@
             fsm-step!
             fsm-run!
             fsm-statistics
+            fsm-pretty-print-statistics
 
             fsm-parent
             fsm-parent-set!
@@ -179,6 +180,14 @@
 (define-method (fsm-statistics (self <fsm>))
   (list (cons 'step-counter       (fsm-step-counter self))
         (cons 'transition-counter (fsm-transition-counter self))))
+
+(define (fsm-pretty-print-statistics fsm port)
+  (display ";;; Statistics:\n" port)
+  (for-each (lambda (record)
+              (ice-9:format port ";;;   ~10a: ~10a~%"
+                            (car record)
+                            (cdr record)))
+            (fsm-statistics fsm)))
 
 
 
