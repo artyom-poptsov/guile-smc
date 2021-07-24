@@ -105,22 +105,6 @@
                     (hash-table->transition-list table))))
      port)))
 
-(define (%write-resolver-status fsm port)
-  (display ";;; Resolver status:\n" port)
-  (let loop ((procedures (sort (set-content (puml-context-resolved-procedures
-                                             (fsm-parent-context fsm)))
-                               (lambda (y x)
-                                 (string<? (object->string y) (object->string x)))))
-             (current-module #f))
-    (unless (null? procedures)
-      (let* ((entry (car procedures))
-             (module (car entry))
-             (proc   (cdr entry)))
-      (unless (equal? current-module module)
-        (format port ";;;   ~a~%" module))
-      (format port ";;;     ~a~%" proc)
-      (loop (cdr procedures) module)))))
-
 
 
 (define* (fsm-compile fsm
@@ -138,7 +122,8 @@
     (display ";;;\n" output-port)
     (fsm-pretty-print-statistics (fsm-parent fsm) output-port)
     (display ";;;\n" output-port)
-    (%write-resolver-status fsm output-port)
+    (puml-context-print-resolver-status (fsm-parent-context fsm)
+                                        output-port)
     (newline output-port))
 
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))

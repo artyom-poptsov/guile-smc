@@ -42,6 +42,7 @@
             puml-context-keep-going?
             puml-context-resolved-procedures
             puml-context-unresolved-procedures
+            puml-context-print-resolver-status
             puml->fsm
             puml-string->fsm))
 
@@ -389,6 +390,31 @@
      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
      (,guard:newline?         ,action:add-state-transition         read)
      (,guard:#t               ,action:store                 read-state-transition-action))))
+
+
+
+(define-method (puml-context-print-resolver-status (puml-context <puml-context>)
+                                                   (port         <port>))
+  (display ";;; Resolver status:\n" port)
+  (let loop ((procedures (sort (set-content (puml-context-resolved-procedures
+                                             puml-context))
+                               (lambda (y x)
+                                 (string<? (object->string y) (object->string x)))))
+             (current-module #f))
+    (unless (null? procedures)
+      (let* ((entry (car procedures))
+             (module (car entry))
+             (proc   (cdr entry)))
+        (unless (equal? current-module module)
+          (format port ";;;   ~a~%" module))
+        (format port ";;;     ~a~%" proc)
+        (loop (cdr procedures) module))))
+
+  (unless (set-empty? (puml-context-unresolved-procedures puml-context))
+    (display ";;;\n;;;    Unresolved procedures:\n" port)
+    (for-each (lambda (proc-name)
+                (format port ";;;      ~a~%" proc-name))
+              (set-content (puml-context-unresolved-procedures puml-context)))))
 
 
 
