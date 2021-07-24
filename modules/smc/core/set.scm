@@ -31,6 +31,7 @@
             set-add!
             set-remove!
             set-capacity
+            set-empty?
             set-contains?))
 
 
@@ -85,5 +86,8 @@
   (if (member element (set-content set))
       #t
       #f))
+
+(define-method (set-empty? (set <set>))
+  (zero? (set-capacity set)))
 
 ;;; set.scm ends here.
