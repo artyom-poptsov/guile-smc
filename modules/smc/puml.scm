@@ -411,9 +411,9 @@
         (loop (cdr procedures) module))))
 
   (unless (set-empty? (puml-context-unresolved-procedures puml-context))
-    (display ";;;\n;;;    Unresolved procedures:\n" port)
+    (display ";;;\n;;;   Unresolved procedures:\n" port)
     (for-each (lambda (proc-name)
-                (format port ";;;      ~a~%" proc-name))
+                (format port ";;;     ~a~%" proc-name))
               (set-content (puml-context-unresolved-procedures puml-context)))))
 
 
