@@ -27,8 +27,10 @@
   #:use-module (oop goops)
   #:use-module (ice-9 pretty-print)
   #:use-module (smc core state)
+  #:use-module (smc core set)
   #:use-module (smc version)
   #:use-module (smc fsm)
+  #:use-module (smc puml)
   #:export (fsm-compile
             %write-module
             %write-transition-table))
@@ -103,6 +105,22 @@
                     (hash-table->transition-list table))))
      port)))
 
+(define (%write-resolver-status fsm port)
+  (display ";;; Resolver status:\n" port)
+  (let loop ((procedures (sort (set-content (puml-context-resolved-procedures
+                                             (fsm-parent-context fsm)))
+                               (lambda (y x)
+                                 (string<? (object->string y) (object->string x)))))
+             (current-module #f))
+    (unless (null? procedures)
+      (let* ((entry (car procedures))
+             (module (car entry))
+             (proc   (cdr entry)))
+      (unless (equal? current-module module)
+        (format port ";;;   ~a~%" module))
+      (format port ";;;     ~a~%" proc)
+      (loop (cdr procedures) module)))))
+
 
 
 (define* (fsm-compile fsm
@@ -119,6 +137,8 @@
               (string-split (fsm-description (fsm-parent fsm)) #\newline))
     (display ";;;\n" output-port)
     (fsm-pretty-print-statistics (fsm-parent fsm) output-port)
+    (display ";;;\n" output-port)
+    (%write-resolver-status fsm output-port)
     (newline output-port))
 
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
