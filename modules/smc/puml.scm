@@ -451,21 +451,20 @@
            #:debug-mode? debug-mode?
            #:transition-table %transition-table)))
 
-    (let* ((context (make <puml-context>
-                      #:module      module
-                      #:keep-going? keep-going?))
-           (new-context (fsm-run! reader-fsm
-                                  (lambda (context)
-                                    (let ((ch (get-char port)))
-                                      (char-context-update-counters! context ch)
-                                      ch))
-                                  context)))
-      (let ((output-fsm (puml-context-fsm new-context)))
-        (fsm-parent-set! output-fsm reader-fsm)
-        (fsm-parent-context-set! output-fsm new-context)
-        (when debug-mode?
-          (fsm-pretty-print-statistics reader-fsm (current-error-port)))
-        output-fsm))))
+    (let* ((context (fsm-run! reader-fsm
+                              (lambda (context)
+                                (let ((ch (get-char port)))
+                                  (char-context-update-counters! context ch)
+                                  ch))
+                              (make <puml-context>
+                                #:module      module
+                                #:keep-going? keep-going?)))
+           (output-fsm (puml-context-fsm context)))
+      (fsm-parent-set! output-fsm reader-fsm)
+      (fsm-parent-context-set! output-fsm context)
+      (when debug-mode?
+        (fsm-pretty-print-statistics reader-fsm (current-error-port)))
+      output-fsm)))
 
 (define* (puml-string->fsm string
                            #:key
