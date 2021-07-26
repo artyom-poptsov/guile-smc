@@ -32,6 +32,8 @@
             state?
             state-name
             state-run
+            state-event-source
+            state-event-source-set!
             state-description
             state-description-set!
             state-transition-count
@@ -84,6 +86,19 @@
    #:setter       state-description-set!
    #:init-keyword #:description
    #:init-value   #f)
+
+  ;; A procedure that returns an event.
+  ;;
+  ;; It called by the FSM the state belongs to as follows:
+  ;;   (proc context)
+  ;;
+  ;; <procedure>
+  (event-source
+   #:getter       state-event-source
+   #:setter       state-event-source-set!
+   #:init-keyword #:event-source
+   #:init-value   (lambda (context) #t))
+
 
   ;; <list> of transitions.
   (transitions
@@ -204,6 +219,13 @@
           (if (tguard context event)
               (values next-state (action context event))
               (loop (cdr transition-alist)))))))
+
+;; Run a STATE in a given CONTEXT.  This procedure uses internal event source
+;; of a STATE, specified by the 'event-source' slot.
+(define-method (state-run (state <state>) context)
+  (state-run state
+             ((state-event-source state) context)
+             context))
 
 
 
