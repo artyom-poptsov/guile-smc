@@ -252,20 +252,14 @@
 
 ;; Convert a list LST to a <state> instance, return the new state.
 (define-method (list->state (lst <list>))
-  (let* ((name        (state:name        lst))
-         (description (state:description lst))
-         (transitions (state:transitions lst)))
-    (make <state>
-      #:name        name
-      #:description description
-      #:transitions transitions)))
+  (make <state>
+    #:name        (state:name        lst)
+    #:description (state:description lst)
+    #:transitions (state:transitions lst)))
 
 (define-method (state->list (state <state>))
-  (let ((name        (state-name        state))
-        (description (state-description state))
-        (transitions (state-transitions state)))
-    `((name        . ,name)
-      (description . ,description)
-      (transitions . ,transitions))))
+  `((name        . ,(state-name        state))
+    (description . ,(state-description state))
+    (transitions . ,(state-transitions state))))
 
 ;;; state.scm ends here.
