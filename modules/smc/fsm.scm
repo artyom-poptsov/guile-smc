@@ -231,7 +231,7 @@
     (for-each (lambda (transition)
                 (when (hash-ref table (state:name transition))
                   (log-error "Duplicate state: ~a" (state:name transition))
-                  (error "Duplicate state" state-name))
+                  (error "Duplicate state" (state:name transition)))
                 (let ((state (list->state transition)))
                   (hash-set! table (state-name state) state)))
               transition-list)
