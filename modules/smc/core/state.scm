@@ -33,6 +33,7 @@
             state-name
             state-run
             state-event-source
+            state-has-event-source?
             state-event-source-set!
             state-description
             state-description-set!
@@ -131,6 +132,9 @@
 
 (define-method (equal? (state-1 <state>) (state-2 <state>))
   (equal? (state-name state-1) (state-name state-2)))
+
+(define-method (state-has-event-source? (state <state>))
+  (not (equal? (state-event-source state) #f)))
 
 
 
