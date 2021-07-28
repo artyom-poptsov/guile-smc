@@ -144,7 +144,7 @@
         (next-method)
         (fsm-transition-table-set!
          self
-         (transition-list->hash-table %transition-table))
+         (transition-list->hash-table self %transition-table))
         (fsm-current-state-set! self
                                 (fsm-state self
                                            (quote ,(state-name (fsm-current-state fsm)))))))

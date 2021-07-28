@@ -53,8 +53,8 @@
   ;;
   ;; <fsm>
   (fsm
-   #:init-thunk   (lambda () (make <fsm>))
-   #:getter       puml-context-fsm)
+   #:getter       puml-context-fsm
+   #:setter       puml-context-fsm-set!)
 
   ;; Modules that contain state machine procedures.
   (module
@@ -87,6 +87,14 @@
   (unresolved-procedures
    #:getter       puml-context-unresolved-procedures
    #:init-thunk   (lambda () (make <set>))))
+
+
+(define-method (initialize (puml-context <puml-context>) initargs)
+  (next-method)
+  (let ((event-source (resolve-global-event-source puml-context)))
+    (puml-context-fsm-set! puml-context
+                           (make <fsm>
+                             #:event-source event-source))))
 
 
 
@@ -142,6 +150,22 @@
        (list-ref tr 3)))
 
 
+(define %event-source-prefix "event-source")
+
+(define (resolve-state-event-source ctx state)
+  (let* ((proc-name (format #f "~a:~a" %event-source-prefix state))
+         (proc      (resolve-procedure ctx proc-name)))
+    (if proc
+        (cdr proc)
+        (fsm-event-source (puml-context-fsm ctx)))))
+
+(define (resolve-global-event-source ctx)
+  (let* ((proc (resolve-procedure ctx %event-source-prefix)))
+    (if proc
+        (cdr proc)
+        (const #t))))
+
+
 (define (action:add-state-transition ctx ch)
 
   (unless (stack-empty? (context-buffer ctx))
@@ -162,7 +186,9 @@
      ((equal? from '*)
       (context-log-debug ctx
                          "action:add-state-transition: Adding first state...")
-      (let ((state (make <state> #:name to)))
+      (let ((state (make <state>
+                     #:name         to
+                     #:event-source (resolve-state-event-source ctx to))))
         (fsm-state-add! fsm state)
         (fsm-current-state-set! fsm state)))
      ((and (equal? from '*) (equal? to '*))
@@ -460,29 +486,29 @@
                     (keep-going? #f)
                     (debug-mode? #f))
   (log-use-stderr! debug-mode?)
-  (let ((reader-fsm
-         (make <fsm>
-           #:description (string-append
-                          "PlantUML <http://www.plantuml.com> Reader Finite-State Machine.\n"
-                          "This FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n"
-                          "<https://github.com/artyom-poptsov/guile-smc>")
-           #:debug-mode? debug-mode?
-           #:transition-table %transition-table)))
-
-    (let* ((context (fsm-run! reader-fsm
-                              (lambda (context)
-                                (let ((ch (get-char port)))
-                                  (char-context-update-counters! context ch)
-                                  ch))
-                              (make <puml-context>
-                                #:module      module
-                                #:keep-going? keep-going?)))
-           (output-fsm (puml-context-fsm context)))
+  (let* ((context (make <puml-context>
+                    #:module      module
+                    #:keep-going? keep-going?))
+         (reader-fsm
+          (make <fsm>
+            #:description (string-append
+                           "PlantUML <http://www.plantuml.com> Reader Finite-State Machine.\n"
+                           "This FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n"
+                           "<https://github.com/artyom-poptsov/guile-smc>")
+            #:debug-mode? debug-mode?
+            #:transition-table %transition-table))
+         (new-context (fsm-run! reader-fsm
+                                (lambda (context)
+                                  (let ((ch (get-char port)))
+                                    (char-context-update-counters! context ch)
+                                    ch))
+                                context))
+         (output-fsm (puml-context-fsm context)))
       (fsm-parent-set! output-fsm reader-fsm)
       (fsm-parent-context-set! output-fsm context)
       (when debug-mode?
         (fsm-pretty-print-statistics reader-fsm (current-error-port)))
-      output-fsm)))
+      output-fsm))
 
 (define* (puml-string->fsm string
                            #:key

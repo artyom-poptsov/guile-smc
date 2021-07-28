@@ -35,6 +35,8 @@
             fsm?
             fsm-description
             fsm-description-set!
+            fsm-event-source
+            fsm-event-source-set!
             fsm-debug-mode-set!
             fsm-debug-mode?
             fsm-transition-table
@@ -104,6 +106,15 @@
    #:setter     fsm-transition-table-set!
    #:init-keyword #:transition-table
    #:init-thunk (lambda () (make-hash-table)))
+
+  ;; Global state machine event source.
+  ;;
+  ;; <procedure>
+  (event-source
+   #:init-value   (lambda (context) #t)
+   #:init-keyword #:event-source
+   #:getter       fsm-event-source
+   #:setter       fsm-event-source-set!)
 
   ;; REQUIRED.  Name of the current state.
   ;;
@@ -226,13 +237,15 @@
 
 
 ;; Convert a TRANSITION-LIST to a hash table.
-(define-method (transition-list->hash-table (transition-list <list>))
+(define-method (transition-list->hash-table (fsm <fsm>) (transition-list <list>))
   (let ((table (make-hash-table)))
     (for-each (lambda (transition)
                 (when (hash-ref table (state:name transition))
                   (log-error "Duplicate state: ~a" (state:name transition))
                   (error "Duplicate state" (state:name transition)))
                 (let ((state (list->state transition)))
+                  (unless (state-has-event-source? state)
+                    (state-event-source-set! state (fsm-event-source fsm)))
                   (hash-set! table (state-name state) state)))
               transition-list)
     (hash-map->list (lambda (state-name state)
@@ -281,7 +294,7 @@
     (when table
       (cond
        ((list? table)
-        (fsm-transition-table-set! self (transition-list->hash-table table))
+        (fsm-transition-table-set! self (transition-list->hash-table self table))
         (fsm-current-state-set! self (fsm-state self (state:name (car table)))))
        (else
         (log-error "Transition table must be a list: ~a" table)
@@ -380,6 +393,16 @@
     (if new-state
         (fsm-run! fsm event-source new-context)
         context)))
+
+;; This version of the 'fsm-run!' procedure uses event sources specific for
+;; each state.
+(define-method (fsm-run! (fsm <fsm>) context)
+  (let ((event-source (state-event-source (fsm-current-state fsm))))
+    (receive (new-state new-context)
+        (fsm-step! fsm (event-source context) context)
+      (if new-state
+          (fsm-run! fsm new-context)
+          context))))
 
 
 
