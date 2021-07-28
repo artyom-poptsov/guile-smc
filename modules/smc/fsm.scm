@@ -250,12 +250,12 @@
 
 ;; Convert a hash table to a transition list of the following form:
 ;;
-;;   '((state1
-;;      "description"
-;;      (guard-procedure        action-procedure        next-state)
-;;      (guard-procedure        action-procedure        next-state)
-;;      ...
-;;      (guard-procedure        action-procedure        next-state))
+;;   '(((name        . state1)
+;;      (description . "description")
+;;      (transitions . ((guard-procedure      action-procedure      next-state)
+;;                      (guard-procedure      action-procedure      next-state)
+;;                      ...
+;;                      (guard-procedure      action-procedure      next-state))))
 ;;     (state1 ...))
 ;;
 ;; Return the transition list.
@@ -282,7 +282,7 @@
       (cond
        ((list? table)
         (fsm-transition-table-set! self (transition-list->hash-table table))
-        (fsm-current-state-set! self (fsm-state self (caar table))))
+        (fsm-current-state-set! self (fsm-state self (state:name (car table)))))
        (else
         (log-error "Transition table must be a list: ~a" table)
         (error "Transition table must be a list"))))))

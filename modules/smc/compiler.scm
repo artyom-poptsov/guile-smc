@@ -94,14 +94,11 @@
                (map (lambda (state)
                       (let* ((name        (state:name        state))
                              (description (state:description state))
-                             (transitions (state:transitions description state)))
-                        (if description
-                            (cons name
-                                  (cons
-                                   description
-                                   (%serialize-transition-table transitions)))
-                            (cons name
-                                  (%serialize-transition-table transitions)))))
+                             (transitions (state:transitions state)))
+                        `((name        . ,name)
+                          (description . ,description)
+                          (transitions
+                           ,@(%serialize-transition-table transitions)))))
                     (hash-table->transition-list table))))
      port)))
 

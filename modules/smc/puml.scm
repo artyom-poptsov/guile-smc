@@ -281,115 +281,133 @@
 
 
 (define %transition-table
-  `((read-start-tag
-     "Read the start @startuml tag and check it for errors."
-     (,guard:eof-object?     ,action:unexpected-end-of-file-error #f)
-     (,guard:space?          ,action:check-start-tag    read)
-     (,guard:newline?        ,action:check-start-tag    read)
-     (,guard:#t              ,action:store       read-start-tag))
-    (read
-     "Read the PlantUML transition table."
-     (,guard:eof-object?          ,action:unexpected-end-of-file-error #f)
-     (,guard:at-symbol?           ,action:store        read-end-tag)
-     (,guard:single-quote?        ,action:no-op        read/skip-comment)
-     (,guard:left-square-bracket? ,action:no-op        read-state)
-     (,guard:letter?              ,action:store        read-word)
-     (,guard:#t                   ,action:no-op        read))
-    (read-end-tag
-     "Read the @enduml tag."
-     (,guard:eof-object?     ,action:check-end-tag     #f)
-     (,guard:newline?        ,action:check-end-tag     #f)
-     (,guard:space?          ,action:check-end-tag     #f)
-     (,guard:#t              ,action:store             read-end-tag))
-    (read/skip-comment
-     "Skip commentaries that are written between stanzas."
-     (,guard:eof-object?     ,action:no-op             #f)
-     (,guard:newline?        ,action:no-op             read)
-     (,guard:#t              ,action:no-op             read/skip-comment))
-    (read-word
-     "Read a word."
-     (,guard:eof-object?    ,action:no-op              #f)
-     (,guard:title?         ,action:clear-buffer       read-title)
-     (,guard:colon?         ,action:update-stanza      read-state-description)
-     (,guard:space?         ,action:update-stanza      search-state-transition)
-     (,guard:#t             ,action:store              read-word))
-    (read-title
-     "Read a diagram title."
-     (,guard:eof-object?    ,action:no-op              #f)
-     (,guard:newline?       ,action:add-description    read)
-     (,guard:#t             ,action:store              read-title))
-    (read-state
-     "Read a PlantUML stanza."
-     (,guard:eof-object?           ,action:no-op                #f)
-     (,guard:newline?              ,action:syntax-error         #f)
-     (,guard:right-square-bracket? ,action:update-stanza search-state-transition)
-     (,guard:space?                ,action:update-stanza search-state-transition)
-     (,guard:colon?                ,action:update-stanza read-state-description)
-     (,guard:#t                    ,action:store         read-state))
-    (search-state-transition
-     "Check if a state has a transition."
-     (,guard:eof-object?     ,action:no-op        #f)
-     (,guard:colon?          ,action:no-op        read-state-description)
-     (,guard:hyphen-minus?           ,action:no-op        read-state-right-arrow)
-     (,guard:less-than-sign? ,action:no-op        read-state-left-arrow)
-     (,guard:#t              ,action:no-op        search-state-transition))
-    (read-state-description
-     "Read a state description if it is present."
-     (,guard:eof-object?     ,action:no-op                 #f)
-     (,guard:newline?        ,action:add-state-description read)
-     (,guard:#t              ,action:store          read-state-description))
-    (read-state-right-arrow
-     "Read a right arrow that indicates a transition."
-     (,guard:eof-object?     ,action:no-op        #f)
-     (,guard:space?          ,action:no-op        search-state-transition-to)
-     (,guard:#t              ,action:no-op        read-state-right-arrow))
-    (search-state-transition-to
-     "Search for a state that the current state transitions to."
-     (,guard:eof-object?          ,action:no-op        #f)
-     (,guard:letter?              ,action:store read-state-transition-to)
-     (,guard:left-square-bracket? ,action:no-op        read-state-transition-to)
-     (,guard:#t                   ,action:no-op        search-state-transition-to))
-    (read-state-transition-to
-     "Read a state that the current state transitions to."
-     (,guard:eof-object?           ,action:no-op                #f)
-     ;; (,guard:space?          ,action:no-op                        read-state-transition-guard)
-     (,guard:right-square-bracket? ,action:no-op                read-state-transition-to)
-     (,guard:colon?                ,action:update-stanza search-state-transition-guard)
-     (,guard:newline?              ,action:add-state-transition read)
-     (,guard:#t                    ,action:store         read-state-transition-to))
-    (search-state-transition-guard
-     "Check if the transition has a guard."
-     (,guard:eof-object?     ,action:no-op                      #f)
-     (,guard:letter?         ,action:store               read-state-transition-guard)
-     (,guard:#t              ,action:no-op                      search-state-transition-guard))
-    (read-state-transition-guard
-     "Read a state transition guard."
-     (,guard:eof-object?     ,action:no-op                      #f)
-     (,guard:space?          ,action:update-stanza       search-state-action-arrow)
-     (,guard:newline?        ,action:add-state-transition       read)
-     (,guard:#t              ,action:store               read-state-transition-guard))
-    (search-state-action-arrow
-     "Check if a transition has an attached action."
-     (,guard:eof-object?     ,action:no-op                      #f)
-     (,guard:newline?        ,action:no-op                      read)
-     (,guard:hyphen-minus?           ,action:no-op                      read-state-action-arrow)
-     (,guard:#t              ,action:no-op                      search-state-action-arrow))
-    (read-state-action-arrow
-     "Read and skip the action arrow."
-     (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
-     (,guard:newline?         ,action:no-op                        #f)
-     (,guard:more-than-sign? ,action:no-op                        search-state-transition-action))
-    (search-state-transition-action
-     "Check if an action is present after the arrow.  Issue an error if it is not."
-     (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
-     (,guard:letter?          ,action:store                 read-state-transition-action)
-     (,guard:newline?         ,action:no-op                        #f)
-     (,guard:#t               ,action:no-op                        search-state-transition-action))
-    (read-state-transition-action
-     "Read the state transition action."
-     (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
-     (,guard:newline?         ,action:add-state-transition         read)
-     (,guard:#t               ,action:store                 read-state-transition-action))))
+  `(((name        . read-start-tag)
+     (description . "Read the start @startuml tag and check it for errors.")
+     (transitions
+      (,guard:eof-object?     ,action:unexpected-end-of-file-error #f)
+      (,guard:space?          ,action:check-start-tag    read)
+      (,guard:newline?        ,action:check-start-tag    read)
+      (,guard:#t              ,action:store       read-start-tag)))
+    ((name        . read)
+     (description . "Read the PlantUML transition table.")
+     (transitions
+      (,guard:eof-object?          ,action:unexpected-end-of-file-error #f)
+      (,guard:at-symbol?           ,action:store        read-end-tag)
+      (,guard:single-quote?        ,action:no-op        read/skip-comment)
+      (,guard:left-square-bracket? ,action:no-op        read-state)
+      (,guard:letter?              ,action:store        read-word)
+      (,guard:#t                   ,action:no-op        read)))
+    ((name         . read-end-tag)
+     (description  . "Read the @enduml tag.")
+     (transitions
+      (,guard:eof-object?     ,action:check-end-tag     #f)
+      (,guard:newline?        ,action:check-end-tag     #f)
+      (,guard:space?          ,action:check-end-tag     #f)
+      (,guard:#t              ,action:store             read-end-tag)))
+    ((name         . read/skip-comment)
+     (description  . "Skip commentaries that are written between stanzas.")
+     (transitions
+      (,guard:eof-object?     ,action:no-op             #f)
+      (,guard:newline?        ,action:no-op             read)
+      (,guard:#t              ,action:no-op             read/skip-comment)))
+    ((name         . read-word)
+     (description  . "Read a word.")
+     (transitions
+      (,guard:eof-object?    ,action:no-op              #f)
+      (,guard:title?         ,action:clear-buffer       read-title)
+      (,guard:colon?         ,action:update-stanza      read-state-description)
+      (,guard:space?         ,action:update-stanza      search-state-transition)
+      (,guard:#t             ,action:store              read-word)))
+    ((name         . read-title)
+     (description  . "Read a diagram title.")
+     (transitions
+      (,guard:eof-object?    ,action:no-op              #f)
+      (,guard:newline?       ,action:add-description    read)
+      (,guard:#t             ,action:store              read-title)))
+    ((name         . read-state)
+     (description  . "Read a PlantUML stanza.")
+     (transitions
+      (,guard:eof-object?           ,action:no-op                #f)
+      (,guard:newline?              ,action:syntax-error         #f)
+      (,guard:right-square-bracket? ,action:update-stanza search-state-transition)
+      (,guard:space?                ,action:update-stanza search-state-transition)
+      (,guard:colon?                ,action:update-stanza read-state-description)
+      (,guard:#t                    ,action:store         read-state)))
+    ((name         . search-state-transition)
+     (description  . "Check if a state has a transition.")
+     (transitions
+      (,guard:eof-object?     ,action:no-op        #f)
+      (,guard:colon?          ,action:no-op        read-state-description)
+      (,guard:hyphen-minus?           ,action:no-op        read-state-right-arrow)
+      (,guard:less-than-sign? ,action:no-op        read-state-left-arrow)
+      (,guard:#t              ,action:no-op        search-state-transition)))
+    ((name         . read-state-description)
+     (description  . "Read a state description if it is present.")
+     (transitions
+      (,guard:eof-object?     ,action:no-op                 #f)
+      (,guard:newline?        ,action:add-state-description read)
+      (,guard:#t              ,action:store          read-state-description)))
+    ((name         . read-state-right-arrow)
+     (description  . "Read a right arrow that indicates a transition.")
+     (transitions
+      (,guard:eof-object?     ,action:no-op        #f)
+      (,guard:space?          ,action:no-op        search-state-transition-to)
+      (,guard:#t              ,action:no-op        read-state-right-arrow)))
+    ((name         . search-state-transition-to)
+     (description  . "Search for a state that the current state transitions to.")
+     (transitions
+      (,guard:eof-object?          ,action:no-op        #f)
+      (,guard:letter?              ,action:store read-state-transition-to)
+      (,guard:left-square-bracket? ,action:no-op        read-state-transition-to)
+      (,guard:#t                   ,action:no-op        search-state-transition-to)))
+    ((name         . read-state-transition-to)
+     (description  . "Read a state that the current state transitions to.")
+     (transitions
+      (,guard:eof-object?           ,action:no-op                #f)
+      ;; (,guard:space?          ,action:no-op                        read-state-transition-guard)
+      (,guard:right-square-bracket? ,action:no-op                read-state-transition-to)
+      (,guard:colon?                ,action:update-stanza search-state-transition-guard)
+      (,guard:newline?              ,action:add-state-transition read)
+      (,guard:#t                    ,action:store         read-state-transition-to)))
+    ((name         . search-state-transition-guard)
+     (description  . "Check if the transition has a guard.")
+     (transitions
+      (,guard:eof-object?     ,action:no-op                      #f)
+      (,guard:letter?         ,action:store               read-state-transition-guard)
+      (,guard:#t              ,action:no-op                      search-state-transition-guard)))
+    ((name         . read-state-transition-guard)
+     (description  . "Read a state transition guard.")
+     (transitions
+      (,guard:eof-object?     ,action:no-op                      #f)
+      (,guard:space?          ,action:update-stanza       search-state-action-arrow)
+      (,guard:newline?        ,action:add-state-transition       read)
+      (,guard:#t              ,action:store               read-state-transition-guard)))
+    ((name         . search-state-action-arrow)
+     (description  . "Check if a transition has an attached action.")
+     (transitions
+      (,guard:eof-object?     ,action:no-op                      #f)
+      (,guard:newline?        ,action:no-op                      read)
+      (,guard:hyphen-minus?           ,action:no-op                      read-state-action-arrow)
+      (,guard:#t              ,action:no-op                      search-state-action-arrow)))
+    ((name         . read-state-action-arrow)
+     (description  . "Read and skip the action arrow.")
+     (transitions
+      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
+      (,guard:newline?         ,action:no-op                        #f)
+      (,guard:more-than-sign? ,action:no-op                        search-state-transition-action)))
+    ((name         . search-state-transition-action)
+     (description  . "Check if an action is present after the arrow.  Issue an error if it is not.")
+     (transitions
+      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
+      (,guard:letter?          ,action:store                 read-state-transition-action)
+      (,guard:newline?         ,action:no-op                        #f)
+      (,guard:#t               ,action:no-op                        search-state-transition-action)))
+    ((name         . read-state-transition-action)
+     (description  . "Read the state transition action.")
+     (transitions
+      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
+      (,guard:newline?         ,action:add-state-transition         read)
+      (,guard:#t               ,action:store                 read-state-transition-action)))))
 
 
 

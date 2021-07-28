@@ -228,25 +228,33 @@
              context))
 
 
+;; State serialized to an associative list of the following form:
+;;
+;;   `((name         . state-name)
+;;     (description  . "State description")
+;;     (event-source . ,event-source:state-name)
+;;     (transitions
+;;      (,guard:...    ,action:...    next-state-name-1)
+;;      (,guard:...    ,action:...    next-state-name-1)
+;;      (,guard:...    ,action:...    next-state-name-2)))
+;;
 
 (define (state:name state)
-  (car state))
+  (assoc-ref state 'name))
 
 (define (state:description state)
-  (and (> (length state) 1)
-       (string? (cadr state))
-       (cadr state)))
+  (assoc-ref state 'description))
 
-(define (state:transitions state-description state)
-  (if state-description
-      (cddr state)
-      (cdr state)))
+(define (state:transitions state)
+  (assoc-ref state 'transitions))
+
+
 
 ;; Convert a list LST to a <state> instance, return the new state.
 (define-method (list->state (lst <list>))
   (let* ((name        (state:name        lst))
          (description (state:description lst))
-         (transitions (state:transitions description lst)))
+         (transitions (state:transitions lst)))
     (make <state>
       #:name        name
       #:description description
@@ -256,12 +264,8 @@
   (let ((name        (state-name        state))
         (description (state-description state))
         (transitions (state-transitions state)))
-  (if (null? transitions)
-      (if description
-          (list name description)
-          (list name))
-      (if description
-          (cons name (cons description transitions))
-          (cons name transitions)))))
+    `((name        . ,name)
+      (description . ,description)
+      (transitions . ,transitions))))
 
 ;;; state.scm ends here.
