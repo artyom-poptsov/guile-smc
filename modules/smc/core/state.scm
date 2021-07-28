@@ -49,6 +49,7 @@
 
             state:name
             state:description
+            state:event-source
             state:transitions
             state-transition:guard
             state-transition:action
@@ -247,6 +248,9 @@
 
 (define (state:transitions state)
   (assoc-ref state 'transitions))
+
+(define (state:event-source state)
+  (assoc-ref state 'event-source))
 
 
 
