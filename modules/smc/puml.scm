@@ -486,23 +486,22 @@
                     (keep-going? #f)
                     (debug-mode? #f))
   (log-use-stderr! debug-mode?)
-  (let* ((context (make <puml-context>
-                    #:module      module
-                    #:keep-going? keep-going?))
-         (reader-fsm
+  (let* ((reader-fsm
           (make <fsm>
             #:description (string-append
                            "PlantUML <http://www.plantuml.com> Reader Finite-State Machine.\n"
                            "This FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n"
                            "<https://github.com/artyom-poptsov/guile-smc>")
             #:debug-mode? debug-mode?
+            #:event-source (lambda (context)
+                             (let ((ch (get-char port)))
+                               (char-context-update-counters! context ch)
+                               ch))
             #:transition-table %transition-table))
-         (new-context (fsm-run! reader-fsm
-                                (lambda (context)
-                                  (let ((ch (get-char port)))
-                                    (char-context-update-counters! context ch)
-                                    ch))
-                                context))
+         (context (fsm-run! reader-fsm
+                            (make <puml-context>
+                              #:module      module
+                              #:keep-going? keep-going?)))
          (output-fsm (puml-context-fsm context)))
       (fsm-parent-set! output-fsm reader-fsm)
       (fsm-parent-context-set! output-fsm context)
