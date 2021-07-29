@@ -198,6 +198,7 @@
 
 (define (action:syntax-error ctx ch)
   (error "Syntax error"
+         (char-context-port ctx)
          (char-context-row ctx)
          (char-context-col ctx)
          ch
@@ -206,7 +207,8 @@
 
 
 (define (%current-position-prefix ctx)
-  (format #f "input:~a:~a: "
+  (format #f "~a:~a:~a: "
+          (char-context-port ctx)
           (char-context-row ctx)
           (char-context-col ctx)))
 
