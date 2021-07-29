@@ -376,6 +376,20 @@
           (values next-state new-context))
         (values #f context))))
 
+(define-method (fsm-step! (self <fsm>) context)
+  (let ((state (fsm-current-state self)))
+    (if state
+        (receive (next-state new-context)
+            (state-run state context)
+          (when (fsm-debug-mode? self)
+            (fsm-log-transition state next-state))
+          (%step-counter-increment! self)
+          (unless (equal? state next-state)
+            (%transition-counter-increment! self))
+          (fsm-current-state-set! self next-state)
+          (values next-state new-context))
+        (values #f context))))
+
 ;; Run an FSM with the given EVENT-SOURCE and a CONTEXT and return the new
 ;; context.
 ;;
@@ -397,12 +411,11 @@
 ;; This version of the 'fsm-run!' procedure uses event sources specific for
 ;; each state.
 (define-method (fsm-run! (fsm <fsm>) context)
-  (let ((event-source (state-event-source (fsm-current-state fsm))))
-    (receive (new-state new-context)
-        (fsm-step! fsm (event-source context) context)
-      (if new-state
-          (fsm-run! fsm new-context)
-          context))))
+  (receive (new-state new-context)
+      (fsm-step! fsm context)
+    (if new-state
+        (fsm-run! fsm new-context)
+        context)))
 
 
 
