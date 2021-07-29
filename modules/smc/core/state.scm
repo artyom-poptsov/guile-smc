@@ -99,7 +99,7 @@
    #:getter       state-event-source
    #:setter       state-event-source-set!
    #:init-keyword #:event-source
-   #:init-value   (lambda (context) #t))
+   #:init-value   #f)
 
 
   ;; <list> of transitions.
