@@ -26,6 +26,7 @@
 (define-module (smc compiler)
   #:use-module (oop goops)
   #:use-module (ice-9 pretty-print)
+  #:use-module (smc core log)
   #:use-module (smc core state)
   #:use-module (smc core set)
   #:use-module (smc version)
@@ -110,6 +111,14 @@
                       (fsm-module    #f)
                       (extra-modules '())
                       (output-port (current-output-port)))
+
+  (when (and (fsm-event-source fsm)
+             (not (procedure-name (fsm-event-source fsm))))
+    (let ((error-message
+           "Cannot compile the FSM as the event source is set to an anonymous procedure"))
+      (log-error "~a: ~a" error-message fsm)
+      (error error-message fsm)))
+
   (%write-header output-port)
 
   (when (fsm-parent fsm)
