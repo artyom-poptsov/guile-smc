@@ -151,7 +151,8 @@
     (pretty-print
      `(define-method (initialize (self ,class-name) initargs)
         (next-method)
-        (fsm-event-source-set! self ,(procedure-name (fsm-event-source fsm)))
+        (fsm-event-source-set! self ,(and (fsm-event-source fsm)
+                                          (procedure-name (fsm-event-source fsm))))
         (fsm-transition-table-set!
          self
          (transition-list->hash-table self %transition-table))
