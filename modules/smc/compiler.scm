@@ -93,11 +93,14 @@
      `(define %transition-table
         ,(list 'quasiquote
                (map (lambda (state)
-                      (let* ((name        (state:name        state))
-                             (description (state:description state))
-                             (transitions (state:transitions state)))
-                        `((name        . ,name)
-                          (description . ,description)
+                      (let* ((name         (state:name              state))
+                             (description  (state:description       state))
+                             (event-source (state:event-source/name state))
+                             (transitions  (state:transitions       state)))
+                        `((name         . ,name)
+                          (description  . ,description)
+                          (event-source . ,(and event-source
+                                               (list 'unquote event-source)))
                           (transitions
                            ,@(%serialize-transition-table transitions)))))
                     (hash-table->transition-list table))))
