@@ -26,6 +26,7 @@
 ;;; Code:
 
 (define-module (smc context char-context)
+  #:use-module (ice-9 textual-ports)
   #:use-module (oop goops)
   #:use-module (smc context context)
   #:use-module (smc core log)
@@ -46,10 +47,14 @@
                action:clear-buffer
                action:update-stanza)
   #:export (<char-context>
+            char-context-port
             char-context-counter
             char-context-row
             char-context-col
             char-context-update-counters!
+
+            event-source
+
             guard:asterisk?
             guard:equals-sign?
             guard:newline?
@@ -74,6 +79,13 @@
             context-log-debug))
 
 (define-class <char-context> (<context>)
+  ;; A port from which data is read.
+  ;;
+  ;; <port>
+  (port
+   #:init-keyword #:port
+   #:getter       char-context-port)
+
   ;; Total number of characters consumed.
   ;;
   ;; <number>
@@ -124,6 +136,15 @@
     (%col++! ctx)
     (when (char=? ch #\newline)
       (%row++! ctx))))
+
+
+;;; Event source.
+
+;; Get the next character from a CONTEXT port.
+(define-method (event-source (context <char-context>))
+  (let ((ch (get-char (char-context-port context))))
+    (char-context-update-counters! context ch)
+    ch))
 
 
 ;;; Guards.

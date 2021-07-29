@@ -28,7 +28,6 @@
 (define-module (smc puml)
   #:use-module (oop goops)
   #:use-module (ice-9 receive)
-  #:use-module (ice-9 textual-ports)
   #:use-module (smc core state)
   #:use-module (smc fsm)
   #:use-module (smc core log)
@@ -493,13 +492,11 @@
                            "This FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n"
                            "<https://github.com/artyom-poptsov/guile-smc>")
             #:debug-mode? debug-mode?
-            #:event-source (lambda (context)
-                             (let ((ch (get-char port)))
-                               (char-context-update-counters! context ch)
-                               ch))
+            #:event-source     event-source
             #:transition-table %transition-table))
          (context (fsm-run! reader-fsm
                             (make <puml-context>
+                              #:port        port
                               #:module      module
                               #:keep-going? keep-going?)))
          (output-fsm (puml-context-fsm context)))
