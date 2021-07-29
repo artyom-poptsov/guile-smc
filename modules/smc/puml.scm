@@ -153,15 +153,21 @@
 
 (define (resolve-state-event-source ctx state)
   (let* ((proc-name (format #f "~a:~a" %event-source-prefix state))
-         (proc      (resolve-procedure ctx proc-name)))
+         (proc      (resolve-procedure ctx (string->symbol proc-name))))
     (if proc
-        (cdr proc)
+        (begin
+          (set-add! (puml-context-resolved-procedures ctx)
+                    proc)
+          (cdr proc))
         (fsm-event-source (puml-context-fsm ctx)))))
 
 (define (resolve-global-event-source ctx)
-  (let* ((proc (resolve-procedure ctx %event-source-prefix)))
+  (let* ((proc (resolve-procedure ctx (string->symbol %event-source-prefix))))
     (if proc
-        (cdr proc)
+        (begin
+          (set-add! (puml-context-resolved-procedures ctx)
+                    proc)
+          (cdr proc))
         (const #t))))
 
 
