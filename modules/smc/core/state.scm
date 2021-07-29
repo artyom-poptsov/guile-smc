@@ -33,6 +33,7 @@
             state-name
             state-run
             state-event-source
+            state:event-source/name
             state-has-event-source?
             state-event-source-set!
             state-description
@@ -255,6 +256,11 @@
 
 (define (state:event-source state)
   (assoc-ref state 'event-source))
+
+(define (state:event-source/name state)
+  (let ((proc (assoc-ref state 'event-source)))
+    (and proc
+         (procedure-name proc))))
 
 
 
