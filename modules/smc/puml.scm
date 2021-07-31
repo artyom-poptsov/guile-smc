@@ -91,6 +91,8 @@
 (define-method (initialize (puml-context <puml-context>) initargs)
   (next-method)
   (let ((event-source (resolve-global-event-source puml-context)))
+    (context-log-info puml-context "FSM global event source: ~a~%"
+                      event-source)
     (puml-context-fsm-set! puml-context
                            (make <fsm>
                              #:event-source event-source))))
@@ -154,12 +156,19 @@
 (define (resolve-state-event-source ctx state)
   (let* ((proc-name (format #f "~a:~a" %event-source-prefix state))
          (proc      (resolve-procedure ctx (string->symbol proc-name))))
+    (context-log-info ctx
+                      "resolve-state-event-source: ~a resolved to ~a"
+                      proc-name proc)
     (if proc
         (begin
           (set-add! (puml-context-resolved-procedures ctx)
                     proc)
           (cdr proc))
-        (fsm-event-source (puml-context-fsm ctx)))))
+        (let ((global-event-source (fsm-event-source (puml-context-fsm ctx))))
+          (context-log-info ctx
+                            "resolve-state-event-source: using ~a"
+                            global-event-source)
+          global-event-source))))
 
 (define (resolve-global-event-source ctx)
   (let* ((proc (resolve-procedure ctx (string->symbol %event-source-prefix))))
