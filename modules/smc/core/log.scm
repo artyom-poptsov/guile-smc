@@ -24,6 +24,8 @@
 ;;; Code:
 
 (define-module (smc core log)
+  #:use-module (ice-9 rdelim)
+  #:use-module (ice-9 popen)
   #:use-module (oop goops)
   #:use-module (smc core state)
   #:export (log
