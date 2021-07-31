@@ -86,23 +86,26 @@
               tr))
        table))
 
+(define-method (%serialize-state state)
+  (let* ((name         (state:name              state))
+         (description  (state:description       state))
+         (event-source (state:event-source/name state))
+         (transitions  (state:transitions       state)))
+    `((name         .  ,name)
+      (description  .  ,description)
+      (event-source .  ,(if event-source
+                            (list 'unquote event-source)
+                            #f))
+      (transitions
+       ,@(%serialize-transition-table transitions)))))
+
 ;; Write a @var{fsm} transition table to a @var{port}.
 (define-method (%write-transition-table (fsm <fsm>) (port <port>))
   (let ((table (fsm-transition-table fsm)))
     (pretty-print
      `(define %transition-table
         ,(list 'quasiquote
-               (map (lambda (state)
-                      (let* ((name         (state:name              state))
-                             (description  (state:description       state))
-                             (event-source (state:event-source/name state))
-                             (transitions  (state:transitions       state)))
-                        `((name         . ,name)
-                          (description  . ,description)
-                          (event-source . ,(and event-source
-                                               (list 'unquote event-source)))
-                          (transitions
-                           ,@(%serialize-transition-table transitions)))))
+               (map %serialize-state
                     (hash-table->transition-list table))))
      port)))
 
