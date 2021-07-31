@@ -180,6 +180,13 @@
         (const #t))))
 
 
+(define (%context-fsm-state-add! ctx state-name)
+  (let ((state (make <state>
+                 #:name         state-name
+                 #:event-source (resolve-state-event-source ctx state-name))))
+    (fsm-state-add! (puml-context-fsm ctx) state)))
+
+
 (define (action:add-state-transition ctx ch)
 
   (unless (stack-empty? (context-buffer ctx))
@@ -200,11 +207,8 @@
      ((equal? from '*)
       (context-log-debug ctx
                          "action:add-state-transition: Adding first state...")
-      (let ((state (make <state>
-                     #:name         to
-                     #:event-source (resolve-state-event-source ctx to))))
-        (fsm-state-add! fsm state)
-        (fsm-current-state-set! fsm state)))
+      (%context-fsm-state-add! ctx to)
+      (fsm-current-state-set! fsm (fsm-state fsm to)))
      ((and (equal? from '*) (equal? to '*))
       (context-log-error ctx "Meaningless transition: [*] -> [*]")
       (error "Meaningless transition: [*] -> [*]"))
@@ -235,6 +239,12 @@
                   (set-add! (puml-context-unresolved-procedures ctx) action)
                   (error "Could not resolve procedure" action ctx))))
 
+        (unless (fsm-state fsm from)
+          (%context-fsm-state-add! ctx from))
+
+        (when (and to (not (fsm-state fsm to)))
+          (%context-fsm-state-add! ctx to))
+
         (fsm-transition-add! fsm from
                              (if resolved-tguard
                                  (cdr resolved-tguard)
@@ -261,6 +271,9 @@
     (when (equal? state-name (string->symbol "*"))
       (context-log-error ctx "[*] cannot have description")
       (error "[*] cannot have description"))
+
+    (unless (fsm-state fsm state-name)
+      (%context-fsm-state-add! ctx state-name))
 
     (if description
         (fsm-state-description-add! fsm
