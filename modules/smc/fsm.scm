@@ -302,50 +302,31 @@
 
 
 
-(define-generic fsm-transition-add!)
+;; Add a new transition from a STATE-NAME to a NEXT-STATE-NAME, guarded by a
+;; TGUARD with the specified transition ACTION.
+;;
+;; Both STATE-NAME and NEXT-STATE-NAME must be a valid state names that
+;; already present in the SELF fsm, otherwise an error will be thrown.
+(define-method (fsm-transition-add! (self            <fsm>)
+                                    (state-name      <symbol>)
+                                    (tguard          <procedure>)
+                                    (action          <procedure>)
+                                    (next-state-name <symbol>))
+  (let ((state      (fsm-state self state-name))
+        (next-state (if (equal? next-state-name '*)
+                        #f
+                        (fsm-state self next-state-name))))
 
-;; Add a new transition to a NEXT-STATE, guarded by a TGUARD with the
-;; specified transition ACTION.
-(define-method (fsm-transition-add! (self       <fsm>)
-                                    (state      <state>)
-                                    (tguard     <procedure>)
-                                    (action     <procedure>)
-                                    next-state)
-  (state-transition-add! state
-                         tguard
-                         action
-                         (and next-state
-                              (cond
-                               ((symbol? next-state)
-                                (fsm-state self next-state))
-                               ((state? next-state)
-                                next-state)))))
+  (unless state
+    (log-error "fsm-transition-add!: Source state ~a is not found" state-name)
+    (error "fsm-transition-add!: Source state is not found" state-name))
 
-(define-method (fsm-transition-add! (self       <fsm>)
-                                    (state-name <symbol>)
-                                    (tguard     <procedure>)
-                                    (action     <procedure>)
-                                    next-state)
+  (when (and (equal? next-state '*)
+             (not next-state))
+    (log-error "fsm-transition-add!: Next state ~a is not found" next-state-name)
+    (error "fsm-transition-add!: Next state is not found" next-state-name))
 
-  (unless (fsm-state self state-name)
-    (fsm-state-add! self (make <state> #:name state-name)))
-
-  (when (and next-state (not (fsm-state self next-state)))
-    (fsm-state-add! self (make <state> #:name next-state)))
-
-  (fsm-transition-add! self (fsm-state self state-name) tguard action next-state))
-
-;; Add TRANSITIONS list to the state specified by a STATE-NAME.
-(define-method (fsm-transition-add! (self       <fsm>)
-                                    (state-name <symbol>)
-                                    (transitions <list>))
-  (for-each (lambda (transition)
-              (fsm-transition-add! self
-                                   state-name
-                                   (state-transition:action     transition)
-                                   (state-transition:guard      transition)
-                                   (state-transition:next-state transition)))
-            transitions))
+  (state-transition-add! state tguard action next-state)))
 
 ;; Add a DESCRIPTION to the state specified by a STATE-NAME.
 (define-method (fsm-state-description-add! (self        <fsm>)

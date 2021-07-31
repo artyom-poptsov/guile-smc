@@ -218,10 +218,7 @@
                                  (resolve-procedure ctx 'guard:#t)))
             (resolved-action (if action
                                  (resolve-procedure ctx action)
-                                 (resolve-procedure ctx 'action:no-op)))
-            (to     (if (equal? to '*)
-                        #f
-                        to)))
+                                 (resolve-procedure ctx 'action:no-op))))
 
         (if resolved-tguard
             (set-add! (puml-context-resolved-procedures ctx) resolved-tguard)
@@ -242,7 +239,7 @@
         (unless (fsm-state fsm from)
           (%context-fsm-state-add! ctx from))
 
-        (when (and to (not (fsm-state fsm to)))
+        (when (and (not (equal? to '*)) (not (fsm-state fsm to)))
           (%context-fsm-state-add! ctx to))
 
         (fsm-transition-add! fsm from
