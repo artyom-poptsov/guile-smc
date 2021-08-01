@@ -148,9 +148,8 @@
   (let ((to-name (state-name to)))
     (transition-list-count
      (lambda (transition)
-       (let ((another-state (transition:next-state transition)))
-         (equal? (state-name another-state)
-                 to-name)))
+       (equal? (state-name (transition:next-state transition))
+               to-name))
      (state-transitions self))))
 
 (define-method (state-transition-count/foreign (self <state>))
@@ -163,8 +162,7 @@
   (let ((from (state-name self)))
     (transition-list-count
      (lambda (transition)
-       (let ((to (transition:next-state transition)))
-         (equal? from (state-name to))))
+       (equal? from (state-name (transition:next-state transition))))
      (state-transitions self))))
 
 ;; Check if the state SELF has any recurrent links (that is, transitions to
