@@ -35,7 +35,7 @@
   #:export (transition:guard
             transition:action
             transition:next-state
-            transition-list-count
+            transition-table-count
             transition-table-run))
 
 
@@ -52,7 +52,7 @@
 
 
 
-(define-method (transition-list-count (predicate <procedure>) (tlist <list>))
+(define-method (transition-table-count (predicate <procedure>) (tlist <list>))
   (fold (lambda (transition prev)
           (if (predicate transition)
               (+ prev 1)

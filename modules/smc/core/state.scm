@@ -146,7 +146,7 @@
 
 (define-method (state-transition-count (self <state>) to)
   (let ((to-name (state-name to)))
-    (transition-list-count
+    (transition-table-count
      (lambda (transition)
        (equal? (state-name (transition:next-state transition))
                to-name))
@@ -160,7 +160,7 @@
 ;; link is a transition of state to itself.
 (define-method (state-recurrent-links-count (self <state>))
   (let ((from (state-name self)))
-    (transition-list-count
+    (transition-table-count
      (lambda (transition)
        (equal? from (state-name (transition:next-state transition))))
      (state-transitions self))))
@@ -172,7 +172,7 @@
 
 ;; Get the number of final transitions for a state SELF.
 (define-method (state-final-transitions (self <state>))
-  (transition-list-count (lambda (tr) (equal? (transition:next-state tr) #f))
+  (transition-table-count (lambda (tr) (equal? (transition:next-state tr) #f))
                          (state-transitions self)))
 
 ;; Check if a state SELF has any final transitions.
