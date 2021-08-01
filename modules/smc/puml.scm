@@ -113,6 +113,12 @@
      (throw %puml-error (apply #f format message args) args))))
 
 
+;;; Misc. helper procedures.
+
+(define-method (stack-content->string (stack <stack>))
+  (list->string (stack-content/reversed stack)))
+
+
 
 ;; This procedure tries to resolve a procedure PROC-NAME in the provided
 ;; modules.
@@ -271,7 +277,7 @@
          (description     (and (fsm-state fsm state-name)
                                (state-description
                                 (fsm-state fsm state-name))))
-         (new-description (list->string (stack-content/reversed buf))))
+         (new-description (stack-content->string buf)))
 
     (when (equal? state-name (string->symbol "*"))
       (puml-error ctx "[*] cannot have description"))
@@ -296,7 +302,7 @@
 (define (action:add-description ctx ch)
   (let ((fsm (puml-context-fsm ctx))
         (buf (context-buffer ctx)))
-    (fsm-description-set! fsm (list->string (stack-content/reversed buf)))
+    (fsm-description-set! fsm (stack-content->string buf))
     (context-buffer-clear! ctx)
     (context-stanza-clear! ctx)
     ctx))
@@ -304,7 +310,7 @@
 
 (define (action:check-start-tag ctx ch)
   (let* ((buf (context-buffer ctx))
-         (str (list->string (stack-content/reversed buf))))
+         (str (stack-content->string buf)))
     (unless (string=? str "@startuml")
       (puml-error ctx "Misspelled @startuml"))
     (context-buffer-clear! ctx)
@@ -312,7 +318,7 @@
 
 (define (action:check-end-tag ctx ch)
   (let* ((buf (context-buffer ctx))
-         (str (list->string (stack-content/reversed buf))))
+         (str (stack-content->string buf)))
     (unless (string=? str "@enduml")
       (puml-error ctx "Misspelled @enduml"))
     (context-buffer-clear! ctx)
@@ -328,7 +334,7 @@
 (define (guard:title? ctx ch)
   (let ((buf (context-buffer ctx)))
     (and (char=? ch #\space)
-         (string=? (list->string (stack-content/reversed buf))
+         (string=? (stack-content->string buf)
                    "title"))))
 
 
