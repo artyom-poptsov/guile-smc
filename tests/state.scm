@@ -169,6 +169,17 @@
            (null? context)))))
 
 
+;;; list->state
+
+(test-equal "list->state"
+  (make <state>
+    #:name         'state-name
+    #:description  "State description"
+    #:event-source event-source:example
+    #:transitions  `(,guard:#t ,action:no-op state-1))
+  (list->state %state))
+
+
 ;;; state->list
 
 (test-equal "state->list: W/o description and transitions"
