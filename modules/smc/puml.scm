@@ -98,6 +98,20 @@
                              #:event-source event-source))))
 
 
+;;; Error reporting.
+
+(define %puml-error 'puml-error)
+
+(define puml-error
+  (case-lambda
+    ((ctx message)
+     (context-log-error message)
+     (throw %puml-error message))
+    ((ctx message . args)
+     (apply context-log-error message args)
+     (throw %puml-error (apply #f format message args) args))))
+
+
 
 (define (%safe-module-ref module proc-name)
   (catch #t
@@ -210,8 +224,7 @@
       (%context-fsm-state-add! ctx to)
       (fsm-current-state-set! fsm (fsm-state fsm to)))
      ((and (equal? from '*) (equal? to '*))
-      (context-log-error ctx "Meaningless transition: [*] -> [*]")
-      (error "Meaningless transition: [*] -> [*]"))
+      (puml-error ctx "Meaningless transition: [*] -> [*]"))
      (else
       (let ((resolved-tguard (if tguard
                                  (resolve-procedure ctx tguard)
@@ -222,19 +235,19 @@
 
         (if resolved-tguard
             (set-add! (puml-context-resolved-procedures ctx) resolved-tguard)
-            (begin
-              (context-log-error ctx "Could not resolve procedure: ~a" tguard)
-              (if (puml-context-keep-going? ctx)
-                  (set-add! (puml-context-unresolved-procedures ctx) tguard)
-                  (error "Could not resolve procedure" tguard ctx))))
+            (if (puml-context-keep-going? ctx)
+                (begin
+                  (context-log-error ctx "Could not resolve procedure ~a in ~a" tguard ctx)
+                  (set-add! (puml-context-unresolved-procedures ctx) tguard))
+                (puml-error "Could not resolve procedure ~a in ~a" tguard ctx)))
 
         (if resolved-action
             (set-add! (puml-context-resolved-procedures ctx) resolved-action)
-            (begin
-              (context-log-error ctx "Could not resolve procedure: ~a" action)
-              (if (puml-context-keep-going? ctx)
-                  (set-add! (puml-context-unresolved-procedures ctx) action)
-                  (error "Could not resolve procedure" action ctx))))
+            (if (puml-context-keep-going? ctx)
+                (begin
+                  (context-log-error ctx "Could not resolve procedure ~a in ~a" action ctx)
+                  (set-add! (puml-context-unresolved-procedures ctx) action))
+                (puml-error "Could not resolve procedure ~a in ~a" action ctx)))
 
         (unless (fsm-state fsm from)
           (%context-fsm-state-add! ctx from))
@@ -266,8 +279,7 @@
          (new-description (list->string (stack-content/reversed buf))))
 
     (when (equal? state-name (string->symbol "*"))
-      (context-log-error ctx "[*] cannot have description")
-      (error "[*] cannot have description"))
+      (puml-error ctx "[*] cannot have description"))
 
     (unless (fsm-state fsm state-name)
       (%context-fsm-state-add! ctx state-name))
@@ -299,8 +311,7 @@
   (let* ((buf (context-buffer ctx))
          (str (list->string (stack-content/reversed buf))))
     (unless (string=? str "@startuml")
-      (context-log-error ctx "Misspelled @startuml")
-      (error "Misspelled @startuml" str))
+      (puml-error ctx "Misspelled @startuml"))
     (context-buffer-clear! ctx)
     ctx))
 
@@ -308,18 +319,15 @@
   (let* ((buf (context-buffer ctx))
          (str (list->string (stack-content/reversed buf))))
     (unless (string=? str "@enduml")
-      (context-log-error ctx "Misspelled @enduml")
-      (error "Misspelled @enduml" str))
+      (puml-error ctx "Misspelled @enduml"))
     (context-buffer-clear! ctx)
     ctx))
 
 (define (action:no-start-tag-error ctx ch)
-  (context-log-error ctx "No start tag found")
-  (error "No start tag found"))
+  (puml-error ctx "No start tag found"))
 
 (define (action:unexpected-end-of-file-error ctx ch)
-  (context-log-error ctx "Unexpected end of file")
-  (error "Unexpected end of file"))
+  (puml-error ctx "Unexpected end of file"))
 
 
 (define (guard:title? ctx ch)
