@@ -121,6 +121,10 @@
 (define-method (equal? (state-1 <state>) (state-2 <state>))
   (equal? (state-name state-1) (state-name state-2)))
 
+;; Special version of procedure that return the symbol itself.
+(define-method (state-name (state <symbol>))
+  state)
+
 (define-method (state-has-event-source? (state <state>))
   (not (equal? (state-event-source state) #f)))
 
@@ -141,15 +145,11 @@
   (length (state-transitions self)))
 
 (define-method (state-transition-count (self <state>) to)
-  (let ((to-name (if (state? to)
-                     (state-name to)
-                     to)))
+  (let ((to-name (state-name to)))
     (transition-list-count
      (lambda (transition)
        (let ((another-state (transition:next-state transition)))
-         (equal? (if (state? another-state)
-                     (state-name another-state)
-                     another-state)
+         (equal? (state-name another-state)
                  to-name)))
      (state-transitions self))))
 
@@ -164,9 +164,7 @@
     (transition-list-count
      (lambda (transition)
        (let ((to (transition:next-state transition)))
-         (equal? from (if (symbol? to)
-                          to
-                          (state-name to)))))
+         (equal? from (state-name to))))
      (state-transitions self))))
 
 ;; Check if the state SELF has any recurrent links (that is, transitions to
