@@ -30,10 +30,12 @@
 ;;; Code:
 
 (define-module (smc core transition)
+  #:use-module (srfi srfi-1)
   #:use-module (oop goops)
   #:export (transition:guard
             transition:action
-            transition:next-state))
+            transition:next-state
+            transition-list-count))
 
 
 ;; Transition accessors.
@@ -46,5 +48,15 @@
 
 (define-method (transition:next-state (transition <list>))
   (list-ref transition 2))
+
+
+
+(define-method (transition-list-count (predicate <procedure>) (tlist <list>))
+  (fold (lambda (transition prev)
+          (if (predicate transition)
+              (+ prev 1)
+              prev))
+        0
+        tlist))
 
 ;;; transition.scm ends here.

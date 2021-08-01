@@ -144,16 +144,14 @@
   (let ((to-name (if (state? to)
                      (state-name to)
                      to)))
-    (fold (lambda (tr prev)
-            (let ((state (transition:next-state tr)))
-              (if (equal? (if (state? state)
-                              (state-name state)
-                              state)
-                          to-name)
-                  (+ prev 1)
-                  prev)))
-          0
-          (state-transitions self))))
+    (transition-list-count
+     (lambda (transition)
+       (let ((another-state (transition:next-state transition)))
+         (equal? (if (state? another-state)
+                     (state-name another-state)
+                     another-state)
+                 to-name)))
+     (state-transitions self))))
 
 (define-method (state-transition-count/foreign (self <state>))
   (- (state-transition-count self)
@@ -162,15 +160,14 @@
 ;; Returns the number of recurrent links that the state SELF has. A recurrent
 ;; link is a transition of state to itself.
 (define-method (state-recurrent-links-count (self <state>))
-  (fold (lambda (tr prev)
-          (let ((to (transition:next-state tr)))
-            (if (equal? (state-name self) (if (symbol? to)
-                                              to
-                                              (state-name to)))
-                (+ prev 1)
-                prev)))
-        0
-        (state-transitions self)))
+  (let ((from (state-name self)))
+    (transition-list-count
+     (lambda (transition)
+       (let ((to (transition:next-state transition)))
+         (equal? from (if (symbol? to)
+                          to
+                          (state-name to)))))
+     (state-transitions self))))
 
 ;; Check if the state SELF has any recurrent links (that is, transitions to
 ;; itself.)
@@ -179,12 +176,8 @@
 
 ;; Get the number of final transitions for a state SELF.
 (define-method (state-final-transitions (self <state>))
-  (fold (lambda (tr prev)
-          (if (transition:next-state tr)
-              prev
-              (+ prev 1)))
-        0
-        (state-transitions self)))
+  (transition-list-count (lambda (tr) (equal? (transition:next-state tr) #f))
+                         (state-transitions self)))
 
 ;; Check if a state SELF has any final transitions.
 (define-method (state-has-final-transitions? (self <state>))
