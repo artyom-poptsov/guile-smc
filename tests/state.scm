@@ -10,6 +10,19 @@
 
 (test-begin "state")
 
+(test-equal "state-transition:guard"
+  guard:#t
+  (state-transition:guard `(,guard:#t ,action:no-op state-1)))
+
+(test-equal "state-transition:action"
+  action:no-op
+  (state-transition:action `(,guard:#t ,action:no-op state-1)))
+
+(test-equal "state-transition:next-state"
+  'state-1
+  (state-transition:next-state `(,guard:#t ,action:no-op state-1)))
+
+
 (test-assert "state?"
   (and (state? (make <state> #:name 'state-1))
        (not (state? 'not-a-state))))
