@@ -24,6 +24,7 @@
 ;;; Code:
 
 (define-module (smc core set)
+  #:use-module (smc core common)
   #:use-module (oop goops)
   #:export (<set>
             set?
@@ -55,7 +56,7 @@
 (define-method (%display (set <set>) (port <port>))
   (format port "#<set capacity: ~a ~a>"
           (set-capacity set)
-          (number->string (object-address set) 16)))
+          (object-address/hex-string set)))
 
 (define-method (display (set <set>) (port <port>))
   (%display set port))

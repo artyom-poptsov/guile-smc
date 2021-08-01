@@ -30,6 +30,7 @@
   #:use-module (ice-9 receive)
   #:use-module (smc core state)
   #:use-module (smc fsm)
+  #:use-module (smc core common)
   #:use-module (smc core log)
   #:use-module (smc core stack)
   #:use-module (smc core set)
@@ -113,12 +114,6 @@
 
 
 
-(define (%safe-module-ref module proc-name)
-  (catch #t
-    (lambda ()
-      (module-ref module proc-name))
-    (const #f)))
-
 ;; This procedure tries to resolve a procedure PROC-NAME in the provided
 ;; modules.
 ;;
@@ -139,7 +134,7 @@
                                     (stanza->list-of-symbols
                                      (context-stanza ctx)))
                  #f)
-               (let ((proc (%safe-module-ref (car mods) proc-name)))
+               (let ((proc (safe-module-ref (car mods) proc-name)))
                  (if proc
                      (cons (car mods) proc)
                      (loop (cdr mods)))))))))

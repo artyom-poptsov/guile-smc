@@ -29,6 +29,7 @@
   #:use-module (ice-9 receive)
   #:use-module ((ice-9 format)
                 #:prefix ice-9:)
+  #:use-module (smc core common)
   #:use-module (smc core log)
   #:use-module (smc core state)
   #:export (<fsm>
@@ -224,7 +225,7 @@
                (state-name (fsm-current-state self)))
           (fsm-step-counter self)
           (fsm-transition-counter self)
-          (number->string (object-address self) 16)))
+          (object-address/hex-string self)))
 
 (define-method (display (self <fsm>) (port <port>))
   (%display self port))

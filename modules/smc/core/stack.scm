@@ -26,6 +26,7 @@
 
 (define-module (smc core stack)
   #:use-module (oop goops)
+  #:use-module (smc core common)
   #:export (<stack>
             stack?
             stack-content
@@ -52,7 +53,7 @@
 (define-method (%display (stack <stack>) (port <port>))
   (format port "#<stack depth: ~a ~a>"
           (stack-size stack)
-          (number->string (object-address stack) 16)))
+          (object-address/hex-string stack)))
 
 (define-method (display (stack <stack>) (port <port>))
   (%display stack port))

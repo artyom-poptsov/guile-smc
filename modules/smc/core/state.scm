@@ -27,6 +27,7 @@
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 receive)
+  #:use-module (smc core common)
   #:use-module (smc core log)
   #:export (<state>
             state?
@@ -118,7 +119,7 @@
           (if (state-description self)
               (string-append ": " (state-description self))
               "")
-          (number->string (object-address self) 16)))
+          (object-address/hex-string self)))
 
 (define-method (display (self <state>) (port <port>))
   (%display self port))
