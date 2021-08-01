@@ -10,6 +10,9 @@
 
 (test-begin "state")
 
+
+;;; Accessors tests.
+
 (test-equal "state-transition:guard"
   guard:#t
   (state-transition:guard `(,guard:#t ,action:no-op state-1)))
@@ -21,6 +24,35 @@
 (test-equal "state-transition:next-state"
   'state-1
   (state-transition:next-state `(,guard:#t ,action:no-op state-1)))
+
+(define (event-source:example ctx)
+  #t)
+
+(define %state `((name         . state-name)
+                 (description  . "State description")
+                 (event-source . ,event-source:example)
+                 (transitions
+                  (,guard:#t ,action:no-op state-1))))
+
+(test-equal "state:name"
+  'state-name
+  (state:name %state))
+
+(test-equal "state:description"
+  "State description"
+  (state:description %state))
+
+(test-equal "state:event-source"
+  event-source:example
+  (state:event-source %state))
+
+(test-equal "state:event-source/name"
+  'event-source:example
+  (state:event-source/name %state))
+
+(test-equal "state:transitions"
+  `((,guard:#t ,action:no-op state-1))
+  (state:transitions %state))
 
 
 (test-assert "state?"
