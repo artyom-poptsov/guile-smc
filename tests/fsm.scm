@@ -117,6 +117,14 @@
     (not (fsm-state-reachable? fsm (fsm-state fsm 'state-2)))))
 
 
+;;; fsm-state-add!
+
+(test-assert "fsm-state-add!: Empty FSM"
+  (let ((fsm (make <fsm>)))
+    (fsm-state-add! fsm (make <state> #:name 'state-1))
+    (fsm-state fsm 'state-1)))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end "fsm")
