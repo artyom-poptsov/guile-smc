@@ -165,6 +165,20 @@
   (is-a? object <fsm>))
 
 
+;;; Error reporting.
+
+(define %fsm-error 'fsm-error)
+
+(define fsm-error
+  (case-lambda
+    ((message)
+     (log-error message)
+     (throw %fsm-error message))
+    ((message . args)
+     (apply log-error message args)
+     (throw %fsm-error (apply format #f message args) args))))
+
+
 
 (define-method (fsm-log-transition (from <state>) (to <state>))
   (log-debug "[~a] -> [~a]" (state-name from) (state-name to)))
@@ -241,8 +255,7 @@
   (let ((table (make-hash-table)))
     (for-each (lambda (transition)
                 (when (hash-ref table (state:name transition))
-                  (log-error "Duplicate state: ~a" (state:name transition))
-                  (error "Duplicate state" (state:name transition)))
+                  (fsm-error "Duplicate state: ~a" (state:name transition)))
                 (let ((state (list->state transition)))
                   (unless (state-has-event-source? state)
                     (state-event-source-set! state (fsm-event-source fsm)))
@@ -297,8 +310,7 @@
         (fsm-transition-table-set! self (transition-list->hash-table self table))
         (fsm-current-state-set! self (fsm-state self (state:name (car table)))))
        (else
-        (log-error "Transition table must be a list: ~a" table)
-        (error "Transition table must be a list"))))))
+        (fsm-error "Transition table must be a list: ~a" table))))))
 
 
 
@@ -317,16 +329,14 @@
                         #f
                         (fsm-state self next-state-name))))
 
-  (unless state
-    (log-error "fsm-transition-add!: Source state ~a is not found" state-name)
-    (error "fsm-transition-add!: Source state is not found" state-name))
+    (unless state
+      (fsm-error "fsm-transition-add!: Source state ~a is not found" state-name))
 
-  (when (and (equal? next-state '*)
-             (not next-state))
-    (log-error "fsm-transition-add!: Next state ~a is not found" next-state-name)
-    (error "fsm-transition-add!: Next state is not found" next-state-name))
+    (when (and (equal? next-state '*)
+               (not next-state))
+      (fsm-error "fsm-transition-add!: Next state ~a is not found" next-state-name))
 
-  (state-transition-add! state tguard action next-state)))
+    (state-transition-add! state tguard action next-state)))
 
 ;; Add a DESCRIPTION to the state specified by a STATE-NAME.
 (define-method (fsm-state-description-add! (self        <fsm>)
