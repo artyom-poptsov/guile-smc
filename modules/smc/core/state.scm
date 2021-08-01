@@ -134,8 +134,9 @@
                                       (tguard     <procedure>)
                                       (action     <procedure>)
                                       next-state)
-  (state-transitions-set! self (append (state-transitions self)
-                                       (list (list tguard action next-state)))))
+  (state-transitions-set! self
+                          (transition-table-append (state-transitions self)
+                                                   tguard action next-state)))
 
 
 

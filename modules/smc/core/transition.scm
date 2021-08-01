@@ -36,7 +36,8 @@
             transition:action
             transition:next-state
             transition-table-count
-            transition-table-run))
+            transition-table-run
+            transition-table-append))
 
 
 ;; Transition accessors.
@@ -69,5 +70,11 @@
               (values (transition:next-state transition)
                       ((transition:action transition) context event))
               (loop (cdr transition-alist)))))))
+
+(define-method (transition-table-append (tlist <list>)
+                                        (tguard <procedure>)
+                                        (action <procedure>)
+                                        next-state)
+  (append tlist (list (list tguard action next-state))))
 
 ;;; transition.scm ends here.
