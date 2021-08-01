@@ -161,6 +161,13 @@
                  #:transitions `((,guard:#t ,action:no-op state-1)))))
     (state-dead-end? state)))
 
+(test-assert "state-dead-end: #f"
+  (let ((state (make <state>
+                 #:name 'state-1
+                 #:transitions `((,guard:#t ,action:no-op state-1)
+                                 (,guard:#t ,action:no-op state-2)))))
+    (not (state-dead-end? state))))
+
 (test-assert "state-run: no transitions"
   (let ((state (make <state> #:name 'state-1)))
     (receive (next-state context)
