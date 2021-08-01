@@ -31,6 +31,7 @@
                 #:prefix ice-9:)
   #:use-module (smc core common)
   #:use-module (smc core log)
+  #:use-module (smc core transition)
   #:use-module (smc core state)
   #:export (<fsm>
             fsm?
@@ -266,10 +267,10 @@
                       (let ((tr-table
                              (map (lambda (tr)
                                     (list
-                                     (state-transition:guard  tr)
-                                     (state-transition:action tr)
+                                     (transition:guard  tr)
+                                     (transition:action tr)
                                      (hash-ref table
-                                               (state-transition:next-state tr))))
+                                               (transition:next-state tr))))
                                   (state-transitions state))))
                         (state-transitions-set! state tr-table)))
                     table)

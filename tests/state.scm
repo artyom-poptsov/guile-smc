@@ -5,6 +5,7 @@
              (oop goops)
              (smc context char-context)
              (smc fsm)
+             (smc core transition)
              (smc core state))
 
 
@@ -13,17 +14,17 @@
 
 ;;; Accessors tests.
 
-(test-equal "state-transition:guard"
+(test-equal "transition:guard"
   guard:#t
-  (state-transition:guard `(,guard:#t ,action:no-op state-1)))
+  (transition:guard `(,guard:#t ,action:no-op state-1)))
 
-(test-equal "state-transition:action"
+(test-equal "transition:action"
   action:no-op
-  (state-transition:action `(,guard:#t ,action:no-op state-1)))
+  (transition:action `(,guard:#t ,action:no-op state-1)))
 
-(test-equal "state-transition:next-state"
+(test-equal "transition:next-state"
   'state-1
-  (state-transition:next-state `(,guard:#t ,action:no-op state-1)))
+  (transition:next-state `(,guard:#t ,action:no-op state-1)))
 
 (define (event-source:example ctx)
   #t)

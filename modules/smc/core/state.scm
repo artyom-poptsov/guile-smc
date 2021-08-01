@@ -29,6 +29,7 @@
   #:use-module (ice-9 receive)
   #:use-module (smc core common)
   #:use-module (smc core log)
+  #:use-module (smc core transition)
   #:export (<state>
             state?
             state-name
@@ -54,24 +55,9 @@
             state:description
             state:event-source
             state:transitions
-            state-transition:guard
-            state-transition:action
-            state-transition:next-state
 
             list->state
             state->list))
-
-
-;; Transition accessors.
-
-(define (state-transition:guard tr)
-  (list-ref tr 0))
-
-(define (state-transition:action tr)
-  (list-ref tr 1))
-
-(define (state-transition:next-state tr)
-  (list-ref tr 2))
 
 
 ;; This class describes an FSM state.
@@ -159,7 +145,7 @@
                      (state-name to)
                      to)))
     (fold (lambda (tr prev)
-            (let ((state (state-transition:next-state tr)))
+            (let ((state (transition:next-state tr)))
               (if (equal? (if (state? state)
                               (state-name state)
                               state)
@@ -177,7 +163,7 @@
 ;; link is a transition of state to itself.
 (define-method (state-recurrent-links-count (self <state>))
   (fold (lambda (tr prev)
-          (let ((to (state-transition:next-state tr)))
+          (let ((to (transition:next-state tr)))
             (if (equal? (state-name self) (if (symbol? to)
                                               to
                                               (state-name to)))
@@ -194,7 +180,7 @@
 ;; Get the number of final transitions for a state SELF.
 (define-method (state-final-transitions (self <state>))
   (fold (lambda (tr prev)
-          (if (state-transition:next-state tr)
+          (if (transition:next-state tr)
               prev
               (+ prev 1)))
         0
@@ -220,9 +206,9 @@
     (if (null? transition-alist)
         (values #f context)
         (let* ((transition (car transition-alist))
-               (tguard     (state-transition:guard      transition))
-               (action     (state-transition:action     transition))
-               (next-state (state-transition:next-state transition)))
+               (tguard     (transition:guard      transition))
+               (action     (transition:action     transition))
+               (next-state (transition:next-state transition)))
           (if (tguard context event)
               (values next-state (action context event))
               (loop (cdr transition-alist)))))))
