@@ -191,16 +191,7 @@
 
 ;; Returns two values: next state (or #f) and new context.
 (define-method (state-run (self <state>) event context)
-  (let loop ((transition-alist (state-transitions self)))
-    (if (null? transition-alist)
-        (values #f context)
-        (let* ((transition (car transition-alist))
-               (tguard     (transition:guard      transition))
-               (action     (transition:action     transition))
-               (next-state (transition:next-state transition)))
-          (if (tguard context event)
-              (values next-state (action context event))
-              (loop (cdr transition-alist)))))))
+  (transition-table-run (state-transitions self) event context))
 
 ;; Run a STATE in a given CONTEXT.  This procedure uses internal event source
 ;; of a STATE, specified by the 'event-source' slot.

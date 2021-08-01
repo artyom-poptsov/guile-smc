@@ -35,7 +35,8 @@
   #:export (transition:guard
             transition:action
             transition:next-state
-            transition-list-count))
+            transition-list-count
+            transition-table-run))
 
 
 ;; Transition accessors.
@@ -58,5 +59,15 @@
               prev))
         0
         tlist))
+
+(define-method (transition-table-run (tlist <list>) event context)
+  (let loop ((transition-alist tlist))
+    (if (null? transition-alist)
+        (values #f context)
+        (let ((transition (car transition-alist)))
+          (if ((transition:guard transition) context event)
+              (values (transition:next-state transition)
+                      ((transition:action transition) context event))
+              (loop (cdr transition-alist)))))))
 
 ;;; transition.scm ends here.
