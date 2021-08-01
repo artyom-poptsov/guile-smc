@@ -1,6 +1,7 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (ice-9 receive)
+             (ice-9 regex)
              (oop goops)
              (smc context char-context)
              (smc fsm)
@@ -8,6 +9,19 @@
 
 
 (test-begin "fsm")
+
+(test-assert "display"
+  (let ((fsm (make <fsm>
+               #:transition-table `(((name        . state-1)
+                                     (description . "This is a description.")
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-1)))))))
+    (display fsm (current-error-port))
+    (newline (current-error-port))
+    (string-match "#<fsm current-state: state-1 statistics: 0/0 [0-9a-z]+>"
+                  (with-output-to-string
+                    (lambda ()
+                      (display fsm))))))
 
 (test-equal "a state in the transition table with description"
   "This is a description."
