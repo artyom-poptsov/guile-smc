@@ -18,6 +18,7 @@
 ## along with Guile-SMC.  If not, see <http://www.gnu.org/licenses/>.
 
 SCM_TESTS = \
+	transition.scm	\
 	state.scm	\
 	context.scm	\
 	stack.scm	\
