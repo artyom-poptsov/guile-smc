@@ -106,7 +106,7 @@
 (define puml-error
   (case-lambda
     ((ctx message)
-     (context-log-error message)
+     (context-log-error ctx message)
      (throw %puml-error message))
     ((ctx message . args)
      (apply context-log-error message args)
