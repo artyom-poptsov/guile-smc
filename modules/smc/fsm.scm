@@ -354,34 +354,40 @@
 
 
 
+;; Handle a state transition for an FSM in the NEW-CONTEXT of the state
+;; machine. The transition changes an OLD-STATE to a NEW-STATE.
+;;
+;; The procedure returns two values:
+;;   - new-state
+;;   - new-context
+(define-method (%handle-state-transition! (fsm <fsm>) old-state new-state new-context)
+  (when (fsm-debug-mode? fsm)
+    (fsm-log-transition old-state new-state))
+  (%step-counter-increment! fsm)
+  (fsm-current-state-set! fsm new-state)
+  (if (equal? old-state new-state)
+      (values new-state new-context)
+      (if new-state
+          (begin
+            (%transition-counter-increment! fsm)
+            (values new-state
+                    ((state-entry-action new-state)
+                     ((state-exit-action old-state) new-context))))
+          (values new-state
+                  ((state-exit-action old-state) new-context)))))
+
 ;; Perform a single FSM step on the specified EVENT and a CONTEXT.
 (define-method (fsm-step! (self <fsm>) event context)
   (let ((state (fsm-current-state self)))
-    (if state
-        (receive (next-state new-context)
-            (state-run state event context)
-          (when (fsm-debug-mode? self)
-            (fsm-log-transition state next-state))
-          (%step-counter-increment! self)
-          (unless (equal? state next-state)
-            (%transition-counter-increment! self))
-          (fsm-current-state-set! self next-state)
-          (values next-state new-context))
-        (values #f context))))
+    (receive (next-state new-context)
+        (state-run state event context)
+      (%handle-state-transition! self state next-state new-context))))
 
 (define-method (fsm-step! (self <fsm>) context)
   (let ((state (fsm-current-state self)))
-    (if state
-        (receive (next-state new-context)
-            (state-run state context)
-          (when (fsm-debug-mode? self)
-            (fsm-log-transition state next-state))
-          (%step-counter-increment! self)
-          (unless (equal? state next-state)
-            (%transition-counter-increment! self))
-          (fsm-current-state-set! self next-state)
-          (values next-state new-context))
-        (values #f context))))
+    (receive (next-state new-context)
+        (state-run state context)
+      (%handle-state-transition! self state next-state new-context))))
 
 ;; Run an FSM with the given EVENT-SOURCE and a CONTEXT and return the new
 ;; context.
@@ -395,20 +401,26 @@
 (define-method (fsm-run! (fsm          <fsm>)
                          (event-source <procedure>)
                          context)
-  (receive (new-state new-context)
-      (fsm-step! fsm (event-source context) context)
-    (if new-state
-        (fsm-run! fsm event-source new-context)
-        context)))
+  (if (fsm-current-state fsm)
+      (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
+        (receive (new-state new-context)
+            (fsm-step! fsm (event-source context) context)
+          (if new-state
+              (loop new-context)
+              context)))
+      context))
 
 ;; This version of the 'fsm-run!' procedure uses event sources specific for
 ;; each state.
 (define-method (fsm-run! (fsm <fsm>) context)
-  (receive (new-state new-context)
-      (fsm-step! fsm context)
-    (if new-state
-        (fsm-run! fsm new-context)
-        context)))
+  (if (fsm-current-state fsm)
+      (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
+        (receive (new-state new-context)
+            (fsm-step! fsm context)
+          (if new-state
+              (loop new-context)
+              context)))
+      context))
 
 
 
