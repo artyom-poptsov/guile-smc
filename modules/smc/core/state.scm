@@ -188,11 +188,17 @@
   (length (state-transitions self)))
 
 (define-method (state-transition-count (self <state>) to)
-  (let ((to-name (and (state? to) (state-name to))))
+  (let ((to-name (cond
+                  ((state? to)  (state-name to))
+                  ((symbol? to) to)
+                  (else         to))))
     (transition-table-count
      (lambda (transition)
-       (equal? (and (state? (transition:next-state transition))
-                    (state-name (transition:next-state transition)))
+       (equal? (cond
+                ((state? (transition:next-state transition))
+                 (state-name (transition:next-state transition)))
+                (else
+                 (transition:next-state transition)))
                to-name))
      (state-transitions self))))
 
