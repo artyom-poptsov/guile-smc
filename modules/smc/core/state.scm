@@ -38,6 +38,8 @@
             state:event-source/name
             state-has-event-source?
             state-event-source-set!
+            state-entry-action
+            state-entry-action-set!
             state-description
             state-description-set!
             state-transition-count
@@ -54,10 +56,17 @@
             state:name
             state:description
             state:event-source
+            state:entry-action
             state:transitions
 
             list->state
             state->list))
+
+
+
+(define (%default-entry-action context)
+  "Default state entry action that just returns a CONTEXT."
+  context)
 
 
 ;; This class describes an FSM state.
@@ -89,6 +98,19 @@
    #:init-keyword #:event-source
    #:init-value   #f)
 
+  ;; A procedure that is called each time 'state-run' is executed, before
+  ;; running the transition table. The procedure MUST return a context, which
+  ;; is passed to the transition table execution.
+  ;;
+  ;; It called by the FSM the state belongs to as follows:
+  ;;   (proc context)
+  ;;
+  ;; <procedure>
+  (entry-action
+   #:init-keyword #:entry-action
+   #:init-value   %default-entry-action
+   #:getter       state-entry-action
+   #:setter       state-entry-action-set!)
 
   ;; <list> of transitions.
   (transitions
@@ -192,7 +214,9 @@
 
 ;; Returns two values: next state (or #f) and new context.
 (define-method (state-run (self <state>) event context)
-  (transition-table-run (state-transitions self) event context))
+  (transition-table-run (state-transitions self)
+                        event
+                        ((state-entry-action self) context)))
 
 ;; Run a STATE in a given CONTEXT.  This procedure uses internal event source
 ;; of a STATE, specified by the 'event-source' slot.
@@ -225,6 +249,9 @@
 (define (state:event-source state)
   (assoc-ref state 'event-source))
 
+(define (state:entry-action state)
+  (assoc-ref state 'entry-action))
+
 (define (state:event-source/name state)
   (let ((proc (assoc-ref state 'event-source)))
     (and proc
@@ -237,13 +264,19 @@
   (make <state>
     #:name         (state:name         lst)
     #:event-source (state:event-source lst)
+    #:entry-action (or (state:entry-action lst)
+                       %default-entry-action)
     #:description  (state:description  lst)
     #:transitions  (state:transitions  lst)))
 
 (define-method (state->list (state <state>))
-  `((name         . ,(state-name        state))
-    (description  . ,(state-description state))
-    (event-source . ,(state-event-source state))
-    (transitions  . ,(state-transitions state))))
+  (filter (lambda (e) (not (null? e)))
+          `((name         . ,(state-name        state))
+            (description  . ,(state-description state))
+            (event-source . ,(state-event-source state))
+            ,(if (equal? (state-entry-action state) %default-entry-action)
+                 '()
+                 (cons 'entry-action (state-entry-action state)))
+            (transitions  . ,(state-transitions state)))))
 
 ;;; state.scm ends here.
