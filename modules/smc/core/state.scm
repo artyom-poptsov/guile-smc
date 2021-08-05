@@ -40,6 +40,8 @@
             state-event-source-set!
             state-entry-action
             state-entry-action-set!
+            state-exit-action
+            state-exit-action-set!
             state-description
             state-description-set!
             state-transition-count
@@ -66,6 +68,10 @@
 
 (define (%default-entry-action context)
   "Default state entry action that just returns a CONTEXT."
+  context)
+
+(define (%default-exit-action context)
+  "Default state exit action that just returns a CONTEXT."
   context)
 
 
@@ -111,6 +117,20 @@
    #:init-value   %default-entry-action
    #:getter       state-entry-action
    #:setter       state-entry-action-set!)
+
+  ;; A procedure that is called each time 'state-run' is executed, before
+  ;; running the transition table. The procedure MUST return a context, which
+  ;; is passed to the transition table execution.
+  ;;
+  ;; It called by the FSM the state belongs to as follows:
+  ;;   (proc context)
+  ;;
+  ;; <procedure>
+  (exit-action
+   #:init-keyword #:exit-action
+   #:init-value   %default-exit-action
+   #:getter       state-exit-action
+   #:setter       state-exit-action-set!)
 
   ;; <list> of transitions.
   (transitions
