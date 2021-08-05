@@ -42,17 +42,24 @@
 
 ;; Transition accessors.
 
+;; Get the transition guard procedure from a TRANSITION.
 (define-method (transition:guard (transition <list>))
   (list-ref transition 0))
 
+;; Get the transition action procedure from a TRANSITION.
 (define-method (transition:action (transition <list>))
   (list-ref transition 1))
 
+;; Get the next state from a TRANSITION.
 (define-method (transition:next-state (transition <list>))
   (list-ref transition 2))
 
 
 
+;; Return number of the elements in the TLIST transition table for which
+;; PREDICATE returns #t.
+;;
+;; PREDICATE is called on each transition.
 (define-method (transition-table-count (predicate <procedure>) (tlist <list>))
   (fold (lambda (transition prev)
           (if (predicate transition)
@@ -61,6 +68,10 @@
         0
         tlist))
 
+;; Run a TLIST transition table on the specified EVENT and a CONTEXT, return
+;; two values: the next state and a new context.
+;;
+;; If no guards returned #t the procedure returns #f as the next state.
 (define-method (transition-table-run (tlist <list>) event context)
   (let loop ((transition-alist tlist))
     (if (null? transition-alist)
@@ -71,6 +82,8 @@
                       ((transition:action transition) context event))
               (loop (cdr transition-alist)))))))
 
+;; Append a new transition to the end of a TLIST transition table. Return a
+;; new transition table with the new transition.
 (define-method (transition-table-append (tlist <list>)
                                         (tguard <procedure>)
                                         (action <procedure>)
