@@ -231,6 +231,7 @@
 ;;   `((name         . state-name)
 ;;     (description  . "State description")
 ;;     (event-source . ,event-source:state-name)
+;;     (entry-action . ,some-entry-action)
 ;;     (transitions
 ;;      (,guard:...    ,action:...    next-state-name-1)
 ;;      (,guard:...    ,action:...    next-state-name-1)
