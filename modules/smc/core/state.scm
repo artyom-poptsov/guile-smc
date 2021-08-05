@@ -215,9 +215,7 @@
 
 ;; Returns two values: next state (or #f) and new context.
 (define-method (state-run (self <state>) event context)
-  (transition-table-run (state-transitions self)
-                        event
-                        ((state-entry-action self) context)))
+  (transition-table-run (state-transitions self) event context))
 
 ;; Run a STATE in a given CONTEXT.  This procedure uses internal event source
 ;; of a STATE, specified by the 'event-source' slot.
