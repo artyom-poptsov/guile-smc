@@ -266,7 +266,47 @@
 (define-method (parse-event-source (line <string>))
   (string-match "[ \t]+event-source:[ \t]+([^ \t\n]+)" line))
 
+;; Try to parse a LINE as an entry action definition.  Returns a match or #f if
+;; line does not match.
+;;
+;; Example entry action definition:
+;;
+;;   entry-action: some-entry-action
+;;
+(define-method (parse-entry-action (line <string>))
+  (string-match "[ \t]+entry-action:[ \t]+([^ \t\n]+)" line))
+
+;; Try to parse a LINE as an exit action definition.  Returns a match or #f if
+;; line does not match.
+;;
+;; Example entry action definition:
+;;
+;;   exit-action: some-exit-action
+;;
+(define-method (parse-exit-action (line <string>))
+  (string-match "[ \t]+exit-action:[ \t]+([^ \t\n]+)" line))
+
 (define (action:process-state-description ctx ch)
+
+  (define (%resolve state-name proc-name)
+    (let ((proc (resolve-procedure ctx (string->symbol proc-name))))
+      (if proc
+          (begin
+            (set-add! (puml-context-resolved-procedures ctx)
+                      event-source)
+            (context-log-info ctx "[~a] Resolved \"~a\" from \"~a\""
+                              state-name (cdr proc) (car proc))
+            (cdr proc))
+          (if (puml-context-keep-going? ctx)
+              (begin
+                (context-log-error ctx "[~a] Could not resolve procedure ~a in ~a"
+                                   state-name proc-name ctx)
+                (set-add! (puml-context-unresolved-procedures ctx) proc-name)
+                #f)
+              (puml-error ctx "[~a] Cannot resolve event source \"~a\""
+                          state-name
+                          proc-name)))))
+
   (let* ((fsm             (puml-context-fsm ctx))
          (stanza          (stanza->list-of-symbols (context-stanza ctx)))
          (buf             (context-buffer ctx))
@@ -282,28 +322,23 @@
     (unless (fsm-state fsm state-name)
       (%context-fsm-state-add! ctx state-name))
 
-    (let ((event-source-match (parse-event-source new-description)))
+    (let ((event-source-match (parse-event-source new-description))
+          (entry-action-match (parse-entry-action new-description))
+          (exit-action-match  (parse-exit-action new-description))
+          (state              (fsm-state fsm state-name)))
       (cond
        (event-source-match
-        (let* ((state             (fsm-state fsm state-name))
-               (event-source-name (string->symbol
-                                   (match:substring event-source-match 1)))
-               (event-source      (resolve-procedure ctx event-source-name)))
-          (unless event-source
-            (if (puml-context-keep-going? ctx)
-                (begin
-                  (context-log-error ctx "Could not resolve procedure ~a in ~a"
-                                     event-source-name ctx)
-                  (set-add! (puml-context-unresolved-procedures ctx)
-                            event-source-name))
-                (puml-error ctx "[~a] Cannot resolve event source \"~a\""
-                            state-name
-                            event-source-name)))
-          (context-log-info ctx "[~a] Resolved event source \"~a\" from \"~a\""
-                            state-name (cdr event-source) (car event-source))
-          (set-add! (puml-context-resolved-procedures ctx)
-                    event-source)
-          (state-event-source-set! state (cdr event-source))))
+        (let ((event-source (%resolve state-name
+                                      (match:substring event-source-match 1))))
+          (state-event-source-set! state event-source)))
+       (entry-action-match
+        (let ((entry-action (%resolve state-name
+                                      (match:substring entry-action-match 1))))
+          (state-entry-action-set! state entry-action)))
+       (exit-action-match
+        (let ((exit-action (%resolve state-name
+                                     (match:substring exit-action-match 1))))
+          (state-entry-action-set! state exit-action)))
        (description
         (fsm-state-description-add! fsm
                                     state-name
