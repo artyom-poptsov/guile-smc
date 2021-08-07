@@ -169,23 +169,6 @@
 
 (define %event-source-prefix "event-source")
 
-(define (resolve-state-event-source ctx state)
-  (let* ((proc-name (format #f "~a:~a" %event-source-prefix state))
-         (proc      (resolve-procedure ctx (string->symbol proc-name))))
-    (context-log-info ctx
-                      "resolve-state-event-source: ~a resolved to ~a"
-                      proc-name proc)
-    (if proc
-        (begin
-          (set-add! (puml-context-resolved-procedures ctx)
-                    proc)
-          (cdr proc))
-        (let ((global-event-source (fsm-event-source (puml-context-fsm ctx))))
-          (context-log-info ctx
-                            "resolve-state-event-source: using ~a"
-                            global-event-source)
-          global-event-source))))
-
 (define (resolve-global-event-source ctx)
   (let* ((proc (resolve-procedure ctx (string->symbol %event-source-prefix))))
     (if proc
@@ -199,7 +182,7 @@
 (define (%context-fsm-state-add! ctx state-name)
   (let ((state (make <state>
                  #:name         state-name
-                 #:event-source (resolve-state-event-source ctx state-name))))
+                 #:event-source (resolve-global-event-source ctx))))
     (fsm-state-add! (puml-context-fsm ctx) state)))
 
 
