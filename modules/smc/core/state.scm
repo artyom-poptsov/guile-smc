@@ -302,7 +302,7 @@
                  (cons 'description  (state-description state))
                  '())
             ,(if (state-event-source state)
-                 (cons 'event-source (list 'unquote (state-event-source state)))
+                 (cons 'event-source (state-event-source state))
                  '())
             ,(if (equal? (state-entry-action state) %default-entry-action)
                  '()
