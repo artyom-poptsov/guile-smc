@@ -109,8 +109,8 @@
      (context-log-error ctx message)
      (throw %puml-error message))
     ((ctx message . args)
-     (apply context-log-error message args)
-     (throw %puml-error (apply #f format message args) args))))
+     (apply context-log-error ctx message args)
+     (throw %puml-error (apply format #f message args) args))))
 
 
 ;;; Misc. helper procedures.
