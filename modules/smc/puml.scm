@@ -253,7 +253,7 @@
         (unless (fsm-state fsm from)
           (%context-fsm-state-add! ctx from))
 
-        (when (and (not (equal? to '*)) (not (fsm-state fsm to)))
+        (unless (or (equal? to '*) (fsm-state fsm to))
           (%context-fsm-state-add! ctx to))
 
         (fsm-transition-add! fsm from
