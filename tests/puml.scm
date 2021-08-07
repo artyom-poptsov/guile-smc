@@ -1,3 +1,5 @@
+(add-to-load-path ".")
+
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (ice-9 receive)
@@ -5,7 +7,8 @@
              (smc context char-context)
              (smc fsm)
              (smc puml)
-             (smc core state))
+             (smc core state)
+             (test-context))
 
 
 (test-begin "puml")
@@ -100,6 +103,25 @@
                                  "state_1 --> state_1: guard:#t\n"
                                  "@enduml\n")))))
     (fsm-description fsm)))
+
+
+
+(test-equal "puml-string->fsm: an FSM with event source"
+  test-event-source
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml\n"
+                                 "title This is an FSM description.\n"
+                                 "[*] -> state_1\n"
+                                 "state_1: A state description.\n"
+                                 "state_1: event-source: test-event-source\n"
+                                 "state_1 --> state_1: guard:#t\n"
+                                 "@enduml\n"))
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (state-event-source (fsm-state fsm 'state_1))))
+
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))

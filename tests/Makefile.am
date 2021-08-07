@@ -46,6 +46,7 @@ AM_SCM_LOG_FLAGS = \
 	-s
 
 EXTRA_DIST = \
+	test-context.scm \
 	${SCM_TESTS}
 
 CLEANFILES = \

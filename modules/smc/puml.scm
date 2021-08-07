@@ -28,6 +28,7 @@
 (define-module (smc puml)
   #:use-module (oop goops)
   #:use-module (ice-9 receive)
+  #:use-module (ice-9 regex)
   #:use-module (smc core state)
   #:use-module (smc fsm)
   #:use-module (smc core common)
@@ -271,7 +272,18 @@
 
     ctx))
 
-(define (action:add-state-description ctx ch)
+
+;; Try to parse a LINE as event source definition.  Returns a match or #f if
+;; line does not match.
+;;
+;; Example event source definition:
+;;
+;;   event-source: some-event-source
+;;
+(define-method (parse-event-source (line <string>))
+  (string-match "[ \t]+event-source:[ \t]+([^ \t\n]+)" line))
+
+(define (action:process-state-description ctx ch)
   (let* ((fsm             (puml-context-fsm ctx))
          (stanza          (stanza->list-of-symbols (context-stanza ctx)))
          (buf             (context-buffer ctx))
@@ -287,16 +299,39 @@
     (unless (fsm-state fsm state-name)
       (%context-fsm-state-add! ctx state-name))
 
-    (if description
+    (let ((event-source-match (parse-event-source new-description)))
+      (cond
+       (event-source-match
+        (let* ((state             (fsm-state fsm state-name))
+               (event-source-name (string->symbol
+                                   (match:substring event-source-match 1)))
+               (event-source      (resolve-procedure ctx event-source-name)))
+          (unless event-source
+            (if (puml-context-keep-going? ctx)
+                (begin
+                  (context-log-error ctx "Could not resolve procedure ~a in ~a"
+                                     event-source-name ctx)
+                  (set-add! (puml-context-unresolved-procedures ctx)
+                            event-source-name))
+                (puml-error ctx "[~a] Cannot resolve event source \"~a\""
+                            state-name
+                            event-source-name)))
+          (context-log-info ctx "[~a] Resolved event source \"~a\" from \"~a\""
+                            state-name (cdr event-source) (car event-source))
+          (set-add! (puml-context-resolved-procedures ctx)
+                    event-source)
+          (state-event-source-set! state (cdr event-source))))
+       (description
         (fsm-state-description-add! fsm
                                     state-name
                                     (string-append
                                      description
                                      " "
-                                     new-description))
+                                     new-description)))
+       (else
         (fsm-state-description-add! fsm
                                     state-name
-                                    new-description))
+                                    new-description))))
     (context-buffer-clear! ctx)
     (context-stanza-clear! ctx)
     ctx))
@@ -406,7 +441,7 @@
      (description  . "Read a state description if it is present.")
      (transitions
       (,guard:eof-object?     ,action:no-op                 #f)
-      (,guard:newline?        ,action:add-state-description read)
+      (,guard:newline?        ,action:process-state-description read)
       (,guard:#t              ,action:store          read-state-description)))
     ((name         . read-state-right-arrow)
      (description  . "Read a right arrow that indicates a transition.")
