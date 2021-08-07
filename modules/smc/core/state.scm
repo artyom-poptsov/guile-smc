@@ -62,7 +62,8 @@
             state:transitions
 
             list->state
-            state->list))
+            state->list
+            state->list/serialized))
 
 
 
@@ -308,5 +309,41 @@
                  '()
                  (cons 'entry-action (state-entry-action state)))
             (transitions  . ,(state-transitions state)))))
+
+
+
+;; This procedure serializes a transition @var{table}. It returns the
+;; transition table as a list.
+(define-method (%serialize-transition-table (table <list>))
+  (map (lambda (tr)
+         (map (lambda (e)
+                (cond
+                 ((procedure? e)
+                  (list 'unquote (procedure-name e)))
+                 ((state? e)
+                  (state-name e))
+                 (else
+                  e)))
+              tr))
+       table))
+
+(define-generic state->list/serialized)
+
+(define-method (state->list/serialized (state-list <list>))
+  (map (lambda (property)
+         (let ((property-name (car property)))
+           (cond
+            ((equal? property-name 'event-source)
+             (cons 'event-source
+                   (list 'unquote (procedure-name (cdr property)))))
+            ((equal? property-name 'transitions)
+             `(transitions
+               ,@(%serialize-transition-table (cdr property))))
+            (else
+             property))))
+       state-list))
+
+(define-method (state->list/serialized (state <state>))
+  (state->list/serialized (state->list state)))
 
 ;;; state.scm ends here.

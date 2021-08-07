@@ -71,42 +71,13 @@
         (loop (append lst (list (car em)))
               (cdr em)))))
 
-;; This procedure serializes a transition @var{table}. It returns the
-;; transition table as a list.
-(define-method (%serialize-transition-table (table <list>))
-  (map (lambda (tr)
-         (map (lambda (e)
-                (cond
-                 ((procedure? e)
-                  (list 'unquote (procedure-name e)))
-                 ((state? e)
-                  (state-name e))
-                 (else
-                  e)))
-              tr))
-       table))
-
-(define-method (%serialize-state state)
-  (let* ((name         (state:name              state))
-         (description  (state:description       state))
-         (event-source (state:event-source/name state))
-         (transitions  (state:transitions       state)))
-    (filter (lambda (e) (not (null? e)))
-            `((name         .  ,name)
-              (description  .  ,description)
-              ,(if event-source
-                   (list 'event-source (list 'unquote event-source))
-                   '())
-              (transitions
-               ,@(%serialize-transition-table transitions))))))
-
 ;; Write a @var{fsm} transition table to a @var{port}.
 (define-method (%write-transition-table (fsm <fsm>) (port <port>))
   (let ((table (fsm-transition-table fsm)))
     (pretty-print
      `(define %transition-table
         ,(list 'quasiquote
-               (map %serialize-state
+               (map state->list/serialized
                     (hash-table->transition-list table))))
      port)))
 
