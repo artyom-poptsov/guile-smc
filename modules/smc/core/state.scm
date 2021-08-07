@@ -333,8 +333,10 @@
   (map (lambda (property)
          (let ((property-name (car property)))
            (cond
-            ((equal? property-name 'event-source)
-             (cons 'event-source
+            ((or (equal? property-name 'event-source)
+                 (equal? property-name 'entry-action)
+                 (equal? property-name 'exit-action))
+             (cons (car property)
                    (list 'unquote (procedure-name (cdr property)))))
             ((equal? property-name 'transitions)
              `(transitions
