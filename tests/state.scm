@@ -193,14 +193,12 @@
 (test-equal "state->list: W/o description and transitions"
   `((name         . state-1)
     (description  . #f)
-    (event-source . #f)
     (transitions))
   (state->list (make <state> #:name 'state-1)))
 
 (test-equal "state->list: With description"
   `((name         . state-1)
     (description  . "This is a description")
-    (event-source . #f)
     (transitions))
   (state->list (make <state>
                  #:name 'state-1
@@ -209,7 +207,6 @@
 (test-equal "state->list: With transitions"
   `((name         . state-1)
     (description  . #f)
-    (event-source . #f)
     (transitions
      (,guard:#t ,action:no-op state-2)))
   (state->list (make <state>
@@ -219,7 +216,6 @@
 (test-equal "state->list: With description and transitions"
   `((name         . state-1)
     (description  . "This is a description")
-    (event-source . #f)
     (transitions
      (,guard:#t ,action:no-op state-2)))
   (state->list (make <state>
