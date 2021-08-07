@@ -179,7 +179,9 @@
 
 
 (define (%context-fsm-state-add! ctx state-name)
-  (let ((state (make <state> #:name state-name)))
+  (let ((state (make <state>
+                 #:name state-name
+                 #:event-source (fsm-event-source (puml-context-fsm ctx)))))
     (fsm-state-add! (puml-context-fsm ctx) state)))
 
 
