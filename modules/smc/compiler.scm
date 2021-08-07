@@ -95,7 +95,7 @@
             `((name         .  ,name)
               (description  .  ,description)
               ,(if event-source
-                   (cons 'event-source (list 'unquote event-source))
+                   (list 'event-source (list 'unquote event-source))
                    '())
               (transitions
                ,@(%serialize-transition-table transitions))))))
