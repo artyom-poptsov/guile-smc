@@ -240,7 +240,7 @@
                 (begin
                   (context-log-error ctx "Could not resolve procedure ~a in ~a" tguard ctx)
                   (set-add! (puml-context-unresolved-procedures ctx) tguard))
-                (puml-error "Could not resolve procedure ~a in ~a" tguard ctx)))
+                (puml-error ctx "Could not resolve procedure ~a in ~a" tguard ctx)))
 
         (if resolved-action
             (set-add! (puml-context-resolved-procedures ctx) resolved-action)
@@ -248,7 +248,7 @@
                 (begin
                   (context-log-error ctx "Could not resolve procedure ~a in ~a" action ctx)
                   (set-add! (puml-context-unresolved-procedures ctx) action))
-                (puml-error "Could not resolve procedure ~a in ~a" action ctx)))
+                (puml-error ctx "Could not resolve procedure ~a in ~a" action ctx)))
 
         (unless (fsm-state fsm from)
           (%context-fsm-state-add! ctx from))
