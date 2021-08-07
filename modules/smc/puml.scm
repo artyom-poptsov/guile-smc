@@ -171,18 +171,15 @@
 
 (define (resolve-global-event-source ctx)
   (let* ((proc (resolve-procedure ctx (string->symbol %event-source-prefix))))
-    (if proc
+    (and proc
         (begin
           (set-add! (puml-context-resolved-procedures ctx)
                     proc)
-          (cdr proc))
-        (const #t))))
+          (cdr proc)))))
 
 
 (define (%context-fsm-state-add! ctx state-name)
-  (let ((state (make <state>
-                 #:name         state-name
-                 #:event-source (fsm-event-source (puml-context-fsm ctx)))))
+  (let ((state (make <state> #:name state-name)))
     (fsm-state-add! (puml-context-fsm ctx) state)))
 
 
