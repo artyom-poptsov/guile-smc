@@ -91,13 +91,14 @@
          (description  (state:description       state))
          (event-source (state:event-source/name state))
          (transitions  (state:transitions       state)))
-    `((name         .  ,name)
-      (description  .  ,description)
-      (event-source .  ,(if event-source
-                            (list 'unquote event-source)
-                            #f))
-      (transitions
-       ,@(%serialize-transition-table transitions)))))
+    (filter (lambda (e) (not (null? e)))
+            `((name         .  ,name)
+              (description  .  ,description)
+              ,(if event-source
+                   (cons 'event-source (list 'unquote event-source))
+                   '())
+              (transitions
+               ,@(%serialize-transition-table transitions))))))
 
 ;; Write a @var{fsm} transition table to a @var{port}.
 (define-method (%write-transition-table (fsm <fsm>) (port <port>))
