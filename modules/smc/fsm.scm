@@ -361,20 +361,21 @@
 ;;   - new-state
 ;;   - new-context
 (define-method (%handle-state-transition! (fsm <fsm>) old-state new-state new-context)
-  (when (fsm-debug-mode? fsm)
-    (fsm-log-transition old-state new-state))
   (%step-counter-increment! fsm)
   (fsm-current-state-set! fsm new-state)
   (if (equal? old-state new-state)
       (values new-state new-context)
-      (if new-state
-          (begin
-            (%transition-counter-increment! fsm)
+      (begin
+        (when (fsm-debug-mode? fsm)
+          (fsm-log-transition old-state new-state))
+        (if new-state
+            (begin
+              (%transition-counter-increment! fsm)
+              (values new-state
+                      ((state-entry-action new-state)
+                       ((state-exit-action old-state) new-context))))
             (values new-state
-                    ((state-entry-action new-state)
-                     ((state-exit-action old-state) new-context))))
-          (values new-state
-                  ((state-exit-action old-state) new-context)))))
+                    ((state-exit-action old-state) new-context))))))
 
 ;; Perform a single FSM step on the specified EVENT and a CONTEXT.
 (define-method (fsm-step! (self <fsm>) event context)
