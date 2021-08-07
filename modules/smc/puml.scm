@@ -263,7 +263,9 @@
                              (if resolved-action
                                  (cdr resolved-action)
                                  action:no-op)
-                             to))))
+                             (if (equal? to '*)
+                                 #f
+                                 to)))))
 
     (context-stanza-clear! ctx)
 

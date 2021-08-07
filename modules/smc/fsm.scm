@@ -319,23 +319,24 @@
 ;; Add a new transition from a STATE-NAME to a NEXT-STATE-NAME, guarded by a
 ;; TGUARD with the specified transition ACTION.
 ;;
-;; Both STATE-NAME and NEXT-STATE-NAME must be a valid state names that
-;; already present in the SELF fsm, otherwise an error will be thrown.
+;; STATE-NAME must be a valid state name that already present in the SELF
+;; FSM, otherwise an error will be thrown.
+;;
+;; NEXT-STATE-NAME must be either a name of a state that is present in the FSM
+;; transition table, or #f (which means the end transition.)
 (define-method (fsm-transition-add! (self            <fsm>)
                                     (state-name      <symbol>)
                                     (tguard          <procedure>)
                                     (action          <procedure>)
-                                    (next-state-name <symbol>))
+                                    (next-state-name <top>))
   (let ((state      (fsm-state self state-name))
-        (next-state (if (equal? next-state-name '*)
-                        #f
-                        (fsm-state self next-state-name))))
+        (next-state (and next-state-name
+                         (fsm-state self next-state-name))))
 
     (unless state
       (fsm-error "fsm-transition-add!: Source state ~a is not found" state-name))
 
-    (when (and (equal? next-state '*)
-               (not next-state))
+    (when (and next-state-name (not next-state))
       (fsm-error "fsm-transition-add!: Next state ~a is not found" next-state-name))
 
     (state-transition-add! state tguard action next-state)))
