@@ -1,3 +1,5 @@
+(add-to-load-path ".")
+
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (ice-9 receive)
@@ -6,7 +8,8 @@
              (smc context char-context)
              (smc fsm)
              (smc core transition)
-             (smc core state))
+             (smc core state)
+             (test-context))
 
 
 (test-begin "state")
@@ -77,6 +80,8 @@
                   (with-output-to-string
                     (lambda ()
                       (write state))))))
+
+
 
 (test-equal "state-transition-add!"
   `((,guard:#t ,action:no-op state-1)
@@ -220,6 +225,27 @@
                  #:name 'state-1
                  #:description "This is a description"
                  #:transitions `((,guard:#t ,action:no-op state-2)))))
+
+
+
+(test-equal "state->list: Check event source name"
+  'test-event-source
+  (let ((state (make <state>
+                 #:event-source test-event-source
+                 #:transitions `((,guard:#t ,action:no-op state-1)))))
+    (state:event-source/name (state->list state))))
+
+(test-equal "state->list/serialized"
+  '((name       . #f)
+    (event-source unquote test-event-source)
+    (entry-action unquote entry-action)
+    (transitions  ((unquote #{guard:#t}#) (unquote action:no-op) state-1)))
+   (let ((state (make <state>
+                  #:event-source test-event-source
+                  #:entry-action entry-action
+                  #:exit-action  exit-action
+                  #:transitions `((,guard:#t ,action:no-op state-1)))))
+    (state->list/serialized state)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
