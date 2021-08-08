@@ -17,29 +17,46 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Guile-SMC.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I build-aux
-
-SUBDIRS = build-aux modules/smc utils doc tests examples/png
+include $(top_srcdir)/build-aux/am/guilec
 
 EXTRA_DIST = \
-	.dir-locals.el
+	png-signature.puml		\
+	png-signature-checker.in
 
-gen-ChangeLog:
-	if test -d .git; then				\
-	  $(top_srcdir)/build-aux/gitlog-to-changelog	\
-	    2bea8c70..HEAD > $(distdir)/cl-t;		\
-	  rm -f $(distdir)/ChangeLog;			\
-	  mv $(distdir)/cl-t $(distdir)/ChangeLog;	\
-	fi
+SOURCES = \
+	png-signature.scm		\
+	png-signature-context.scm	\
+	png-signature-checker.in
 
-dist-hook: gen-ChangeLog
-.PHONY: gen-ChangeLog
+examplesdir = $(pkgdatadir)/examples
+examples_pngdir = $(pkgdatadir)/examples/png
+dist_examples_png_DATA = \
+	png-signature.puml		\
+	png-signature.scm		\
+	png-signature-context.scm	\
+	png-signature-checker.scm
 
-clean-go:
-	-$(RM) $(GOBJECTS)
-.PHONY: clean-go
+SUFFIXES = .in .puml
+
+substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
+.in.scm:
+	$(MKDIR_P) "`dirname "$@"`"
+	$(substitute) "$^" > "$@.tmp" && 	\
+	chmod +x "$@.tmp" &&			\
+	mv "$@.tmp" "$@"
+
+.puml.scm:
+	@echo "  SMC      $<"
+	@cat $< | smc compile \
+	-L "$(top_srcdir)/modules:." \
+	-U "((png-signature-context))" \
+	--fsm-name ini-fsm \
+	--fsm-module "(png-signature)" \
+	--validate > $@
 
 CLEANFILES = \
-	$(GOBJECTS)
+	png-signature.scm		\
+	png-signature-checker.scm
 
 # Makefile.am ends here
+

@@ -1,0 +1,40 @@
+@startuml
+[*] ---> read_first_byte
+
+read_first_byte --> [*]: guard:eof-object?
+read_first_byte -down-> P: guard:correct-first-byte?
+read_first_byte --> [*]: action:wrong-first-byte-error
+
+P: Read the "P" letter
+P --> [*]: guard:eof-object? -> action:unexpected-eof-error
+P -down-> N: guard:letter-P?
+P --> [*]: action:unexpected-byte-error
+
+N: Read the "N" letter
+N --> [*]: guard:eof-object? -> action:unexpected-eof-error
+N -down-> G: guard:letter-N?
+N --> [*]: action:unexpected-byte-error
+
+G: Read the "G" letter
+G --> [*]: guard:eof-object? -> action:unexpected-eof-error
+G -down-> CR: guard:letter-G?
+G --> [*]: action:unexpected-byte-error
+
+CR: Read the carriage return (CR)
+CR ---> [*]: guard:eof-object? -> action:unexpected-eof-error
+CR -down-> LF: guard:letter-CR?
+CR --> [*]: action:unexpected-byte-error
+
+LF: Read the linefeed (LF)
+LF ---> [*]: guard:eof-object? -> action:unexpected-eof-error
+LF -down-> ctrl_z: guard:letter-LF?
+LF ---> [*]: action:unexpected-byte-error
+
+ctrl_z --> [*]: guard:eof-object? -> action:unexpected-eof-error
+ctrl_z -down-> final_LF: guard:letter-ctrl-z?
+ctrl_z --> [*]: action:unexpected-byte-error
+
+final_LF ---> [*]: guard:eof-object? -> action:unexpected-eof-error
+final_LF -down-> [*]: guard:letter-LF?
+final_LF ---> [*]: action:unexpected-byte-error
+@enduml

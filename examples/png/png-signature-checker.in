@@ -1,0 +1,19 @@
+#!@GUILE@ \
+-L . -e main -s
+!#
+
+(use-modules (ice-9 binary-ports)
+             (oop goops)
+             (smc fsm)
+             (png-signature))
+
+
+(define (main args)
+  (let ((p   (open-input-file (cadr args)))
+        (fsm (make <png-signature-fsm>)))
+    (fsm-run! fsm (lambda (context) (get-u8 p)) #f)
+    (close p)))
+
+;; Local Variables:
+;; mode: Scheme
+;; End:

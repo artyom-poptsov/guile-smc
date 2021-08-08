@@ -57,6 +57,7 @@ AC_CONFIG_FILES([
         build-aux/am/Makefile
         build-aux/Makefile
         build-aux/m4/Makefile
+        examples/png/Makefile
         modules/smc/Makefile
         modules/smc/core/Makefile
         modules/smc/context/Makefile
