@@ -47,7 +47,7 @@ substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 
 .puml.scm:
 	@echo "  SMC      $<"
-	@cat $< | smc compile \
+	@cat $< | $(top_srcdir)/utils/smc compile \
 	-L "$(top_srcdir)/modules:." \
 	-U "((png-signature-context))" \
 	--fsm-name ini-fsm \
