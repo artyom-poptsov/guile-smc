@@ -9,14 +9,30 @@
 The @code{(smc puml)} module contains a parser implementation for
 @url{http://www.plantuml.com/, PlantUML} format.
 
-@deftp {Class} <puml-context> #:module
+@c -----------------------------------------------------------------------------
+@subsection The PlantUML context
+
+@deftp {Class} <puml-context> @
+               #:module @
+               [#:keep-going?=#f]
 
 @table @asis
 @item #:module
 A module which contains state machine procedures.
+
+@item #:keep-going? (value <boolean>)
+Whether the parser should keep going when a procedure cannot be resolved or
+not.
+
+When set to #t, the parser remembers all unresolved procedures but keeps going
+without issuing an error. All unresolved procedures are replaced with default
+variants (@code{guard:t} for guards, @code{action:no-op} for actions.)
 @end table
 
 @end deftp
+
+@c -----------------------------------------------------------------------------
+@subsection Public API
 
 @deffn {Scheme Procedure} puml-context-fsm (context <puml-context>)
 Get the @var{context} output finite state machine.
@@ -43,6 +59,35 @@ to Guile-SMC @code{<fsm>} instance.
 Convert a @var{string} in the PlantUML format and to Guile-SMC @code{<fsm>}
 instance.
 @end deffn
+
+@c -----------------------------------------------------------------------------
+@subsubsection Resolver status
+
+@deffn {Scheme Procedure} puml-context-resolved-procedures @
+               (puml-context <puml-context>)
+
+Return a @code{<set>} of resolved procedures. Each element of the set is a
+pair, where @code{car} of the pair is a module from which a procedure is
+resolved, and @code{cdr} is a resolved procedure.
+@end deffn
+
+@deffn {Scheme Procedure} puml-context-unresolved-procedures @
+               (puml-context <puml-context>)
+
+Return a @code{<set>} of unresolved procedures. Each element of the set an
+unresolved procedure name.
+@end deffn
+
+@deffn {Scheme Procedure} puml-context-print-resolver-status @
+               (puml-context <puml-context>) @
+               (port         <port>)
+
+Pretty-print a @var{puml-context} resolver status to the specified @var{port}.
+
+@end deffn
+
+@c -----------------------------------------------------------------------------
+@subsection Internal procedures
 
 @deffn {Scheme Procedure} resolve-procedure context proc-name default
 This procedure tries to resolve a procedure @var{proc-name} in the provided
