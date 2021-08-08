@@ -6,7 +6,26 @@
 @node State
 @section State
 
-@deftp {Class} <state> #:name [#:description=#f] [#:transitions=#f]
+@c -----------------------------------------------------------------------------
+@subsection Default entry/exit actions
+
+@deffn {Scheme Procedure} %default-entry-action context
+Default state entry action that just returns a @var{context}.
+@end deffn
+
+@deffn {Scheme Procedure} %default-exit-action context
+Default state exit action that just returns a @var{context}.
+@end deffn
+
+@c -----------------------------------------------------------------------------
+@subsection The main class
+
+@deftp {Class} <state> #:name @
+       [#:description=#f] @
+       [#:event-source=#f] @
+       [#:entry-action=%default-entry-action] @
+       [#:exit-action=%default-exit-action] @
+       [#:transitions=#f]
 This class describes an FSM state.
 
 Constructor parameters:
@@ -18,12 +37,48 @@ Constructor parameters:
 @item #:description (description <string>)
 Description of this state.
 
+@item #:event-source (proc <procedure>)
+A procedure that returns an event.
+
+It called by the FSM the state belongs to as follows:
+@example lisp
+(proc context)
+@end example
+
+@item #:entry-action (proc <procedure>)
+A procedure that is called by the FSM the state belongs to when a transition
+occurs to this state from another state, before running the transition table.
+Note that the procedure is not called on self-transitions.
+
+The procedure MUST return a context, which is passed to the transition table
+execution.
+
+The procedure called as follows:
+@example lisp
+(proc context)
+@end example
+
+@item #:exit-action (proc <procedure>)
+A procedure that is called by the FSM the state belongs to when a transition
+occurs from this state to another state, before running the transition table.
+Note that the procedure is not called on self-transitions.
+
+The procedure MUST return a context.
+
+The procedure called as follows:
+@example lisp
+(proc context)
+@end example
+
 @item #:transitions (transitions <list>)
 The transitions for this state.
 
 @end table
 
 @end deftp
+
+@c -----------------------------------------------------------------------------
+@subsection Public API
 
 @deffn {Scheme Procedure} state? object
 Check if @var{object} is an instance of the @code{<state>} class.
@@ -38,9 +93,35 @@ Get the state description as a @code{<string>} if it is available, return
 @code{#f} otherwise.
 @end deffn
 
+@deffn {Scheme Procedure} state-event-source (state <state>)
+Get the @var{state} event source procedure.
+@end deffn
+
+@deffn {Scheme Procedure} state-event-source-set! (state <state>)
+Set the @var{state} event source procedure.
+@end deffn
+
+@deffn {Scheme Procedure} state-entry-action (state <state>)
+Get the @var{state} entry action procedure.
+@end deffn
+
+@deffn {Scheme Procedure} state-entry-action-set! (state <state>)
+Set the @var{state} entry action procedure.
+@end deffn
+
+@deffn {Scheme Procedure} state-exit-action (state <state>)
+Get the @var{state} exit action procedure.
+@end deffn
+
+@deffn {Scheme Procedure} state-exit-action-set! (state <state>)
+Set the @var{state} exit action procedure.
+@end deffn
+
 @deffn {Scheme Procedure} state-transitions (state <state>)
 Get the state transitions as a list.
 @end deffn
+
+@c -----------------------------------------------------------------------------
 
 @deffn {Scheme Procedure} state-transition-add! @
                (state <state>) @
@@ -86,6 +167,52 @@ transitions.
 @deffn {Scheme Procedure} state-run (state <state>) event context
 Run a @var{state}.  Returns two values: next state (or @code{#f}) and new
 context.
+@end deffn
+
+@c ---------------------------------------------------------------------------
+@subsubsection State as a list
+
+State serialized to an associative list of the following form:
+
+@example lisp
+   `((name         . state-name)
+     (description  . "State description")
+     (event-source . ,event-source:state-name)
+     (entry-action . ,some-entry-action)
+     (transitions
+      (,guard:...    ,action:...    next-state-name-1)
+      (,guard:...    ,action:...    next-state-name-1)
+      (,guard:...    ,action:...    next-state-name-2)))
+@end example
+
+@deffn  {Scheme Procedure} state:name state
+@deffnx {Scheme Procedure} state:description state
+@deffnx {Scheme Procedure} state:transitions state
+@deffnx {Scheme Procedure} state:event-source state
+@deffnx {Scheme Procedure} state:entry-action state
+@deffnx {Scheme Procedure} state:exit-action state
+Get the corresponding element of a @var{state} alist.
+@end deffn
+
+@deffn {Scheme Procedure} state:event-source/name state
+Get the name of a @var{state} event source procedure. Returns @code{#f} when
+no event source is set.
+@end deffn
+
+@c ---------------------------------------------------------------------------
+@subsubsection List/state conversion
+
+@deffn {Scheme Procedure} list->state (lst <list>)
+Convert a list @var{lst} to a @code{<state>} instance, return the new state.
+@end deffn
+
+@deffn {Scheme Procedure} state->list (state <state>)
+Convert a @var{state} to an associative list.
+@end deffn
+
+@deffn {Scheme Procedure} state->list/serialized (state <state>)
+Convert a @var{state} to an associative list, replace all the procedures with
+their names.
 @end deffn
 
 @c Local Variables:
