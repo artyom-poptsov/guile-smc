@@ -6,6 +6,42 @@
 @node FSM
 @section FSM
 
+@c -----------------------------------------------------------------------------
+@subsection The main class
+
+@deftp {Class} <fsm> @
+       [#:description=#f] @
+       [#:debug-mode?=#f] @
+       [#:transition-table='()] @
+       [#:event-source=(labmda (context) #t)] @
+       [#:current-state=#f]
+
+The main class that describes a finite state machine.
+
+@table @asis
+@item #:current-state (state <state>)
+@strong{required} Current FSM state.
+
+@item #:description (str <string>)
+Optional custom human-readable description for the finite-state machine.
+
+@item #:debug-mode? (enabled? <boolean>)
+Is the debug mode enabled?
+
+@item #:transition-table (table <list>)
+A transition table.
+
+@item #:event-source (proc <procedure>)
+Global state machine event source.
+
+@end table
+
+@end deftp
+
+
+@c -----------------------------------------------------------------------------
+@subsection Public API
+
 @deffn {Scheme Procedure} fsm? object
 Check if an @var{object} is an @code{<fsm>} instance.
 @end deffn
@@ -19,6 +55,7 @@ Lookup a state by its @var{name} from the state table of @var{fsm}.
 @end deffn
 
 @deffn {Scheme Procedure} transition-list->hash-table @
+               (fsm <fsm>) @
                (transition-list <list>)
 Convert a @var{transition-list} to a hash table.
 @end deffn
@@ -27,36 +64,31 @@ Convert a @var{transition-list} to a hash table.
 Convert a hash @var{table} to a transition list of the following form:
 
 @example lisp
-'((state1
-   "description"
-   (guard-procedure        action-procedure        next-state)
-   (guard-procedure        action-procedure        next-state)
-   ...
-   (guard-procedure        action-procedure        next-state))
-  (state1 ...))
+   '(((name        . state1)
+      (description . "description")
+      (transitions . ((guard-procedure      action-procedure      next-state)
+                      (guard-procedure      action-procedure      next-state)
+                      ...
+                      (guard-procedure      action-procedure      next-state))))
+     (state1 ...))
 @end example
 
 Return the transition list.
 @end deffn
 
 @deffn {Scheme Procedure} fsm-transition-add! @
-               (self   <fsm>) @
-               (state  <state>) @
-               (tguard <procedure>) @
-               (action <procedure>) @
-               next-state
-@deffnx {Scheme Procedure} fsm-transition-add! @
-               (self       <fsm>) @
-               (state-name <symbol>) @
-               (tguard     <procedure>) @
-               (action     <procedure>) @
-               next-state
-@deffnx {Scheme Procedure} fsm-transition-add! @
-               (self        <fsm>) @
-               (state-name  <symbol>) @
-               (transitions <list>)
-Add a new transition to a @var{next-state}, guarded by a @var{tguard} with the
-specified transition @var{action}.
+               (self            <fsm>) @
+               (state-name      <symbol>) @
+               (tguard          <procedure>) @
+               (action          <procedure>) @
+               (next-state-name <top>)
+
+Add a new transition to a state named @var{next-state-name}, guarded by a
+@var{tguard} with the specified transition @var{action}.
+
+@var{next-state-mame} must be a name of a state that is already present in the
+FSM transition table, or @code{#f} (which means that the transition is final.)
+
 @end deffn
 
 @deffn {Scheme Procedure} fsm-state-description-add! @
@@ -68,10 +100,37 @@ Add a new @var{description} to a state @var{state-name}.
 
 @end deffn
 
-@deffn {Scheme Procedure} fsm-run! (fsm <fsm>) event context
+@c -----------------------------------------------------------------------------
+@subsubsection Executing a FSM
+
+@deffn  {Scheme Procedure} fsm-step! (fsm <fsm>) event context
+@deffnx {Scheme Procedure} fsm-step! (fsm <fsm>) context
 Perform a single @var{fsm} step on the specified @var{event} and a
 @var{context}.
+
+If @var{event} parameter is missing, then @var{fsm} will always use event
+sources specific for each state during the execution.
+
+Returns two values: new state and new context.
 @end deffn
+
+@deffn  {Scheme Procedure} fsm-run! (fsm <fsm>) event-source context
+@deffnx {Scheme Procedure} fsm-run! (fsm <fsm>) context
+Run an @var{fsm} with the given @var{context} return the new context.
+
+@var{event-source} must be a procedure that accepts a @var{context} as a
+single parameter.
+
+If @var{event-source} parameter is missing, then then @var{fsm} will always
+use event sources specific for each state during the execution.
+
+@var{context} can be any Scheme object.
+
+Return the @var{context} after @var{fsm} execution.
+@end deffn
+
+@c -----------------------------------------------------------------------------
+@subsubsection Getting information about an FSM
 
 @deffn {Scheme Procedure} fsm-state-count (fsm <fsm>)
  Calculate the number of states in a finite state machine @var{fsm}. Return
@@ -101,7 +160,7 @@ Validate the finite state machine @var{fsm} and return the list of errors. If
 the list is empty then no errors were found.
 @end deffn
 
-@subsection Logging
+@subsubsection Logging
 @cindex FSM logging
 
 @deffn  {Scheme Procedure} fsm-log-transition (from <state>) (to <state>)
