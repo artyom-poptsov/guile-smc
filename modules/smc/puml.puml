@@ -20,9 +20,10 @@ read -> read
 
 ' Read 
 ' TODO: Add end tag check.
-read_end_tag --> [*]: guard:eof-object? -> action:check-end-tag
-read_end_tag --> [*]: guard:newline? -> action:check-end-tag
-read_end_tag --> [*]: guard:space? -> action:check-end-tag
+read_end_tag: exit-action: action:check-end-tag
+read_end_tag --> [*]: guard:eof-object?
+read_end_tag --> [*]: guard:newline?
+read_end_tag --> [*]: guard:space?
 read_end_tag ->  read_end_tag: guard:#t -> action:store
 
 ' Skipping comments

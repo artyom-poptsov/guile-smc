@@ -370,7 +370,7 @@
     (context-buffer-clear! ctx)
     ctx))
 
-(define (action:check-end-tag ctx ch)
+(define (action:check-end-tag ctx)
   (let* ((buf (context-buffer ctx))
          (str (stack-content->string buf)))
     (unless (string=? str "@enduml")
@@ -412,11 +412,12 @@
       (,guard:#t                   ,action:no-op        read)))
     ((name         . read-end-tag)
      (description  . "Read the @enduml tag.")
+     (exit-action  . ,action:check-end-tag)
      (transitions
-      (,guard:eof-object?     ,action:check-end-tag     #f)
-      (,guard:newline?        ,action:check-end-tag     #f)
-      (,guard:space?          ,action:check-end-tag     #f)
-      (,guard:#t              ,action:store             read-end-tag)))
+      (,guard:eof-object?     ,action:no-op     #f)
+      (,guard:newline?        ,action:no-op     #f)
+      (,guard:space?          ,action:no-op     #f)
+      (,guard:#t              ,action:store     read-end-tag)))
     ((name         . read/skip-comment)
      (description  . "Skip commentaries that are written between stanzas.")
      (transitions
