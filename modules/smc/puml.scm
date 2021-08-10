@@ -57,6 +57,11 @@
    #:getter       puml-context-fsm
    #:setter       puml-context-fsm-set!)
 
+  ;; <symbol>
+  (fsm-event-source
+   #:init-keyword #:fsm-event-source
+   #:getter       puml-context-fsm-event-source)
+
   ;; Modules that contain state machine procedures.
   (module
    #:init-keyword #:module
@@ -92,12 +97,33 @@
 
 (define-method (initialize (puml-context <puml-context>) initargs)
   (next-method)
-  (let ((event-source (resolve-global-event-source puml-context)))
-    (context-log-info puml-context "FSM global event source: ~a~%"
-                      event-source)
-    (puml-context-fsm-set! puml-context
-                           (make <fsm>
-                             #:event-source event-source))))
+  (let* ((event-source-name (puml-context-fsm-event-source puml-context))
+         (event-source (resolve-procedure puml-context event-source-name)))
+    (if event-source
+        (begin
+          (set-add! (puml-context-resolved-procedures puml-context)
+                    event-source)
+          (context-log-info puml-context
+                            "FSM global event source: ~a~%"
+                            (cdr event-source))
+          (puml-context-fsm-set! puml-context
+                                 (make <fsm>
+                                   #:event-source (cdr event-source))))
+        (if (puml-context-keep-going? puml-context)
+            (begin
+              (context-log-error puml-context
+                                 "Could not resolve procedure ~a in ~a"
+                                 event-source-name
+                                 puml-context)
+              (set-add! (puml-context-unresolved-procedures puml-context)
+                        event-source-name)
+              (puml-context-fsm-set! puml-context
+                                     (make <fsm>
+                                       #:event-source (const #t))))
+            (puml-error puml-context
+                        "Could not resolve procedure ~a in ~a"
+                        event-source-name
+                        puml-context)))))
 
 
 ;;; Error reporting.
@@ -169,17 +195,6 @@
 (define (%puml-transition:action tr)
   (and (= (length tr) 4)
        (list-ref tr 3)))
-
-
-(define %event-source-prefix "event-source")
-
-(define (resolve-global-event-source ctx)
-  (let* ((proc (resolve-procedure ctx (string->symbol %event-source-prefix))))
-    (and proc
-        (begin
-          (set-add! (puml-context-resolved-procedures ctx)
-                    proc)
-          (cdr proc)))))
 
 
 (define (%context-fsm-state-add! ctx state-name)
@@ -554,6 +569,10 @@
 ;;   module             A list of modules that needed to resolve output FSM
 ;;                      procedures.
 ;;                      Default value: (current-module)
+;;   default-event-source
+;;                      Default event source procedure name (as a symbol) that
+;;                      will be set for the output FSM.
+;;                      Default value: 'event-source
 ;;   keep-going?        If this parameter is set to #t, the parser ignores
 ;;                      unresolved procedure errors.  All unresolved procedures
 ;;                      are replaced with default values.
@@ -566,6 +585,7 @@
 (define* (puml->fsm port
                     #:key
                     (module (current-module))
+                    (default-event-source 'event-source)
                     (keep-going? #f)
                     (debug-mode? #f))
   (log-use-stderr! debug-mode?)
@@ -580,9 +600,10 @@
             #:transition-table %transition-table))
          (context (fsm-run! reader-fsm
                             (make <puml-context>
-                              #:port        port
-                              #:module      module
-                              #:keep-going? keep-going?)))
+                              #:port             port
+                              #:module           module
+                              #:fsm-event-source default-event-source
+                              #:keep-going?      keep-going?)))
          (output-fsm (puml-context-fsm context)))
       (fsm-parent-set! output-fsm reader-fsm)
       (fsm-parent-context-set! output-fsm context)
