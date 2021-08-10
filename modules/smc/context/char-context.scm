@@ -149,51 +149,31 @@
 
 
 ;;; Guards.
+(define (make-guard ch1)
+  "Make a procedure that checks if a CH1 equals to CH2."
+  (lambda (ctx ch2) (char=? ch1 ch2)))
 
-(define (guard:equals-sign? ctx ch)
-  (char=? ch #\=))
+(define (make-charset-guard charset)
+  "Make a procedure that checks if a CH is in a CHARSET."
+  (lambda (ctx ch) (char-set-contains? charset ch)))
 
-(define (guard:newline? ctx ch)
-  (char=? ch #\newline))
-
-(define (guard:hyphen-minus? ctx ch)
-  (char=? ch #\-))
-
-(define (guard:space? ctx ch)
-  (char=? ch #\space))
-
-(define (guard:less-than-sign? ctx ch)
-  (char=? ch #\<))
-
-(define (guard:more-than-sign? ctx ch)
-  (char=? ch #\>))
-
-(define (guard:letter? ctx ch)
-  (char-set-contains? char-set:letter ch))
+(define guard:equals-sign?           (make-guard #\=))
+(define guard:newline?               (make-guard #\newline))
+(define guard:hyphen-minus?          (make-guard #\-))
+(define guard:space?                 (make-guard #\space))
+(define guard:less-than-sign?        (make-guard #\<))
+(define guard:more-than-sign?        (make-guard #\>))
+(define guard:letter?                (make-charset-guard char-set:letter))
+(define guard:single-quote?          (make-guard #\'))
+(define guard:colon?                 (make-guard #\:))
+(define guard:semicolon?             (make-guard #\;))
+(define guard:left-square-bracket?   (make-guard #\[))
+(define guard:right-square-bracket?  (make-guard #\]))
+(define guard:at-symbol?             (make-guard #\@))
+(define guard:asterisk?              (make-guard #\*))
 
 (define (guard:eof-object? ctx ch)
   (eof-object? ch))
-
-(define (guard:single-quote? ctx ch)
-  (char=? ch #\'))
-
-(define (guard:colon? ctx ch)
-  (char=? ch #\:))
-
-(define (guard:semicolon? ctx ch)
-  (char=? ch #\;))
-
-(define (guard:left-square-bracket? ctx ch)
-  (char=? ch #\[))
-
-(define (guard:right-square-bracket? ctx ch)
-  (char=? ch #\]))
-
-(define (guard:at-symbol? ctx ch)
-  (char=? ch #\@))
-
-(define (guard:asterisk? ctx ch)
-  (char=? ch #\*))
 
 
 
