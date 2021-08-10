@@ -119,6 +119,10 @@
 (define-method (stack-content->string (stack <stack>))
   (list->string (stack-content/reversed stack)))
 
+;; Convert a context buffer of PUML-CONTEXT to a string.
+(define-method (context-buffer->string (puml-context <puml-context>))
+  (stack-content->string (context-buffer puml-context)))
+
 
 
 ;; This procedure tries to resolve a procedure PROC-NAME in the provided
@@ -308,12 +312,11 @@
 
   (let* ((fsm             (puml-context-fsm ctx))
          (stanza          (stanza->list-of-symbols (context-stanza ctx)))
-         (buf             (context-buffer ctx))
          (state-name      (list-ref stanza 0))
          (description     (and (fsm-state fsm state-name)
                                (state-description
                                 (fsm-state fsm state-name))))
-         (new-description (stack-content->string buf)))
+         (new-description (context-buffer->string ctx)))
 
     (when (equal? state-name (string->symbol "*"))
       (puml-error ctx "[*] cannot have description"))
@@ -354,26 +357,22 @@
     ctx))
 
 (define (action:add-description ctx ch)
-  (let ((fsm (puml-context-fsm ctx))
-        (buf (context-buffer ctx)))
-    (fsm-description-set! fsm (stack-content->string buf))
-    (context-buffer-clear! ctx)
-    (context-stanza-clear! ctx)
-    ctx))
+  (fsm-description-set! (puml-context-fsm ctx) (context-buffer->string ctx))
+  (context-buffer-clear! ctx)
+  (context-stanza-clear! ctx)
+  ctx)
 
 
 (define (action:check-start-tag ctx ch)
-  (let* ((buf (context-buffer ctx))
-         (str (stack-content->string buf)))
-    (unless (string=? str "@startuml")
+  (let ((tag (context-buffer->string ctx)))
+    (unless (string=? tag "@startuml")
       (puml-error ctx "Misspelled @startuml"))
     (context-buffer-clear! ctx)
     ctx))
 
 (define (action:check-end-tag ctx)
-  (let* ((buf (context-buffer ctx))
-         (str (stack-content->string buf)))
-    (unless (string=? str "@enduml")
+  (let* ((tag (context-buffer->string ctx)))
+    (unless (string=? tag "@enduml")
       (puml-error ctx "Misspelled @enduml"))
     (context-buffer-clear! ctx)
     ctx))
@@ -386,10 +385,8 @@
 
 
 (define (guard:title? ctx ch)
-  (let ((buf (context-buffer ctx)))
-    (and (char=? ch #\space)
-         (string=? (stack-content->string buf)
-                   "title"))))
+  (and (char=? ch #\space)
+       (string=? (context-buffer->string ctx) "title")))
 
 
 
