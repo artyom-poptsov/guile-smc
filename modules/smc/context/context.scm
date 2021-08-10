@@ -38,6 +38,7 @@
             context-buffer
             context-buffer-set!
             context-buffer-clear!
+            context-clear!
             guard:#t
             action:no-op
             action:store
@@ -79,6 +80,10 @@
 
 (define-method (context-stanza-clear! (ctx <context>))
   (stack-clear! (context-stanza ctx)))
+
+(define-method (context-clear! (ctx <context>))
+  (context-buffer-clear! ctx)
+  (context-stanza-clear! ctx))
 
 
 

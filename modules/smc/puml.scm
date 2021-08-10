@@ -352,14 +352,12 @@
         (fsm-state-description-add! fsm
                                     state-name
                                     new-description))))
-    (context-buffer-clear! ctx)
-    (context-stanza-clear! ctx)
+    (context-clear! ctx)
     ctx))
 
 (define (action:add-description ctx ch)
   (fsm-description-set! (puml-context-fsm ctx) (context-buffer->string ctx))
-  (context-buffer-clear! ctx)
-  (context-stanza-clear! ctx)
+  (context-clear! ctx)
   ctx)
 
 

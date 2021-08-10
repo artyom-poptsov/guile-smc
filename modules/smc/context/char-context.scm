@@ -41,6 +41,7 @@
                context-buffer
                context-buffer-set!
                context-buffer-clear!
+               context-clear!
                guard:#t
                action:no-op
                action:store
