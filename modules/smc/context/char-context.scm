@@ -77,7 +77,10 @@
             context-log-error
             context-log-warning
             context-log-info
-            context-log-debug))
+            context-log-debug
+
+            make-char-guard
+            make-charset-guard))
 
 (define-class <char-context> (<context>)
   ;; A port from which data is read.
@@ -149,7 +152,7 @@
 
 
 ;;; Guards.
-(define (make-guard ch1)
+(define (make-char-guard ch1)
   "Make a procedure that checks if a CH1 equals to CH2."
   (lambda (ctx ch2) (char=? ch1 ch2)))
 
@@ -157,20 +160,20 @@
   "Make a procedure that checks if a CH is in a CHARSET."
   (lambda (ctx ch) (char-set-contains? charset ch)))
 
-(define guard:equals-sign?           (make-guard #\=))
-(define guard:newline?               (make-guard #\newline))
-(define guard:hyphen-minus?          (make-guard #\-))
-(define guard:space?                 (make-guard #\space))
-(define guard:less-than-sign?        (make-guard #\<))
-(define guard:more-than-sign?        (make-guard #\>))
+(define guard:equals-sign?           (make-char-guard #\=))
+(define guard:newline?               (make-char-guard #\newline))
+(define guard:hyphen-minus?          (make-char-guard #\-))
+(define guard:space?                 (make-char-guard #\space))
+(define guard:less-than-sign?        (make-char-guard #\<))
+(define guard:more-than-sign?        (make-char-guard #\>))
 (define guard:letter?                (make-charset-guard char-set:letter))
-(define guard:single-quote?          (make-guard #\'))
-(define guard:colon?                 (make-guard #\:))
-(define guard:semicolon?             (make-guard #\;))
-(define guard:left-square-bracket?   (make-guard #\[))
-(define guard:right-square-bracket?  (make-guard #\]))
-(define guard:at-symbol?             (make-guard #\@))
-(define guard:asterisk?              (make-guard #\*))
+(define guard:single-quote?          (make-char-guard #\'))
+(define guard:colon?                 (make-char-guard #\:))
+(define guard:semicolon?             (make-char-guard #\;))
+(define guard:left-square-bracket?   (make-char-guard #\[))
+(define guard:right-square-bracket?  (make-char-guard #\]))
+(define guard:at-symbol?             (make-char-guard #\@))
+(define guard:asterisk?              (make-char-guard #\*))
 
 (define (guard:eof-object? ctx ch)
   (eof-object? ch))
