@@ -288,7 +288,7 @@
 
 (define-public guard:left-curly-bracket?    (make-char-guard #\{))
 (define-public guard:vertical-line?         (make-char-guard #\|))
-(define-public guard:right-curly-bracket?   (make-char-guard #\{))
+(define-public guard:right-curly-bracket?   (make-char-guard #\}))
 (define-public guard:tilde?                 (make-char-guard #\~))
 (define-public guard:del?                   (make-char-guard (integer->char 127)))
 
