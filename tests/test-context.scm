@@ -1,4 +1,4 @@
-(define-module (test-context)
+(define-module (tests test-context)
   #:export (test-event-source
             entry-action
             exit-action))

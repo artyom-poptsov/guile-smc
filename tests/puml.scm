@@ -1,4 +1,4 @@
-(add-to-load-path ".")
+(add-to-load-path (getenv "abs_top_srcdir"))
 
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
@@ -8,7 +8,7 @@
              (smc fsm)
              (smc puml)
              (smc core state)
-             (test-context))
+             (tests test-context))
 
 
 (test-begin "puml")
