@@ -119,7 +119,7 @@
                                  "@enduml\n"))
                                #:module (list (resolve-module '(test-context))
                                               (current-module))
-                               #:debug-mode? #t)))
+                               #:debug-mode? #f)))
     (state-event-source (fsm-state fsm 'state_1))))
 
 
