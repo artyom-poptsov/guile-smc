@@ -15,17 +15,7 @@ jobs:
           - 'ubuntu:20.04'
         include:
           - distro: 'ubuntu:20.04'
-            pre: |
-              apt -qy install \
-                  guile-3.0 \
-                  guile-3.0-libs \
-                  guile-3.0-dev \
-                  guile-library \
-                  texinfo \
-                  gettext \
-                  make \
-                  automake \
-                  autoconf
+            pre: 'apt -qy install guile-3.0 guile-3.0-libs guile-3.0-dev guile-library texinfo gettext make automake autoconf'
 
     runs-on: ubuntu-latest
     steps:
