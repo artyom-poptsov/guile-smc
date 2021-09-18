@@ -23,6 +23,7 @@ SCM_TESTS = \
 	context.scm	\
 	stack.scm	\
 	fsm.scm		\
+	puml-context.scm	\
 	puml.scm
 
 TESTS = ${SCM_TESTS}
