@@ -43,17 +43,11 @@
                puml-context-keep-going?
                puml-context-resolved-procedures
                puml-context-unresolved-procedures
-               resolve-procedure)
+               resolve-procedure
+               stanza->list-of-symbols)
   #:export (puml->fsm
             puml-string->fsm
             puml-context-print-resolver-status))
-
-
-
-(define-method (stanza->list-of-symbols (stanza <stack>))
-  (map (lambda (elem)
-         (string->symbol (list->string elem)))
-       (stack-content/reversed stanza)))
 
 
 (define (%puml-transition:from tr)

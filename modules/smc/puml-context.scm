@@ -42,6 +42,7 @@
             puml-context-unresolved-procedures
             %puml-error
             puml-error
+            stanza->list-of-symbols
             stack-content->string
             context-buffer->string
             resolve-procedure
@@ -156,6 +157,11 @@
 
 
 ;;; Misc. helper procedures.
+
+(define-method (stanza->list-of-symbols (stanza <stack>))
+  (map (lambda (elem)
+         (string->symbol (list->string elem)))
+       (stack-content/reversed stanza)))
 
 (define-method (stack-content->string (stack <stack>))
   (list->string (stack-content/reversed stack)))
