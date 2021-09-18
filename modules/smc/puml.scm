@@ -36,63 +36,17 @@
   #:use-module (smc core stack)
   #:use-module (smc core set)
   #:use-module (smc context char-context)
-  #:export (<puml-context>
-            resolve-procedure
-            puml-context-fsm
-            puml-context-module
-            puml-context-keep-going?
-            puml-context-resolved-procedures
-            puml-context-unresolved-procedures
-            puml-context-print-resolver-status
+  #:use-module (smc puml-context)
+  #:re-export (puml-context-fsm
+               puml-context-fsm-event-source
+               puml-context-module
+               puml-context-keep-going?
+               puml-context-resolved-procedures
+               puml-context-unresolved-procedures)
+  #:export (resolve-procedure
             puml->fsm
-            puml-string->fsm))
-
-
-
-(define-class <puml-context> (<char-context>)
-  ;; The output FSM of the PUML parser.
-  ;;
-  ;; <fsm>
-  (fsm
-   #:getter       puml-context-fsm
-   #:setter       puml-context-fsm-set!)
-
-  ;; <symbol>
-  (fsm-event-source
-   #:init-keyword #:fsm-event-source
-   #:getter       puml-context-fsm-event-source)
-
-  ;; Modules that contain state machine procedures.
-  (module
-   #:init-keyword #:module
-   #:getter       puml-context-module)
-
-  ;; Whether the parser should keep going when a procedure cannot be resolved
-  ;; or not.
-  ;;
-  ;; When set to #t, the parser remembers all unresolved procedures but keeps
-  ;; going without issuing an error.  All unresolved procedures are replaced
-  ;; with default variants ('guard:t' for guards, 'action:no-op' for actions.)
-  ;;
-  ;; <boolean>
-  (keep-going?
-   #:init-value   #f
-   #:init-keyword #:keep-going?
-   #:getter       puml-context-keep-going?)
-
-  ;; This set contains resolved procedures.
-  ;;
-  ;; <set>
-  (resolved-procedures
-   #:getter       puml-context-resolved-procedures
-   #:init-thunk   (lambda () (make <set>)))
-
-  ;; This set contains unresolved procedures.
-  ;;
-  ;; <set>
-  (unresolved-procedures
-   #:getter       puml-context-unresolved-procedures
-   #:init-thunk   (lambda () (make <set>))))
+            puml-string->fsm
+            puml-context-print-resolver-status))
 
 
 (define-method (initialize (puml-context <puml-context>) initargs)
@@ -124,30 +78,6 @@
                         "Could not resolve procedure ~a in ~a"
                         event-source-name
                         puml-context)))))
-
-
-;;; Error reporting.
-
-(define %puml-error 'puml-error)
-
-(define puml-error
-  (case-lambda
-    ((ctx message)
-     (context-log-error ctx message)
-     (throw %puml-error message))
-    ((ctx message . args)
-     (apply context-log-error ctx message args)
-     (throw %puml-error (apply format #f message args) args))))
-
-
-;;; Misc. helper procedures.
-
-(define-method (stack-content->string (stack <stack>))
-  (list->string (stack-content/reversed stack)))
-
-;; Convert a context buffer of PUML-CONTEXT to a string.
-(define-method (context-buffer->string (puml-context <puml-context>))
-  (stack-content->string (context-buffer puml-context)))
 
 
 
@@ -389,17 +319,6 @@
       (puml-error ctx "Misspelled @enduml"))
     (context-buffer-clear! ctx)
     ctx))
-
-(define (action:no-start-tag-error ctx ch)
-  (puml-error ctx "No start tag found"))
-
-(define (action:unexpected-end-of-file-error ctx ch)
-  (puml-error ctx "Unexpected end of file"))
-
-
-(define (guard:title? ctx ch)
-  (and (char=? ch #\space)
-       (string=? (context-buffer->string ctx) "title")))
 
 
 

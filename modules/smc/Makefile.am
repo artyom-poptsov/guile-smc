@@ -24,6 +24,7 @@ SUBDIRS = core . context cli
 SOURCES = \
 	version.scm	\
 	fsm.scm 	\
+	puml-context.scm \
 	puml.scm	\
 	compiler.scm
 
