@@ -122,6 +122,37 @@
                                #:debug-mode? #f)))
     (state-event-source (fsm-state fsm 'state_1))))
 
+(test-equal "puml-string->fsm: an FSM with an entry action"
+  entry-action
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml\n"
+                                 "title This is an FSM description.\n"
+                                 "[*] -> state_1\n"
+                                 "state_1: A state description.\n"
+                                 "state_1: entry-action: entry-action\n"
+                                 "state_1 --> state_1: guard:#t\n"
+                                 "@enduml\n"))
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #f)))
+    (state-entry-action (fsm-state fsm 'state_1))))
+
+(test-equal "puml-string->fsm: an FSM with an exit action"
+  exit-action
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml\n"
+                                 "title This is an FSM description.\n"
+                                 "[*] -> state_1\n"
+                                 "state_1: A state description.\n"
+                                 "state_1: exit-action: exit-action\n"
+                                 "state_1 --> state_1: guard:#t\n"
+                                 "@enduml\n"))
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #f)))
+    (state-exit-action (fsm-state fsm 'state_1))))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))

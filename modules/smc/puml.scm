@@ -355,7 +355,7 @@
        (exit-action-match
         (let ((exit-action (%resolve state-name
                                      (match:substring exit-action-match 1))))
-          (state-entry-action-set! state exit-action)))
+          (state-exit-action-set! state exit-action)))
        (description
         (fsm-state-description-add! fsm
                                     state-name
