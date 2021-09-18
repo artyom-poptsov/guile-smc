@@ -42,69 +42,13 @@
                puml-context-module
                puml-context-keep-going?
                puml-context-resolved-procedures
-               puml-context-unresolved-procedures)
-  #:export (resolve-procedure
-            puml->fsm
+               puml-context-unresolved-procedures
+               resolve-procedure)
+  #:export (puml->fsm
             puml-string->fsm
             puml-context-print-resolver-status))
 
 
-(define-method (initialize (puml-context <puml-context>) initargs)
-  (next-method)
-  (let* ((event-source-name (puml-context-fsm-event-source puml-context))
-         (event-source (resolve-procedure puml-context event-source-name)))
-    (if event-source
-        (begin
-          (set-add! (puml-context-resolved-procedures puml-context)
-                    event-source)
-          (context-log-info puml-context
-                            "FSM global event source: ~a~%"
-                            (cdr event-source))
-          (puml-context-fsm-set! puml-context
-                                 (make <fsm>
-                                   #:event-source (cdr event-source))))
-        (if (puml-context-keep-going? puml-context)
-            (begin
-              (context-log-error puml-context
-                                 "Could not resolve procedure ~a in ~a"
-                                 event-source-name
-                                 puml-context)
-              (set-add! (puml-context-unresolved-procedures puml-context)
-                        event-source-name)
-              (puml-context-fsm-set! puml-context
-                                     (make <fsm>
-                                       #:event-source (const #t))))
-            (puml-error puml-context
-                        "Could not resolve procedure ~a in ~a"
-                        event-source-name
-                        puml-context)))))
-
-
-
-;; This procedure tries to resolve a procedure PROC-NAME in the provided
-;; modules.
-;;
-;; Return a pair which 'car' is the module and 'cdr' -- the resolved
-;; procedure.  When a procedure cannot be resolved, return #f.
-(define (resolve-procedure ctx proc-name)
-  (and proc-name
-       (let ((modules (puml-context-module ctx)))
-         (let loop ((mods modules))
-           (if (null? mods)
-               (begin
-                 (context-log-error ctx
-                                    "Could not find \"~a\" procedure in provided modules: ~a"
-                                    proc-name
-                                    modules)
-                 (context-log-error ctx
-                                    "Stanza: ~a"
-                                    (stanza->list-of-symbols
-                                     (context-stanza ctx)))
-                 #f)
-               (let ((proc (safe-module-ref (car mods) proc-name)))
-                 (if proc
-                     (cons (car mods) proc)
-                     (loop (cdr mods)))))))))
 
 (define-method (stanza->list-of-symbols (stanza <stack>))
   (map (lambda (elem)
