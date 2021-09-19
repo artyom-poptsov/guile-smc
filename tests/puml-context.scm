@@ -7,6 +7,7 @@
              (smc context char-context)
              (smc fsm)
              (smc puml-context)
+             (smc core stack)
              (smc core state)
              (smc core set)
              (tests test-context))
@@ -14,6 +15,22 @@
 
 (define %test-name "puml-context")
 (test-begin %test-name)
+
+
+
+(test-equal "stanza->list-of-symbols"
+  '(s1 s2)
+  (let ((s (make <stack>)))
+    (stack-push! s '(#\s #\1))
+    (stack-push! s '(#\s #\2))
+    (stanza->list-of-symbols s)))
+
+(test-equal "stack-content->string"
+  "ab"
+  (let ((s (make <stack>)))
+    (stack-push! s #\a)
+    (stack-push! s #\b)
+    (stack-content->string s)))
 
 
 
@@ -43,8 +60,35 @@
                                         (current-module)))))
     ctx))
 
+(test-assert "resolve-procedure: failure"
+  (let ((ctx (make <puml-context>
+               #:port             (current-input-port)
+               #:fsm-event-source 'test-event-source
+               #:module           (list (resolve-module '(test-context))
+                                        (current-module)))))
+    (not (resolve-procedure ctx 'some-procedure))))
+
+(test-assert "resolve-procedure: success"
+  (let ((ctx (make <puml-context>
+               #:port             (current-input-port)
+               #:fsm-event-source 'test-event-source
+               #:module           (list (resolve-module '(test-context))
+                                        (current-module)))))
+    (resolve-procedure ctx 'entry-action)))
+
 
 
+(test-assert "guard:title?: #t"
+  (let ((ctx (make <puml-context>
+               #:port             (current-input-port)
+               #:fsm-event-source 'test-event-source
+               #:module           (list (resolve-module '(test-context))
+                                        (current-module)))))
+    (for-each (lambda (ch) (action:store ctx ch))
+              (string->list "title"))
+    (guard:title? ctx #\space)))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end %test-name)
