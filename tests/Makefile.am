@@ -20,6 +20,7 @@
 SCM_TESTS = \
 	transition.scm	\
 	state.scm	\
+	set.scm		\
 	context.scm	\
 	stack.scm	\
 	fsm.scm		\
