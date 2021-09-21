@@ -75,7 +75,7 @@
 ;; Remove an ELEMENT from the SET.
 (define-method (set-remove! (set <set>) element)
   (let ((content (set-content set)))
-    (unless (member element content)
+    (when (member element content)
       (set-content-set! set (delete element content)))))
 
 ;; Get the SET capacity.
