@@ -113,7 +113,8 @@
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
     (if fsm-module
         (%write-module fsm-module extra-modules class-name output-port)
-        (%write-use-modules extra-modules output-port))
+        (when extra-modules
+          (%write-use-modules extra-modules output-port)))
 
     (newline output-port)
 
