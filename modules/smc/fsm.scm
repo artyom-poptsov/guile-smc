@@ -213,8 +213,8 @@
 (define (fsm-pretty-print-statistics fsm port)
   (display ";;; Statistics:\n" port)
   (for-each (lambda (record)
-              (ice-9:format port ";;;   ~10a: ~10a~%"
-                            (car record)
+              (ice-9:format port ";;;   ~20,,a ~10,,@a~%"
+                            (format #f "~a:" (car record))
                             (cdr record)))
             (fsm-statistics fsm)))
 
