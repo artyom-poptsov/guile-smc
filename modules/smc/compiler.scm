@@ -52,7 +52,7 @@
                      #:use-module (oop goops)
                      #:use-module (smc fsm)))
              (em  extra-modules))
-    (if (null? em)
+    (if (or (not em) (null? em))
         (begin
           (pretty-print (append lst `(#:export (,class-name)))
                         port)
