@@ -64,7 +64,7 @@
 (define (%write-use-modules extra-modules port)
   (let loop ((lst `(use-modules (smc fsm) (oop goops)))
              (em  extra-modules))
-    (if (null? em)
+    (if (or (not em) (null? em))
         (begin
           (display lst port)
           (newline port))
@@ -113,8 +113,7 @@
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
     (if fsm-module
         (%write-module fsm-module extra-modules class-name output-port)
-        (when extra-modules
-          (%write-use-modules extra-modules output-port)))
+        (%write-use-modules extra-modules output-port))
 
     (newline output-port)
 
