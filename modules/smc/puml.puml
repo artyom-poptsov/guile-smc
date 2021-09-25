@@ -33,9 +33,9 @@ read_skip_comment ->  read_skip_comment
 
 read_word: Read a word.
 read_word --> [*]: guard:eof-object?
-read_word --> read_title: guard:title? -> action:update-stanza
-read_word --> search_state_transition: guard:space? -> action:update-stanza
+read_word --> read_title: guard:title? -> action:clear-buffer
 read_word --> read_state_description: guard:colon? -> action:update-stanza
+read_word --> search_state_transition: guard:space? -> action:update-stanza
 read_word -> read_word: guard:#t -> action:store
 
 read_title: Read a diagram title.
@@ -45,6 +45,7 @@ read_title -> read_title: guard:#t -> action:store
 
 read_state: Read a PlantUML stanza.
 read_state --> [*]: guard:eof-object?
+read_state --> [*]: guard:newline? -> action:syntax-error
 read_state --> search_state_transition: guard:right-square-bracket? -> action:update-stanza
 read_state --> search_state_transition: guard:space? -> action:update-stanza
 read_state --> read_state_description: guard:colon? -> action:update-stanza
