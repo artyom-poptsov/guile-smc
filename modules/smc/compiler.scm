@@ -37,6 +37,8 @@
             %write-transition-table))
 
 
+(define (%form-feed port)
+  (display #\ff port))
 
 ;; Write a header commentary to a @var{port}.
 (define (%write-header port)
@@ -100,16 +102,19 @@
   (%write-header output-port)
 
   (when (fsm-parent fsm)
+    (%form-feed output-port)
     (display ";;; This finite-state machine is produced by:\n" output-port)
     (for-each (lambda (line) (format output-port ";;;   ~a~%" line))
               (string-split (fsm-description (fsm-parent fsm)) #\newline))
     (display ";;;\n" output-port)
+
     (fsm-pretty-print-statistics (fsm-parent fsm) output-port)
     (display ";;;\n" output-port)
     (puml-context-print-resolver-status (fsm-parent-context fsm)
                                         output-port)
     (newline output-port))
 
+  (%form-feed output-port)
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
     (if fsm-module
         (%write-module fsm-module extra-modules class-name output-port)
@@ -117,15 +122,18 @@
 
     (newline output-port)
 
+    (%form-feed output-port)
     (%write-transition-table fsm output-port)
 
     (newline output-port)
 
+    (%form-feed output-port)
     (pretty-print `(define-class ,class-name (<fsm>))
                   output-port)
 
     (newline output-port)
 
+    (%form-feed output-port)
     (pretty-print
      `(define-method (initialize (self ,class-name) initargs)
         (next-method)
