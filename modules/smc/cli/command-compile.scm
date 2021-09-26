@@ -18,12 +18,22 @@ The program reads a PlantUML transition diagram from the standard input.
 Options:
   --help, -h        Print this message and exit.
   --print-transition-table, -p
-                    Print the FSM transition table.
-  --load-path, -L   Add a paths separated by a colon to load paths.
-  --modules, -U     Load additional modules.
-  --fsm-name, -n    Set the name for the output FSM.
-  --fsm-module, -m  Set the module for the output FSM.
+                    Print the FSM transition table to the standard
+                    output.
+  --load-path, -L <paths>
+                    Add a paths separated by a colon to load paths.
+  --modules, -U <extra-modules>
+                    Load additional modules.  The value must be the same
+                    as for 'use-modules'.  Example value:
+                      \"((smc context char-context) (smc puml-context))\"
+  --fsm-name, -n <name>
+                    Set the name for the output FSM.
+  --fsm-module, -m <module>
+                    Set the module for the output FSM.  Example value:
+                      \"(smc puml-fsm)\"
   --validate        Validate the output FSM and print the validation result.
+                    The exit code is 0 if the validation is passed,
+                    and a non-zero value otherwise.
   --debug           Enable the debug mode.
 
 "))
