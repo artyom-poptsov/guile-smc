@@ -1,5 +1,5 @@
 @startuml
-title PlantUML <plantuml.com> Reader FSM. This diagram is a part of Guile-SMC <github.com/artyom-poptsov/guile-smc>
+title PlantUML <https://plantuml.com> Reader Finite-State Machine.\nThis FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n<https://github.com/artyom-poptsov/guile-smc>
 
 ' Entry point
 [*] -> read_start_tag
