@@ -137,6 +137,7 @@
     (pretty-print
      `(define-method (initialize (self ,class-name) initargs)
         (next-method)
+        (fsm-description-set! self ,(fsm-description fsm))
         (fsm-event-source-set! self ,(and (fsm-event-source fsm)
                                           (procedure-name (fsm-event-source fsm))))
         (fsm-transition-table-set!
