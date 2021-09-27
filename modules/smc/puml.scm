@@ -36,6 +36,7 @@
   #:use-module (smc core set)
   #:use-module (smc context char-context)
   #:use-module (smc puml-context)
+  #:use-module (smc puml-fsm)
   #:re-export (puml-context-fsm
                puml-context-fsm-event-source
                puml-context-module
@@ -54,137 +55,6 @@
                action:unexpected-end-of-file-error)
   #:export (puml->fsm
             puml-string->fsm))
-
-
-(define %transition-table
-  `(((name        . read-start-tag)
-     (description . "Read the start @startuml tag and check it for errors.")
-     (transitions
-      (,guard:eof-object?     ,action:unexpected-end-of-file-error #f)
-      (,guard:space?          ,action:check-start-tag    read)
-      (,guard:newline?        ,action:check-start-tag    read)
-      (,guard:#t              ,action:store       read-start-tag)))
-    ((name        . read)
-     (description . "Read the PlantUML transition table.")
-     (transitions
-      (,guard:eof-object?          ,action:unexpected-end-of-file-error #f)
-      (,guard:at-symbol?           ,action:store        read-end-tag)
-      (,guard:single-quote?        ,action:no-op        read/skip-comment)
-      (,guard:left-square-bracket? ,action:no-op        read-state)
-      (,guard:letter?              ,action:store        read-word)
-      (,guard:#t                   ,action:no-op        read)))
-    ((name         . read-end-tag)
-     (description  . "Read the @enduml tag.")
-     (exit-action  . ,action:check-end-tag)
-     (transitions
-      (,guard:eof-object?     ,action:no-op     #f)
-      (,guard:newline?        ,action:no-op     #f)
-      (,guard:space?          ,action:no-op     #f)
-      (,guard:#t              ,action:store     read-end-tag)))
-    ((name         . read/skip-comment)
-     (description  . "Skip commentaries that are written between stanzas.")
-     (transitions
-      (,guard:eof-object?     ,action:no-op             #f)
-      (,guard:newline?        ,action:no-op             read)
-      (,guard:#t              ,action:no-op             read/skip-comment)))
-    ((name         . read-word)
-     (description  . "Read a word.")
-     (transitions
-      (,guard:eof-object?    ,action:no-op              #f)
-      (,guard:title?         ,action:clear-buffer       read-title)
-      (,guard:colon?         ,action:update-stanza      read-state-description)
-      (,guard:space?         ,action:update-stanza      search-state-transition)
-      (,guard:#t             ,action:store              read-word)))
-    ((name         . read-title)
-     (description  . "Read a diagram title.")
-     (transitions
-      (,guard:eof-object?    ,action:no-op              #f)
-      (,guard:newline?       ,action:add-description    read)
-      (,guard:#t             ,action:store              read-title)))
-    ((name         . read-state)
-     (description  . "Read a PlantUML stanza.")
-     (transitions
-      (,guard:eof-object?           ,action:no-op                #f)
-      (,guard:newline?              ,action:syntax-error         #f)
-      (,guard:right-square-bracket? ,action:update-stanza search-state-transition)
-      (,guard:space?                ,action:update-stanza search-state-transition)
-      (,guard:colon?                ,action:update-stanza read-state-description)
-      (,guard:#t                    ,action:store         read-state)))
-    ((name         . search-state-transition)
-     (description  . "Check if a state has a transition.")
-     (transitions
-      (,guard:eof-object?     ,action:no-op        #f)
-      (,guard:colon?          ,action:no-op        read-state-description)
-      (,guard:hyphen-minus?           ,action:no-op        read-state-right-arrow)
-      (,guard:less-than-sign? ,action:no-op        read-state-left-arrow)
-      (,guard:#t              ,action:no-op        search-state-transition)))
-    ((name         . read-state-description)
-     (description  . "Read a state description if it is present.")
-     (transitions
-      (,guard:eof-object?     ,action:no-op                 #f)
-      (,guard:newline?        ,action:process-state-description read)
-      (,guard:#t              ,action:store          read-state-description)))
-    ((name         . read-state-right-arrow)
-     (description  . "Read a right arrow that indicates a transition.")
-     (transitions
-      (,guard:eof-object?     ,action:no-op        #f)
-      (,guard:space?          ,action:no-op        search-state-transition-to)
-      (,guard:#t              ,action:no-op        read-state-right-arrow)))
-    ((name         . search-state-transition-to)
-     (description  . "Search for a state that the current state transitions to.")
-     (transitions
-      (,guard:eof-object?          ,action:no-op        #f)
-      (,guard:letter?              ,action:store read-state-transition-to)
-      (,guard:left-square-bracket? ,action:no-op        read-state-transition-to)
-      (,guard:#t                   ,action:no-op        search-state-transition-to)))
-    ((name         . read-state-transition-to)
-     (description  . "Read a state that the current state transitions to.")
-     (transitions
-      (,guard:eof-object?           ,action:no-op                #f)
-      ;; (,guard:space?          ,action:no-op                        read-state-transition-guard)
-      (,guard:right-square-bracket? ,action:no-op                read-state-transition-to)
-      (,guard:colon?                ,action:update-stanza search-state-transition-guard)
-      (,guard:newline?              ,action:add-state-transition read)
-      (,guard:#t                    ,action:store         read-state-transition-to)))
-    ((name         . search-state-transition-guard)
-     (description  . "Check if the transition has a guard.")
-     (transitions
-      (,guard:eof-object?     ,action:no-op                      #f)
-      (,guard:letter?         ,action:store               read-state-transition-guard)
-      (,guard:#t              ,action:no-op                      search-state-transition-guard)))
-    ((name         . read-state-transition-guard)
-     (description  . "Read a state transition guard.")
-     (transitions
-      (,guard:eof-object?     ,action:no-op                      #f)
-      (,guard:space?          ,action:update-stanza       search-state-action-arrow)
-      (,guard:newline?        ,action:add-state-transition       read)
-      (,guard:#t              ,action:store               read-state-transition-guard)))
-    ((name         . search-state-action-arrow)
-     (description  . "Check if a transition has an attached action.")
-     (transitions
-      (,guard:eof-object?     ,action:no-op                      #f)
-      (,guard:newline?        ,action:no-op                      read)
-      (,guard:hyphen-minus?           ,action:no-op                      read-state-action-arrow)
-      (,guard:#t              ,action:no-op                      search-state-action-arrow)))
-    ((name         . read-state-action-arrow)
-     (description  . "Read and skip the action arrow.")
-     (transitions
-      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
-      (,guard:newline?         ,action:no-op                        #f)
-      (,guard:more-than-sign? ,action:no-op                        search-state-transition-action)))
-    ((name         . search-state-transition-action)
-     (description  . "Check if an action is present after the arrow.  Issue an error if it is not.")
-     (transitions
-      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
-      (,guard:letter?          ,action:store                 read-state-transition-action)
-      (,guard:newline?         ,action:no-op                        #f)
-      (,guard:#t               ,action:no-op                        search-state-transition-action)))
-    ((name         . read-state-transition-action)
-     (description  . "Read the state transition action.")
-     (transitions
-      (,guard:eof-object?      ,action:unexpected-end-of-file-error #f)
-      (,guard:newline?         ,action:add-state-transition         read)
-      (,guard:#t               ,action:store                 read-state-transition-action)))))
 
 
 ;; Read state machine description in PlantUML format from a PORT and parse it.
@@ -217,14 +87,9 @@
                     (debug-mode? #f))
   (log-use-stderr! debug-mode?)
   (let* ((reader-fsm
-          (make <fsm>
-            #:description (string-append
-                           "PlantUML <http://www.plantuml.com> Reader Finite-State Machine.\n"
-                           "This FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n"
-                           "<https://github.com/artyom-poptsov/guile-smc>")
+          (make <puml-fsm>
             #:debug-mode? debug-mode?
-            #:event-source     event-source
-            #:transition-table %transition-table))
+            #:event-source     event-source))
          (context (fsm-run! reader-fsm
                             (make <puml-context>
                               #:port             port

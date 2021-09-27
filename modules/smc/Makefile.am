@@ -25,6 +25,7 @@ SOURCES = \
 	version.scm	\
 	fsm.scm 	\
 	puml-context.scm \
+	puml-fsm.scm	\
 	puml.scm	\
 	compiler.scm
 
@@ -57,6 +58,13 @@ guilec_env = GUILE_AUTO_COMPILE=0
 .scm.go:
 	$(AM_V_GUILEC)$(guilec_env) $(GUILEC) $(guilec_opts) \
 	--output=$@ $<
+
+puml-fsm.scm: puml.puml
+	@echo "  SMC      $<"
+	@cat $< | smc compile \
+	    --fsm-name "puml-fsm" \
+	    --fsm-module "(smc puml-fsm)" \
+	    --modules "((smc context char-context)(smc puml-context))" > $@
 
 substitute = sed -e 's,[@]VERSION[@],$(PACKAGE_VERSION),g'
 
