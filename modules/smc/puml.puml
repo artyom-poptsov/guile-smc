@@ -32,7 +32,7 @@ read_skip_comment --> read: guard:newline?
 read_skip_comment ->  read_skip_comment
 
 read_word: Read a word.
-read_word --> [*]: guard:eof-object?
+read_word --> [*]: guard:eof-object?  -> action:unexpected-end-of-file-error
 read_word --> read_title: guard:title? -> action:clear-buffer
 read_word --> read_state_description: guard:colon? -> action:update-stanza
 read_word --> search_state_transition: guard:space? -> action:update-stanza

@@ -7,11 +7,11 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6083
-;;;   transition-counter:         776
+;;;   step-counter:              6123
+;;;   transition-counter:         780
 ;;;
 ;;; Resolver status:
-;;;   #<directory (smc context char-context) 55d4d8fa91e0>
+;;;   #<directory (smc context char-context) 562f9481f1e0>
 ;;;     #<<generic> event-source (1)>
 ;;;     #<procedure #{guard:#t}# (ctx event)>
 ;;;     #<procedure action:clear-buffer (ctx event)>
@@ -31,7 +31,7 @@
 ;;;     #<procedure guard:right-square-bracket? (ctx ch2)>
 ;;;     #<procedure guard:single-quote? (ctx ch2)>
 ;;;     #<procedure guard:space? (ctx ch2)>
-;;;   #<directory (smc puml) 55d4d8e6c780>
+;;;   #<directory (smc puml) 562f946e2780>
 ;;;     #<procedure action:add-description (ctx ch)>
 ;;;     #<procedure action:add-state-transition (ctx ch)>
 ;;;     #<procedure action:check-end-tag (ctx)>
@@ -116,7 +116,9 @@
      (description . "Read a word.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
+       (,guard:eof-object?
+        ,action:unexpected-end-of-file-error
+        #f)
        (,guard:title? ,action:clear-buffer read_title)
        (,guard:colon?
         ,action:update-stanza
