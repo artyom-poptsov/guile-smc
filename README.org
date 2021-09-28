@@ -10,6 +10,19 @@ GNU Guile state machine compiler.
     any later version.  Please see =COPYING= file for the terms of GNU General
     Public License.
 
+** Requirements
+    - [[https://www.gnu.org/software/guile/][GNU Guile]], version 2.2 or later
+
+** Installation
+#+BEGIN_EXAMPLE shell
+$ git clone https://github.com/artyom-poptsov/guile-smc.git
+$ cd guile-smc
+$ autoreconf -vif
+$ ./configure
+$ make
+$ sudo make install
+#+END_EXAMPLE
+
 ** Architecture
    [[./doc/architecture.png]]
 
