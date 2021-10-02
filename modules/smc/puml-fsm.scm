@@ -7,11 +7,11 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6162
-;;;   transition-counter:         784
+;;;   step-counter:              6201
+;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:
-;;;   #<directory (smc context char-context) 5651287461e0>
+;;;   #<directory (smc context char-context) 55ac6af3c1e0>
 ;;;     #<<generic> event-source (1)>
 ;;;     #<procedure #{guard:#t}# (ctx event)>
 ;;;     #<procedure action:clear-buffer (ctx event)>
@@ -31,7 +31,7 @@
 ;;;     #<procedure guard:right-square-bracket? (ctx ch2)>
 ;;;     #<procedure guard:single-quote? (ctx ch2)>
 ;;;     #<procedure guard:space? (ctx ch2)>
-;;;   #<directory (smc puml) 565128606780>
+;;;   #<directory (smc puml) 55ac6adfc780>
 ;;;     #<procedure action:add-description (ctx ch)>
 ;;;     #<procedure action:add-state-transition (ctx ch)>
 ;;;     #<procedure action:check-end-tag (ctx)>
@@ -133,7 +133,9 @@
        "Skip commentaries that are written between stanzas.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
+       (,guard:eof-object?
+        ,action:unexpected-end-of-file-error
+        #f)
        (,guard:newline? ,action:no-op read)
        (,#{guard:#t}# ,action:no-op read_skip_comment)))
     ((name . read)

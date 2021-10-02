@@ -27,7 +27,7 @@ read_end_tag --> [*]: guard:space?
 read_end_tag ->  read_end_tag: guard:#t -> action:store
 
 read_skip_comment: Skip commentaries that are written between stanzas.
-read_skip_comment --> [*]: guard:eof-object?
+read_skip_comment --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
 read_skip_comment --> read: guard:newline?
 read_skip_comment ->  read_skip_comment
 
