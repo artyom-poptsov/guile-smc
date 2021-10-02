@@ -8,6 +8,8 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   notice and this notice are preserved.
 
 * Unreleased
+** Bootstrap PlantUML parser by itself
+   Now Guile-SMC uses itself to generate an FSM for PlantUML format.
 ** =(smc version)=: New module
    The module contains information about the current Guile-SMC version.
 ** Documentation updated
