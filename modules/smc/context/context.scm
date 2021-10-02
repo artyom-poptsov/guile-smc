@@ -20,6 +20,14 @@
 
 ;; This file contains an implementation of a generic context that can be used
 ;; with an FSM to provide a memory.
+;;
+;; Also a context module usually provides event sources, guards, actions and
+;; other vital procedures for a FSM to work.
+;;
+;; Custom contexts are required for some FSMs that need store some extra state
+;; (e.g. number of characters read by the parser.)
+;;
+;; Guile-SMC can use any Scheme object as the context for a finite-state machine.
 
 
 ;;; Code:
