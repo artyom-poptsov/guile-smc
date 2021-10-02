@@ -39,7 +39,7 @@ read_word --> search_state_transition: guard:space? -> action:update-stanza
 read_word -> read_word: guard:#t -> action:store
 
 read_title: Read a diagram title.
-read_title --> [*]: guard:eof-object?
+read_title --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
 read_title --> read: guard:newline? -> action:add-description
 read_title -> read_title: guard:#t -> action:store
 
