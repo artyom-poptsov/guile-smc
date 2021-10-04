@@ -60,6 +60,7 @@ AC_CONFIG_FILES([
         examples/png/Makefile
         modules/smc/Makefile
         modules/smc/core/Makefile
+        modules/smc/compiler/Makefile
         modules/smc/context/Makefile
         modules/smc/cli/Makefile
         utils/Makefile
