@@ -30,6 +30,7 @@ SOURCES = \
 	compiler.scm
 
 EXTRA_DIST = \
+	puml.puml	\
 	version.scm.in
 
 GOBJECTS = $(SOURCES:%.scm=%.go)
