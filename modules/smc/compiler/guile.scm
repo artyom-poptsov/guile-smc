@@ -26,6 +26,7 @@
 (define-module (smc compiler guile)
   #:use-module (oop goops)
   #:use-module (ice-9 pretty-print)
+  #:use-module (smc core state)
   #:use-module (smc version)
   #:use-module (smc fsm)
   #:export (write-header
