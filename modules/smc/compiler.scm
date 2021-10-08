@@ -37,6 +37,16 @@
 
 
 
+(define (anonymous-procedure? x)
+  (and (procedure? x) (not (procedure-name x))))
+
+(define (fsm-event-source-anonymous? fsm)
+  (let ((es (fsm-event-source fsm)))
+  (and es
+       (anonymous-procedure? es))))
+
+
+
 (define* (fsm-compile fsm
                       #:key
                       (fsm-name 'custom-fsm)
@@ -44,8 +54,7 @@
                       (extra-modules '())
                       (output-port (current-output-port)))
 
-  (when (and (fsm-event-source fsm)
-             (not (procedure-name (fsm-event-source fsm))))
+  (when (fsm-event-source-anonymous? fsm)
     (let ((error-message
            "Cannot compile the FSM as the event source is set to an anonymous procedure"))
       (log-error "~a: ~a" error-message fsm)
