@@ -29,10 +29,12 @@
   #:use-module (smc core state)
   #:use-module (smc version)
   #:use-module (smc fsm)
+  #:use-module (smc puml)
   #:export (write-header
             write-module
             write-use-modules
             write-transition-table
+            write-parent-fsm-info
             form-feed))
 
 
@@ -83,5 +85,18 @@
                (map state->list/serialized
                     (hash-table->transition-list table))))
      port)))
+
+(define-method (write-parent-fsm-info (fsm <fsm>) (port <port>))
+  (form-feed port)
+  (display ";;; This finite-state machine is produced by:\n" port)
+  (for-each (lambda (line) (format port ";;;   ~a~%" line))
+            (string-split (fsm-description (fsm-parent fsm)) #\newline))
+  (display ";;;\n" port)
+
+  (fsm-pretty-print-statistics (fsm-parent fsm) port)
+  (display ";;;\n" port)
+  (puml-context-print-resolver-status (fsm-parent-context fsm)
+                                      port)
+  (newline port))
 
 ;;; guile.scm ends here.
