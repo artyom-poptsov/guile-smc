@@ -194,6 +194,9 @@
 (define-method (fsm-log-transition (from <state>) (to <boolean>))
   (log-debug "[~a] -> [*]" (state-name from)))
 
+(define-method (fsm-log-transition (from <boolean>) (to <state>))
+  (log-debug "[*] -> [~a]" (state-name to)))
+
 (define (fsm-log-error state fmt . args)
   (apply log-error (string-append "[~a]: ERROR: " fmt) args))
 
@@ -404,24 +407,28 @@
                          (event-source <procedure>)
                          context)
   (if (fsm-current-state fsm)
-      (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
-        (receive (new-state new-context)
-            (fsm-step! fsm (event-source context) context)
-          (if new-state
-              (loop new-context)
-              context)))
+      (begin
+        (fsm-log-transition #f (fsm-current-state fsm))
+        (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
+          (receive (new-state new-context)
+              (fsm-step! fsm (event-source context) context)
+            (if new-state
+                (loop new-context)
+                context))))
       context))
 
 ;; This version of the 'fsm-run!' procedure uses event sources specific for
 ;; each state.
 (define-method (fsm-run! (fsm <fsm>) context)
   (if (fsm-current-state fsm)
-      (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
-        (receive (new-state new-context)
-            (fsm-step! fsm context)
-          (if new-state
-              (loop new-context)
-              context)))
+      (begin
+        (fsm-log-transition #f (fsm-current-state fsm))
+        (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
+          (receive (new-state new-context)
+              (fsm-step! fsm context)
+            (if new-state
+                (loop new-context)
+                context))))
       context))
 
 
