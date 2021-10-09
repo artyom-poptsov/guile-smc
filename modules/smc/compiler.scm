@@ -95,7 +95,8 @@
          (transition-list->hash-table self %transition-table))
         (fsm-current-state-set! self
                                 (fsm-state self
-                                           (quote ,(state-name (fsm-current-state fsm)))))))
+                                           (quote ,(state-name (fsm-current-state fsm))))))
+     output-port)
 
     (newline output-port)))
 
