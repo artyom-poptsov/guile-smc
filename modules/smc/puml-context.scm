@@ -379,7 +379,8 @@
 (define (action:process-state-description ctx ch)
 
   (define (%resolve state-name proc-name)
-    (let ((proc (resolve-procedure ctx (string->symbol proc-name))))
+    (let* ((proc-name (string->symbol proc-name))
+           (proc      (resolve-procedure ctx proc-name)))
       (if proc
           (begin
             (set-add! (puml-context-resolved-procedures ctx)
