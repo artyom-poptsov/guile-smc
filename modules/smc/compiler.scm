@@ -79,8 +79,7 @@
     (newline output-port)
 
     (form-feed output-port)
-    (pretty-print `(define-class ,class-name (<fsm>))
-                  output-port)
+    (write-define-class class-name output-port)
 
     (newline output-port)
 

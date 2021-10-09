@@ -35,6 +35,7 @@
             write-use-modules
             write-transition-table
             write-parent-fsm-info
+            write-define-class
             form-feed))
 
 
@@ -98,5 +99,9 @@
   (puml-context-print-resolver-status (fsm-parent-context fsm)
                                       port)
   (newline port))
+
+(define (write-define-class class-name port)
+  (pretty-print `(define-class ,class-name (<fsm>))
+                port))
 
 ;;; guile.scm ends here.
