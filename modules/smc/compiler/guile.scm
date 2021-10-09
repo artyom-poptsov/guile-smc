@@ -36,6 +36,7 @@
             write-transition-table
             write-parent-fsm-info
             write-define-class
+            write-initialize
             form-feed))
 
 
@@ -103,5 +104,20 @@
 (define (write-define-class class-name port)
   (pretty-print `(define-class ,class-name (<fsm>))
                 port))
+
+(define (write-initialize fsm class-name port)
+  (pretty-print
+   `(define-method (initialize (self ,class-name) initargs)
+      (next-method)
+      (fsm-description-set! self ,(fsm-description fsm))
+      (fsm-event-source-set! self ,(and (fsm-event-source fsm)
+                                        (procedure-name (fsm-event-source fsm))))
+      (fsm-transition-table-set!
+       self
+       (transition-list->hash-table self %transition-table))
+      (fsm-current-state-set! self
+                              (fsm-state self
+                                         (quote ,(state-name (fsm-current-state fsm))))))
+   port))
 
 ;;; guile.scm ends here.

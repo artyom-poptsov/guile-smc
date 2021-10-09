@@ -84,19 +84,7 @@
     (newline output-port)
 
     (form-feed output-port)
-    (pretty-print
-     `(define-method (initialize (self ,class-name) initargs)
-        (next-method)
-        (fsm-description-set! self ,(fsm-description fsm))
-        (fsm-event-source-set! self ,(and (fsm-event-source fsm)
-                                          (procedure-name (fsm-event-source fsm))))
-        (fsm-transition-table-set!
-         self
-         (transition-list->hash-table self %transition-table))
-        (fsm-current-state-set! self
-                                (fsm-state self
-                                           (quote ,(state-name (fsm-current-state fsm))))))
-     output-port)
+    (write-initialize fsm class-name output-port)
 
     (newline output-port)))
 
