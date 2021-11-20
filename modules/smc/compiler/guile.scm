@@ -42,7 +42,8 @@
 
 
 (define (form-feed port)
-  (display #\ff port))
+  (display #\ff port)
+  (newline port))
 
 
 ;; Write a header commentary to a @var{port}.
