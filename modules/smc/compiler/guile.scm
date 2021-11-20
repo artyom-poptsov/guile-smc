@@ -26,6 +26,7 @@
 (define-module (smc compiler guile)
   #:use-module (oop goops)
   #:use-module (ice-9 pretty-print)
+  #:use-module (ice-9 regex)
   #:use-module (smc core state)
   #:use-module (smc version)
   #:use-module (smc fsm)
@@ -93,7 +94,11 @@
   (form-feed port)
   (display ";;; This finite-state machine is produced by:\n" port)
   (for-each (lambda (line) (format port ";;;   ~a~%" line))
-            (string-split (fsm-description (fsm-parent fsm)) #\newline))
+            (string-split (regexp-substitute/global #f
+                                                    "\\\\n"
+                                                    (fsm-description (fsm-parent fsm))
+                                                    'pre "\n" 'post)
+                          #\newline))
   (display ";;;\n" port)
 
   (fsm-pretty-print-statistics (fsm-parent fsm) port)
