@@ -166,6 +166,12 @@
                      (cons (car mods) proc)
                      (loop (cdr mods)))))))))
 
+(define (module-name module)
+  (let ((str (object->string module)))
+    (substring/read-only str
+                         (string-index str #\()
+                         (+ (string-index str #\)) 1))))
+
 (define-method (puml-context-print-resolver-status (puml-context <puml-context>)
                                                    (port         <port>))
   (display ";;; Resolver status:\n" port)
@@ -179,7 +185,7 @@
              (module (car entry))
              (proc   (cdr entry)))
         (unless (equal? current-module module)
-          (format port ";;;   ~a~%" module))
+          (format port ";;;   #<directory ~a>~%" (module-name module)))
         (format port ";;;     ~a~%" proc)
         (loop (cdr procedures) module))))
 
