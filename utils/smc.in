@@ -30,25 +30,26 @@ help message for the given command.
 
 
 
+(define %commands
+  `((("compile")                ,command-compile)
+    (("context")                ,command-context)
+    (("help", "--help", "-h")   ,(lambda (rest)
+                                   (print-help-and-exit)))))
+
+
 (define (main args)
 
   (when (< (length args) 2)
     (print-help-and-exit))
 
-  (let ((command (cadr args))
-        (rest    (cons (car args) (cddr args))))
-  (cond
-   ((equal? command "compile")
-    (command-compile rest))
-   ((equal? command "context")
-    (command-context rest))
-   ((or (equal? command "help")
-        (equal? command "-h")
-        (equal? command "--help"))
-    (print-help-and-exit))
-   (else
-    (format (current-error-port) "Unknown command: ~a~%" command)
-    (print-help-and-exit)))))
+  (let* ((command (cadr args))
+         (rest    (cons (car args) (cddr args)))
+         (handler (command-match command %commands)))
+    (if handler
+        (handler rest)
+        (begin
+          (format (current-error-port) "Unknown command: ~a~%" command)
+          (print-help-and-exit)))))
 
 ;;;
 

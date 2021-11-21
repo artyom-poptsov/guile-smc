@@ -29,7 +29,9 @@
   #:export (puml-modules
             add-to-load-path*
             eval-string/quote
-            pretty-print-transition-table))
+            pretty-print-transition-table
+            string-any=?
+            command-match))
 
 
 (define (pretty-print-transition-table fsm)
@@ -64,5 +66,21 @@
                  (map resolve-module
                       (eval-string/quote modules-list)))
          %core-modules))))
+
+
+
+(define (string-any=? str string-list)
+  (cond
+   ((null? string-list)
+    #f)
+   ((string=? str (car string-list))
+    #t)
+   (else
+    (string-any=? str (cdr string-list)))))
+
+(define (command-match command command-list)
+  (if (string-any=? command (caar command-list))
+      (cadar command-list)
+      (command-match command (cdr command-list))))
 
 ;;; common.scm ends here.
