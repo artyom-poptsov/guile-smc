@@ -12,6 +12,7 @@ GNU Guile state machine compiler.
 
 ** Requirements
     - [[https://www.gnu.org/software/guile/][GNU Guile]], version 2.2 or later
+    - [[https://www.nongnu.org/guile-lib/][Guile Library]]
 
 *** Build-time dependencies
     - GNU Guile development files (something with =dev= suffix, e.g.

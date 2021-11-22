@@ -24,8 +24,10 @@
 ;;; Code:
 
 (define-module (smc core log)
+  #:use-module (scheme documentation)
   #:use-module (ice-9 rdelim)
   #:use-module (ice-9 popen)
+  #:use-module (logging logger)
   #:use-module (oop goops)
   #:use-module (smc core state)
   #:export (log
@@ -35,49 +37,71 @@
             log-debug
             log-use-stderr!))
 
-(define %logger
-  (begin
-    (use-modules (ice-9 popen)
-                 (ice-9 rdelim))
-    (read-line (open-input-pipe "which logger"))))
-
-(define %tag    "guile-smc")
-
-(define *use-stderr?* #f)
+(define %logger-command "logger")
+(define %tag            "guile-smc")
 
 
-;; Enable or disable logging to stderr.
-(define-method (log-use-stderr! (value <boolean>))
-  (set! *use-stderr?* value))
 
-(define (log level fmt . args)
-  (let* ((message (apply format #f fmt args))
-         (command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
-                          %logger
-                          (if *use-stderr?*
+(define-class-with-docs <syslog> (<log-handler>)
+  "This is a log handler which writes logs to the syslog."
+  (tag
+   #:init-keyword #:tag
+   #:getter       syslog-tag)
+  (use-stderr?
+   #:init-value   #f
+   #:init-keyword #:use-stderr?
+   #:getter       syslog-use-stderr?
+   #:setter       syslog-use-stderr!))
+
+(define-method (accept-log (log <syslog>) level time str)
+  (let* ((command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
+                          %logger-command
+                          (if (syslog-use-stderr? log)
                               "-s"
                               "")
                           level
-                          %tag
-                          message))
+                          (syslog-tag log)
+                          str))
          (result (system command)))
     (unless (zero? result)
       (error "Could not log a message"))))
 
+
+
+(define %syslog (make <syslog>
+                  #:tag %tag))
+
+(define %logger (make <logger>))
+
+(add-handler! %logger %syslog)
+(set-default-logger! %logger)
+(open-log! %logger)
+
+
+;; Enable or disable logging to stderr.
+(define-method (log-use-stderr! (value <boolean>))
+  (syslog-use-stderr! %syslog value))
+
+(define (log level fmt . args)
+  (let ((message (apply format #f fmt args)))
+    (log-msg level message)))
+
+
+
 (define (log-error fmt . args)
   "Log a formatted error message."
-  (apply log "err" fmt args))
+  (apply log 'ERROR fmt args))
 
 (define (log-warning fmt . args)
   "Log a formatted warning message."
-  (apply log "warning" fmt args))
+  (apply log 'WARNING fmt args))
 
 (define (log-info fmt . args)
   "Log a formatted informational message."
-  (apply log "info" fmt args))
+  (apply log 'INFO fmt args))
 
 (define (log-debug fmt . args)
   "Log a formatted debug message."
-  (apply log "debug" fmt args))
+  (apply log 'DEBUG fmt args))
 
 ;;; log.scm ends here.
