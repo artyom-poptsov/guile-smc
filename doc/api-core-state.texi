@@ -84,8 +84,20 @@ The transitions for this state.
 Check if @var{object} is an instance of the @code{<state>} class.
 @end deffn
 
+@deffn {Scheme Procedure} equal? state-1 state-2
+Check if @var{state-1} is equal to @var{state-2}.
+@end deffn
+
 @deffn {Scheme Procedure} state-name (state <state>)
 Get the state name as a @code{<string>}.
+@end deffn
+
+@deffn {Scheme Procedure} state-name (state <symbol>)
+Special version of procedure that return the symbol itself.
+@end deffn
+
+@deffn {Scheme Procedure} state-has-event-source? (state <state>)
+Check if a @var{state} has an event source.
 @end deffn
 
 @deffn {Scheme Procedure} state-description (state <state>)
