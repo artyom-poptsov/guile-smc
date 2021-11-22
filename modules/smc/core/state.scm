@@ -166,8 +166,8 @@
 (define-method (equal? (state-1 <state>) (state-2 <state>))
   (equal? (state-name state-1) (state-name state-2)))
 
-;; Special version of procedure that return the symbol itself.
-(define-method (state-name (state <symbol>))
+(define-method-with-docs (state-name (state <symbol>))
+  "Special version of procedure that return the symbol itself."
   state)
 
 (define-method (state-has-event-source? (state <state>))
@@ -209,46 +209,46 @@
   (- (state-transition-count self)
      (state-recurrent-links-count self)))
 
-;; Returns the number of recurrent links that the state SELF has. A recurrent
-;; link is a transition of state to itself.
-(define-method (state-recurrent-links-count (self <state>))
+(define-method-with-docs (state-recurrent-links-count (self <state>))
+  "Returns the number of recurrent links that the state SELF has. A recurrent
+link is a transition of state to itself."
   (let ((from (state-name self)))
     (transition-table-count
      (lambda (transition)
        (equal? from (state-name (transition:next-state transition))))
      (state-transitions self))))
 
-;; Check if the state SELF has any recurrent links (that is, transitions to
-;; itself.)
-(define-method (state-has-recurrent-links? (self <state>))
+(define-method-with-docs (state-has-recurrent-links? (self <state>))
+  "Check if the state SELF has any recurrent links (that is, transitions to
+itself.)"
   (> (state-recurrent-links-count self) 0))
 
-;; Get the number of final transitions for a state SELF.
-(define-method (state-final-transitions (self <state>))
+(define-method-with-docs (state-final-transitions (self <state>))
+  "Get the number of final transitions for a state SELF."
   (transition-table-count (lambda (tr) (equal? (transition:next-state tr) #f))
                          (state-transitions self)))
 
-;; Check if a state SELF has any final transitions.
-(define-method (state-has-final-transitions? (self <state>))
+(define-method-with-docs (state-has-final-transitions? (self <state>))
+  "Check if a state SELF has any final transitions."
   (> (state-final-transitions self) 0))
 
-;; Check if a state SELF is a dead-end state. A state is considered a dead-end
-;; if it has no foreign transitions, has recurrent links and has no final
-;; transitions.
-(define-method (state-dead-end? (self <state>))
+(define-method-with-docs (state-dead-end? (self <state>))
+  "Check if a state SELF is a dead-end state. A state is considered a dead-end
+if it has no foreign transitions, has recurrent links and has no final
+transitions."
   (and (not (state-has-final-transitions? self))
        (> (state-recurrent-links-count self) 0)
        (zero? (state-transition-count/foreign self))))
 
 
 
-;; Returns two values: next state (or #f) and new context.
-(define-method (state-run (self <state>) event context)
+(define-method-with-docs (state-run (self <state>) event context)
+  "Returns two values: next state (or #f) and new context."
   (transition-table-run (state-transitions self) event context))
 
-;; Run a STATE in a given CONTEXT.  This procedure uses internal event source
-;; of a STATE, specified by the 'event-source' slot.
 (define-method (state-run (state <state>) context)
+  "Run a STATE in a given CONTEXT.  This procedure uses internal event source
+of a STATE, specified by the 'event-source' slot."
   (state-run state
              ((state-event-source state) context)
              context))
@@ -288,8 +288,8 @@
 
 
 
-;; Convert a list LST to a <state> instance, return the new state.
-(define-method (list->state (lst <list>))
+(define-method-with-docs (list->state (lst <list>))
+  "Convert a list LST to a <state> instance, return the new state."
   (make <state>
     #:name         (state:name         lst)
     #:event-source (state:event-source lst)
@@ -314,9 +314,9 @@
 
 
 
-;; This procedure serializes a transition @var{table}. It returns the
-;; transition table as a list.
-(define-method (%serialize-transition-table (table <list>))
+(define-method-with-docs (%serialize-transition-table (table <list>))
+  "This procedure serializes a transition @var{table}. It returns the
+transition table as a list."
   (map (lambda (tr)
          (map (lambda (e)
                 (cond

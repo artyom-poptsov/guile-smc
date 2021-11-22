@@ -24,8 +24,10 @@
 ;;; Code:
 
 (define-module (smc core common)
-  #:export (object-address/hex-string
-            safe-module-ref))
+  #:use-module (scheme documentation)
+  #:export (define-method-with-docs
+             object-address/hex-string
+             safe-module-ref))
 
 (define (safe-module-ref module proc-name)
   (catch #t
@@ -35,5 +37,12 @@
 
 (define (object-address/hex-string object)
   (number->string (object-address object) 16))
+
+(define-macro-with-docs (define-method-with-docs name-and-args docs . body)
+  "Define a method with documentation."
+  `(begin
+     (define-method ,name-and-args ,@body)
+     (set-object-property! ,(car name-and-args) 'documentation ,docs)
+     *unspecified*))
 
 ;;; common.scm ends here.
