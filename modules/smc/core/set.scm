@@ -24,6 +24,7 @@
 ;;; Code:
 
 (define-module (smc core set)
+  #:use-module (scheme documentation)
   #:use-module (smc core common)
   #:use-module (oop goops)
   #:export (<set>
@@ -37,8 +38,9 @@
 
 
 
-;; This class describes the "set" data structure.
-(define-class <set> ()
+(define-class-with-docs <set> ()
+  "This class describes the 'set' data structure."
+
   ;; The set content.
   ;;
   ;; <list>

@@ -25,6 +25,7 @@
 
 
 (define-module (smc fsm)
+  #:use-module (scheme documentation)
   #:use-module (oop goops)
   #:use-module (ice-9 receive)
   #:use-module ((ice-9 format)
@@ -72,8 +73,9 @@
             fsm-log-error))
 
 
-;; The main class that describes a finite state machine.
-(define-class <fsm> ()
+
+(define-class-with-docs <fsm> ()
+  "The main class that describes a finite state machine (FSM)."
 
   ;; Optional custom human-readable description for the finite-state machine.
   ;;

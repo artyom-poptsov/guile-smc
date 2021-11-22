@@ -24,6 +24,7 @@
 ;;; Code:
 
 (define-module (smc core state)
+  #:use-module (scheme documentation)
   #:use-module (oop goops)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 receive)
@@ -76,8 +77,9 @@
   context)
 
 
-;; This class describes an FSM state.
-(define-class <state> ()
+(define-class-with-docs <state> ()
+  "This class describes an @abbrev{FSM, Finite State Machine} state."
+
   ;; REQUIRED. This slot contains the state name as a <symbol>.
   ;;
   ;; <symbol>
