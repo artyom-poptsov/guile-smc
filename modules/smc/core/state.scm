@@ -160,32 +160,37 @@
 
 
 
-(define-method (state? x)
-  (is-a? x <state>))
+(define-method-with-docs (state? object)
+  "Check if @var{object} is an instance of the @code{<state>} class."
+  (is-a? object <state>))
 
-(define-method (equal? (state-1 <state>) (state-2 <state>))
+(define-method-with-docs (equal? (state-1 <state>) (state-2 <state>))
+  "Check if @var{state-1} is equal to @var{state-2}."
   (equal? (state-name state-1) (state-name state-2)))
 
 (define-method-with-docs (state-name (state <symbol>))
   "Special version of procedure that return the symbol itself."
   state)
 
-(define-method (state-has-event-source? (state <state>))
+(define-method-with-docs (state-has-event-source? (state <state>))
+  "Check if a @var{state} has an event source."
   (not (equal? (state-event-source state) #f)))
 
 
 
-(define-method (state-transition-add! (self       <state>)
-                                      (tguard     <procedure>)
-                                      (action     <procedure>)
-                                      next-state)
-  (state-transitions-set! self
-                          (transition-table-append (state-transitions self)
+(define-method-with-docs (state-transition-add! (state      <state>)
+                                                (tguard     <procedure>)
+                                                (action     <procedure>)
+                                                next-state)
+  "Add a new transition to the @var{state}."
+  (state-transitions-set! state
+                          (transition-table-append (state-transitions state)
                                                    tguard action next-state)))
 
 
 
-(define-generic state-transition-count)
+(define-generic-with-docs state-transition-count
+  "Get the transitions count for a @var{state}.")
 
 (define-method (state-transition-count (self <state>))
   (length (state-transitions self)))
@@ -205,9 +210,11 @@
                to-name))
      (state-transitions self))))
 
-(define-method (state-transition-count/foreign (self <state>))
-  (- (state-transition-count self)
-     (state-recurrent-links-count self)))
+(define-method-with-docs (state-transition-count/foreign (state <state>))
+  "Get the foreign transitions count for a @var{state}. A foreign transition
+is a transition that points to another state."
+  (- (state-transition-count state)
+     (state-recurrent-links-count state)))
 
 (define-method-with-docs (state-recurrent-links-count (self <state>))
   "Returns the number of recurrent links that the state SELF has. A recurrent
