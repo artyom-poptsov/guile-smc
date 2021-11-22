@@ -19,6 +19,7 @@ jobs:
               autoconf \
               guile-2.2 \
               guile-2.2-dev \
+              guile-library \
               texinfo
         
       - name: Checkout repository 
