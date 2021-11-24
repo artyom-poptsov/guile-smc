@@ -210,8 +210,8 @@
 (define-method (%transition-counter-increment! (self <fsm>))
   (fsm-transition-counter-set! self (+ (fsm-transition-counter self) 1)))
 
-;; Get an alist of FSM statistics.
-(define-method (fsm-statistics (self <fsm>))
+(define-method-with-docs (fsm-statistics (self <fsm>))
+  "Get an alist of FSM statistics."
   (list (cons 'step-counter       (fsm-step-counter self))
         (cons 'transition-counter (fsm-transition-counter self))))
 
@@ -250,15 +250,16 @@
                  name
                  state))))
 
-;; Get a FSM state from the transition table of SELF by a NAME.
-(define-method (fsm-state (self <fsm>)
-                          (name <symbol>))
+(define-method-with-docs (fsm-state (self <fsm>)
+                                    (name <symbol>))
+  "Get a FSM state from the transition table of SELF by a NAME."
   (hash-ref (fsm-transition-table self) name))
 
 
 
-;; Convert a TRANSITION-LIST to a hash table.
-(define-method (transition-list->hash-table (fsm <fsm>) (transition-list <list>))
+(define-method-with-docs (transition-list->hash-table (fsm <fsm>)
+                                                      (transition-list <list>))
+  "Convert a TRANSITION-LIST to a hash table."
   (let ((table (make-hash-table)))
     (for-each (lambda (transition)
                 (when (hash-ref table (state:name transition))
@@ -292,7 +293,8 @@
 ;;     (state1 ...))
 ;;
 ;; Return the transition list.
-(define-method (hash-table->transition-list table)
+(define-method-with-docs (hash-table->transition-list table)
+  "Convert a hash TABLE to a transition list."
   (hash-map->list (lambda (state-name state) (state->list state))
                   table))
 
@@ -321,19 +323,19 @@
 
 
 
-;; Add a new transition from a STATE-NAME to a NEXT-STATE-NAME, guarded by a
-;; TGUARD with the specified transition ACTION.
-;;
-;; STATE-NAME must be a valid state name that already present in the SELF
-;; FSM, otherwise an error will be thrown.
-;;
-;; NEXT-STATE-NAME must be either a name of a state that is present in the FSM
-;; transition table, or #f (which means the end transition.)
-(define-method (fsm-transition-add! (self            <fsm>)
-                                    (state-name      <symbol>)
-                                    (tguard          <procedure>)
-                                    (action          <procedure>)
-                                    (next-state-name <top>))
+(define-method-with-docs (fsm-transition-add! (self            <fsm>)
+                                              (state-name      <symbol>)
+                                              (tguard          <procedure>)
+                                              (action          <procedure>)
+                                              (next-state-name <top>))
+  "Add a new transition from a STATE-NAME to a NEXT-STATE-NAME, guarded by a
+TGUARD with the specified transition ACTION.
+
+STATE-NAME must be a valid state name that already present in the SELF FSM,
+otherwise an error will be thrown.
+
+NEXT-STATE-NAME must be either a name of a state that is present in the FSM
+transition table, or #f (which means the end transition.)"
   (let ((state      (fsm-state self state-name))
         (next-state (and next-state-name
                          (fsm-state self next-state-name))))
@@ -346,10 +348,10 @@
 
     (state-transition-add! state tguard action next-state)))
 
-;; Add a DESCRIPTION to the state specified by a STATE-NAME.
-(define-method (fsm-state-description-add! (self        <fsm>)
-                                           (state-name  <symbol>)
-                                           (description <string>))
+(define-method-with-docs (fsm-state-description-add! (self        <fsm>)
+                                                     (state-name  <symbol>)
+                                                     (description <string>))
+  "Add a DESCRIPTION to the state specified by a STATE-NAME."
   (let ((trimmed-description (string-trim-both description)))
     (if (fsm-state self state-name)
         (state-description-set! (fsm-state self state-name)
@@ -360,13 +362,14 @@
 
 
 
-;; Handle a state transition for an FSM in the NEW-CONTEXT of the state
-;; machine. The transition changes an OLD-STATE to a NEW-STATE.
-;;
-;; The procedure returns two values:
-;;   - new-state
-;;   - new-context
-(define-method (%handle-state-transition! (fsm <fsm>) old-state new-state new-context)
+(define-method-with-docs (%handle-state-transition! (fsm <fsm>)
+                                                    old-state
+                                                    new-state
+                                                    new-context)
+  "Handle a state transition for an FSM in the NEW-CONTEXT of the state
+machine. The transition changes an OLD-STATE to a NEW-STATE.
+
+The procedure returns two values: new-state and new-context"
   (%step-counter-increment! fsm)
   (fsm-current-state-set! fsm new-state)
   (if (equal? old-state new-state)
@@ -383,8 +386,8 @@
             (values new-state
                     ((state-exit-action old-state) new-context))))))
 
-;; Perform a single FSM step on the specified EVENT and a CONTEXT.
-(define-method (fsm-step! (self <fsm>) event context)
+(define-method-with-docs (fsm-step! (self <fsm>) event context)
+  "Perform a single FSM step on the specified EVENT and a CONTEXT."
   (let ((state (fsm-current-state self)))
     (receive (next-state new-context)
         (state-run state event context)
@@ -396,18 +399,14 @@
         (state-run state context)
       (%handle-state-transition! self state next-state new-context))))
 
-;; Run an FSM with the given EVENT-SOURCE and a CONTEXT and return the new
-;; context.
-;;
-;; EVENT-SOURCE must be a procedure that accepts a CONTEXT as a single
-;; parameter.
-;;
-;; CONTEXT can be any Scheme object.
-;;
-;; Return the CONTEXT after FSM execution.
-(define-method (fsm-run! (fsm          <fsm>)
-                         (event-source <procedure>)
-                         context)
+(define-method-with-docs (fsm-run! (fsm          <fsm>)
+                                   (event-source <procedure>)
+                                   context)
+  "Run an FSM with the given EVENT-SOURCE and a CONTEXT and return the new
+context. EVENT-SOURCE must be a procedure that accepts a CONTEXT as a single
+parameter. CONTEXT can be any Scheme object.
+
+Return the CONTEXT after FSM execution."
   (if (fsm-current-state fsm)
       (begin
         (fsm-log-transition #f (fsm-current-state fsm))
@@ -419,9 +418,9 @@
                 context))))
       context))
 
-;; This version of the 'fsm-run!' procedure uses event sources specific for
-;; each state.
-(define-method (fsm-run! (fsm <fsm>) context)
+(define-method-with-docs (fsm-run! (fsm <fsm>) context)
+  "This version of the 'fsm-run!' procedure uses event sources specific for
+each state."
   (if (fsm-current-state fsm)
       (begin
         (fsm-log-transition #f (fsm-current-state fsm))
@@ -435,14 +434,14 @@
 
 
 
-;; Calculate the number of states in a finite state machine SELF. Return the
-;; number of states.
-(define-method (fsm-state-count (self <fsm>))
+(define-method-with-docs (fsm-state-count (self <fsm>))
+  "Calculate the number of states in a finite state machine SELF. Return the
+number of states."
   (hash-count (const #t) (fsm-transition-table self)))
 
-;; Calculate the total transition count for a finite state machine SELF. Return
-;; the number of transitions.
-(define-method (fsm-transition-count (self <fsm>))
+(define-method-with-docs (fsm-transition-count (self <fsm>))
+  "Calculate the total transition count for a finite state machine SELF.
+Return the number of transitions."
   (hash-fold (lambda (name state result)
                (+ result (state-transition-count state)))
              0
@@ -467,14 +466,14 @@
              0
              (fsm-transition-table self)))
 
-;; Check if a STATE is reachable in the SELF finite state machine.
-(define-method (fsm-state-reachable? (self <fsm>) (state <state>))
+(define-method-with-docs (fsm-state-reachable? (self <fsm>) (state <state>))
+  "Check if a STATE is reachable in the SELF finite state machine."
   (or (equal? (fsm-current-state self) state)
       (> (fsm-incoming-transition-count self state) 0)))
 
-;; Validate the finite state machine and return the list of errors. If the list
-;; is empty then no errors were found.
-(define-method (fsm-validate (self <fsm>))
+(define-method-with-docs (fsm-validate (self <fsm>))
+  "Validate the finite state machine and return the list of errors. If the
+list is empty then no errors were found."
   (let ((errors '()))
     (log-debug "fsm-validate: begin ...")
     (hash-map->list (lambda (state-name state)
