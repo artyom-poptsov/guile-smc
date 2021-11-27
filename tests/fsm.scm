@@ -10,6 +10,19 @@
 
 (test-begin "fsm")
 
+
+
+(test-assert "anonymous-procedure?: #t"
+  (anonymous-procedure? (lambda () #t)))
+
+(test-assert "anonymous-procedure?: #f"
+  (not (anonymous-procedure? display)))
+
+(test-assert "anonymous-procedure?: #f (not a procedure)"
+  (not (anonymous-procedure? 'not-a-procedure)))
+
+
+
 (test-assert "display"
   (let ((fsm (make <fsm>
                #:transition-table `(((name        . state-1)
