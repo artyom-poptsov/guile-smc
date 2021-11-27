@@ -40,6 +40,7 @@
             fsm-description-set!
             fsm-event-source
             fsm-event-source-set!
+            fsm-event-source-anonymous?
             fsm-debug-mode-set!
             fsm-debug-mode?
             fsm-transition-table
@@ -70,7 +71,9 @@
             hash-table->transition-list
 
             fsm-log-transition
-            fsm-log-error))
+            fsm-log-error
+
+            anonymous-procedure?))
 
 
 
@@ -238,6 +241,18 @@
 
 (define-method (write (self <fsm>) (port <port>))
   (%display self port))
+
+
+
+(define (anonymous-procedure? x)
+  "Check if X is an anonymous procedure."
+  (and (procedure? x) (not (procedure-name x))))
+
+(define (fsm-event-source-anonymous? fsm)
+  "Check if an FSM instance has an anonymous event source."
+  (let ((es (fsm-event-source fsm)))
+    (and es
+         (anonymous-procedure? es))))
 
 
 

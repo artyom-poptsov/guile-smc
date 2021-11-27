@@ -37,18 +37,6 @@
 
 
 
-(define (anonymous-procedure? x)
-  "Check if X is an anonymous procedure."
-  (and (procedure? x) (not (procedure-name x))))
-
-(define (fsm-event-source-anonymous? fsm)
-  "Check if an FSM instance has an anonymous event source."
-  (let ((es (fsm-event-source fsm)))
-  (and es
-       (anonymous-procedure? es))))
-
-
-
 (define* (fsm-compile fsm
                       #:key
                       (fsm-name 'custom-fsm)
