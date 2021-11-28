@@ -167,8 +167,8 @@
    #:getter       fsm-parent-context
    #:setter       fsm-parent-context-set!))
 
-;; Check if an OBJECT is an instance of <fsm> class.
-(define-method (fsm? object)
+(define-method-with-docs (fsm? object)
+  "Check if an OBJECT is an instance of <fsm> class."
   (is-a? object <fsm>))
 
 
@@ -219,6 +219,7 @@
         (cons 'transition-counter (fsm-transition-counter self))))
 
 (define (fsm-pretty-print-statistics fsm port)
+  "Print FSM statistics in human-readable format to a PORT."
   (display ";;; Statistics:\n" port)
   (for-each (lambda (record)
               (ice-9:format port ";;;   ~20,,a ~10,,@a~%"
@@ -256,9 +257,9 @@
 
 
 
-;; Add a new state to the SM table.
-(define-method (fsm-state-add! (self  <fsm>)
-                               (state <state>))
+(define-method-with-docs (fsm-state-add! (self  <fsm>)
+                                         (state <state>))
+  "Add a new state to the SM table."
   (let ((name (state-name state)))
     (unless (fsm-state self name)
       (hash-set! (fsm-transition-table self)
@@ -462,11 +463,12 @@ Return the number of transitions."
              0
              (fsm-transition-table self)))
 
-;; Calculate the incoming transition count for a STATE. Optionally the procedure
-;; can include recurrent links of a STATE to itself in the calculation if
-;; INCLUDE-RECURRENT-LINKS? is set to #t.
-(define* (fsm-incoming-transition-count self state
+(define* (fsm-incoming-transition-count self
+                                        state
                                         #:key (include-recurrent-links? #f))
+  "Calculate the incoming transition count for a STATE. Optionally the
+procedure can include recurrent links of a STATE to itself in the calculation
+if INCLUDE-RECURRENT-LINKS? is set to #t."
   (hash-fold (lambda (name other-state result)
                (log-debug "  name:             ~a" name)
                (log-debug "  other-state:      ~a" other-state)
