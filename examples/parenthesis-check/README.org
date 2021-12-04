@@ -1,0 +1,66 @@
+* Parenthesis Checker
+This program checks if all parenthesis are balanced by counting them.
+
+** Finite-State Machine
+The finite-state machine (or FSM for short) itself is written in the
+=fsm.puml= file, in the PlantUML format.
+
+** Context
+Context is described in =(context)= module that can be found in =context.scm=
+file.
+
+There are three procedures exported from the module:
+- =event-source= -- this procedure is the source of "events" that make the FSM
+  run and change states.  In our case events are characters read from the
+  standard input stream.
+- =action:count= -- this procedure counts the parenthesis.
+- =action:validate= -- this procedure is called on the final state transition
+  and validates if the parenthesis are all balanced by checking the
+  parenthesis counter.  If the counter is not equal to zero, the procedure
+  throws an error.
+
+** Compilation and running
+You have two choices of how to run this example.  The first option is to
+compile the finite-state machine from the =fsm.puml= file like follows:
+#+BEGIN_EXAMPLE shell
+$ cat fsm.puml | smc compile -L .  -U "((context))" -m "(custom-fsm)" > custom-fsm.scm
+#+END_EXAMPLE
+
+After the compilation you can run the FSM like this:
+#+BEGIN_EXAMPLE shell
+$ cat main.scm | ./main.scm
+#+END_EXAMPLE
+
+The second options is to run this FSM in place with =smc run= command like
+follows:
+#+BEGIN_EXAMPLE shell
+$ cat main.scm | smc run -L . -U "((context))" -C "(lambda () 0)" fsm.puml
+#+END_EXAMPLE
+
+When the parenthesis are unbalanced this FSM throws the following error:
+#+BEGIN_EXAMPLE shell
+$ echo "I like Lisp :-)" | smc run -L . -U "((context))" -C "(lambda () 0)" fsm.puml
+Backtrace:
+In ice-9/boot-9.scm:
+  1736:10  9 (with-exception-handler _ _ #:unwind? _ # _)
+In unknown file:
+           8 (apply-smob/0 #<thunk 562e7f152a00>)
+In ice-9/boot-9.scm:
+    718:2  7 (call-with-prompt _ _ #<procedure default-prompt-handle…>)
+In ice-9/eval.scm:
+    619:8  6 (_ #(#(#<directory (guile-user) 562e7f1f2f00>)))
+In unknown file:
+           5 (eval (begin (fsm-event-source-set! fsm #) (let (#) …)) #)
+In ice-9/eval.scm:
+   293:34  4 (_ #<interface (#{ g74}#) 562e7f4a9780>)
+In smc/fsm.scm:
+   445:14  3 (_ #<fsm current-state: DEFAULT statistics: 16/0 562e7…> …)
+    415:8  2 (_ #<fsm current-state: DEFAULT statistics: 16/0 562e7…> …)
+In smc/core/transition.scm:
+    82:22  1 (_ _ _ _)
+In context.scm:
+     29:4  0 (action:validate -1 #<eof>)
+
+context.scm:29:4: In procedure action:validate:
+Parenthesis mismatch -1
+#+END_EXAMPLE
