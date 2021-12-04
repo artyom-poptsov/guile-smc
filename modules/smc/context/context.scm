@@ -33,6 +33,7 @@
 ;;; Code:
 
 (define-module (smc context context)
+  #:use-module (scheme documentation)
   #:use-module (oop goops)
   #:use-module (smc core log)
   #:use-module (smc core stack)
@@ -53,8 +54,11 @@
             action:clear-buffer
             action:update-stanza))
 
-;; This class describes a generic parser context.
-(define-class <context> ()
+
+
+(define-class-with-docs <context> ()
+  "This class describes a generic parser context."
+
   ;; <boolean>
   (debug-mode?
    #:init-value #f
@@ -79,6 +83,7 @@
    #:setter     context-stanza-set!))
 
 (define-method (context? x)
+  "Check if an X is a <context> instance."
   (is-a? x <context>))
 
 
@@ -105,8 +110,8 @@
   (stack-push! (context-buffer ctx) event)
   ctx)
 
-;; Clear the context CTX buffer.
 (define (action:clear-buffer ctx event)
+  "Clear the context CTX buffer."
   (stack-clear! (context-buffer ctx))
   ctx)
 
