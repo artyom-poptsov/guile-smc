@@ -21,6 +21,8 @@ Usage: smc <command> [options]
 Commands:
   compile        Compile a PlantUML state diagram to a Guile finite-state machine.
   context        Analyze or generate a context stub based on a given PlantUML file.
+  run            Read a finite-state machine from a specified PlantUML file and run
+                 it right away.
   help           Print this help message.
 
 For each command there's '--help' option (or '-h' for short) that prints a
