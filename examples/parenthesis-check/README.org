@@ -31,7 +31,7 @@ After the compilation you can run the FSM like this:
 $ cat main.scm | ./main.scm
 #+END_EXAMPLE
 
-The second options is to run this FSM in place with =smc run= command like
+The second option is to run this FSM in place with =smc run= command like
 follows:
 #+BEGIN_EXAMPLE shell
 $ cat main.scm | smc run -L . -U "((context))" -C "(lambda () 0)" fsm.puml
