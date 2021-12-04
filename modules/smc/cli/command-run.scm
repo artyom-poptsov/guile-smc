@@ -69,7 +69,7 @@ Options:
          (debug-mode?      (option-ref options 'debug     #f))
          (args             (option-ref options '()        #f)))
 
-    (when (or (option-ref options 'help #f) (not args))
+    (when (or (option-ref options 'help #f) (null? args))
       (print-help)
       (exit 0))
 
