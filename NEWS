@@ -7,7 +7,7 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
-* Unreleased
+* Version 0.3.0 (2021-12-04)
 ** Bootstrap PlantUML parser by itself
    Now Guile-SMC uses itself to generate an FSM for PlantUML format.
 ** =(smc version)=: New module
