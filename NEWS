@@ -12,6 +12,9 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
    Now Guile-SMC uses itself to generate an FSM for PlantUML format.
 ** =(smc version)=: New module
    The module contains information about the current Guile-SMC version.
+** Implement "run" command
+    The =smc= program now has =run= command that allows to read and run a
+    finite-state machine based on a PlantUML description right away.
 ** Documentation updated
 * Version 0.2.0 (2021-06-06)
 ** Fix installation paths for source and compiled and files
