@@ -62,9 +62,9 @@
      %core-modules)
     ((modules-list)
      (if modules-list
-         (append %core-modules
-                 (map resolve-module
-                      (eval-string/quote modules-list)))
+         (append (map resolve-module
+                      (eval-string/quote modules-list))
+                 %core-modules)
          %core-modules))))
 
 
