@@ -12,9 +12,24 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
    Now Guile-SMC uses itself to generate an FSM for PlantUML format.
 ** =(smc version)=: New module
    The module contains information about the current Guile-SMC version.
+** Guile-SMC compiler now adds version information to the output file
+** Add new context modules
+   There are now =(smc context context-char)=.  This module defines guards
+   for the whole ASCII table.
+** Allow to provide custom event sources for FSMs
+** Allow to set entry/exit actions for each state
+** Use a logger implementation from the Guile-Library
+** Order of parameters of guards and actions is changed
+** =(smc puml)=: Improve PlantUML syntax checking
+** Guile-SMC now allows to set a FSM description
+** =smc= functionality now split between sub-commands
+** =smc= now allows to generate and analyze FSM context
+   See =context= sub-command.
+** =(smc fsm)=: API of =fsm-run!= is simplified
 ** Implement "run" command
-    The =smc= program now has =run= command that allows to read and run a
-    finite-state machine based on a PlantUML description right away.
+   The =smc= program now has =run= command that allows to read and run a
+   finite-state machine based on a PlantUML description right away.
+** Add new tests
 ** Documentation updated
 * Version 0.2.0 (2021-06-06)
 ** Fix installation paths for source and compiled and files
