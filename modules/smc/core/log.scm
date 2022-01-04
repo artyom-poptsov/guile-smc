@@ -31,7 +31,8 @@
   #:use-module (oop goops)
   #:use-module (smc core common)
   #:use-module (smc core state)
-  #:export (log
+  #:export (<syslog>
+            log
             log-error
             log-warning
             log-info
