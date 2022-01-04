@@ -31,13 +31,25 @@
   #:use-module (oop goops)
   #:use-module (smc core common)
   #:use-module (smc core state)
-  #:export (<syslog>
+  #:export (<precise-logger>
+            <syslog>
+            <port-log/us>
+            log-add-handler!
             log
             log-error
             log-warning
             log-info
             log-debug
-            log-use-stderr!))
+            log-use-stderr!
+
+            ;; Helper procedures.
+            %precise-log-formatter
+            %precise-log-helper))
+
+
+
+(define-class-with-docs <precise-logger> (<logger>)
+  "Guile-SMC precise logger that prints log with microsecond accuracy.")
 
 
 
@@ -68,6 +80,65 @@
    #:setter       syslog-use-stderr!))
 
 
+;; The precise logger API is inspired by (logging logger) API.
+
+(define (%precise-log-formatter lvl time str)
+  (with-output-to-string
+    (lambda ()
+      (display (strftime "%F %H:%M:%S" (localtime (car time))))
+      (display ".")
+      (display (cdr time))
+      (display " (")
+      (display (symbol->string lvl))
+      (display "): ")
+      (display str)
+      (newline))))
+
+(define-class-with-docs <port-log/us> (<log-handler>)
+  "Millisecond version of <port-log> from (logging port-log)."
+
+  ;; <port>
+  (port
+   #:init-keyword #:port
+   #:init-value   #f
+   #:accessor     port))
+
+(define-method (initialize (self <port-log/us>) args)
+  (next-method)
+  (slot-set! self 'formatter %precise-log-formatter))
+
+(define (level-enabled? lgr lvl)
+  "Check if a log level LVL is enabled for a logger LGR."
+  (hashq-ref (slot-ref lgr 'levels) lvl #t))
+
+(define-method (%precise-log-helper (self <precise-logger>) level objs)
+  (when (level-enabled? self level)
+    (let ((cur-time (gettimeofday)))
+      (for-each (lambda (str)
+                  (unless (string-null? str)
+                    ;; pass the string to each log handler for SELF.
+                    (for-each (lambda (handler)
+                                (accept-log handler level cur-time str))
+                              (slot-ref self 'log-handlers))))
+                ;; split the string at newlines into different log statements
+                (string-split
+                 (with-output-to-string (lambda () (for-each (lambda (o) (display o)) objs)))
+                 #\nl)))))
+
+(define-method (log-msg (lgr <precise-logger>) lvl . objs)
+  (%precise-log-helper lgr lvl objs))
+
+(define-method (emit-log (self <port-log/us>) str)
+  (display str (port self)))
+
+(define-method (flush-log (self <port-log/us>))
+  (force-output (port self)))
+
+(define-method (close-log! (self <port-log/us>))
+  (close-port (port self))
+  (set! (port self) (%make-void-port "w")))
+
+
 
 (define-method (accept-log (log <syslog>) level time str)
   (let* ((command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
@@ -90,11 +161,14 @@
 
 (define-with-docs %logger
   "Default logger instance for Guile-SMC."
-  (make <logger>))
+  (make <precise-logger>))
 
 (add-handler! %logger %syslog)
 (set-default-logger! %logger)
 (open-log! %logger)
+
+(define-method (log-add-handler! (handler <log-handler>))
+  (add-handler! %logger handler))
 
 
 (define-method-with-docs (log-use-stderr! (value <boolean>))
@@ -103,7 +177,7 @@
 
 (define (log level fmt . args)
   (let ((message (apply format #f fmt args)))
-    (log-msg level message)))
+    (log-msg %logger level message)))
 
 
 
