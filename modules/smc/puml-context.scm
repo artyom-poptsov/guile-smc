@@ -98,7 +98,7 @@
   ;; <set>
   (resolved-procedures
    #:getter       puml-context-resolved-procedures
-   #:init-thunk   (lambda () (make <set>)))
+   #:init-thunk   (lambda () (make-hash-table)))
 
   ;; This set contains unresolved procedures.
   ;;
@@ -115,8 +115,6 @@
          (event-source (resolve-procedure puml-context event-source-name)))
     (if event-source
         (begin
-          (set-add! (puml-context-resolved-procedures puml-context)
-                    event-source)
           (context-log-info puml-context
                             "FSM global event source: ~a~%"
                             (cdr event-source))
@@ -148,23 +146,32 @@
 ;; procedure.  When a procedure cannot be resolved, return #f.
 (define (resolve-procedure ctx proc-name)
   (and proc-name
-       (let ((modules (puml-context-module ctx)))
-         (let loop ((mods modules))
-           (if (null? mods)
-               (begin
-                 (context-log-error ctx
-                                    "Could not find \"~a\" procedure in provided modules: ~a"
-                                    proc-name
-                                    modules)
-                 (context-log-error ctx
-                                    "Stanza: ~a"
-                                    (stanza->list-of-symbols
-                                     (context-stanza ctx)))
-                 #f)
-               (let ((proc (safe-module-ref (car mods) proc-name)))
-                 (if proc
-                     (cons (car mods) proc)
-                     (loop (cdr mods)))))))))
+       (let* ((resolved-procs (puml-context-resolved-procedures ctx))
+              (p              (hash-ref resolved-procs proc-name)))
+         (if p
+             p
+             (let ((modules (puml-context-module ctx)))
+               (let loop ((mods modules))
+                 (if (null? mods)
+                     (begin
+                       (context-log-error ctx
+                                          "Could not find \"~a\" procedure in provided modules: ~a"
+                                          proc-name
+                                          modules)
+                       (context-log-error ctx
+                                          "Stanza: ~a"
+                                          (stanza->list-of-symbols
+                                           (context-stanza ctx)))
+                       (set-add! (puml-context-unresolved-procedures ctx) proc-name)
+                       #f)
+                     (let ((proc (safe-module-ref (car mods) proc-name)))
+                       (if proc
+                           (let ((result (cons (car mods) proc)))
+                             (hash-set! (puml-context-resolved-procedures ctx)
+                                        proc-name
+                                        result)
+                             result)
+                           (loop (cdr mods)))))))))))
 
 (define (module-name module)
   (let ((str (object->string module)))
@@ -175,8 +182,9 @@
 (define-method (puml-context-print-resolver-status (puml-context <puml-context>)
                                                    (port         <port>))
   (display ";;; Resolver status:\n" port)
-  (let loop ((procedures (sort (set-content (puml-context-resolved-procedures
-                                             puml-context))
+  (let loop ((procedures (sort (hash-map->list cons
+                                               (puml-context-resolved-procedures
+                                                puml-context))
                                (lambda (y x)
                                  (string<? (object->string y) (object->string x)))))
              (current-module #f))
@@ -314,21 +322,15 @@
                                  (resolve-procedure ctx action)
                                  (resolve-procedure ctx 'action:no-op))))
 
-        (if resolved-tguard
-            (set-add! (puml-context-resolved-procedures ctx) resolved-tguard)
-            (if (puml-context-keep-going? ctx)
-                (begin
-                  (context-log-error ctx "Could not resolve procedure ~a in ~a" tguard ctx)
-                  (set-add! (puml-context-unresolved-procedures ctx) tguard))
-                (puml-error ctx "Could not resolve procedure ~a in ~a" tguard ctx)))
+        (unless resolved-tguard
+          (if (puml-context-keep-going? ctx)
+              (context-log-error ctx "Could not resolve procedure ~a in ~a" tguard ctx)
+              (puml-error ctx "Could not resolve procedure ~a in ~a" tguard ctx)))
 
-        (if resolved-action
-            (set-add! (puml-context-resolved-procedures ctx) resolved-action)
-            (if (puml-context-keep-going? ctx)
-                (begin
-                  (context-log-error ctx "Could not resolve procedure ~a in ~a" action ctx)
-                  (set-add! (puml-context-unresolved-procedures ctx) action))
-                (puml-error ctx "Could not resolve procedure ~a in ~a" action ctx)))
+        (unless resolved-action
+          (if (puml-context-keep-going? ctx)
+              (context-log-error ctx "Could not resolve procedure ~a in ~a" action ctx)
+              (puml-error ctx "Could not resolve procedure ~a in ~a" action ctx)))
 
         (unless (fsm-state fsm from)
           (%context-fsm-state-add! ctx from))
