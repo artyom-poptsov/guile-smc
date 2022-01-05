@@ -10,7 +10,8 @@
              (smc cli common)
              (smc cli command-compile)
              (smc cli command-context)
-             (smc cli command-run))
+             (smc cli command-run)
+             (smc cli command-profile))
 
 
 
@@ -23,6 +24,7 @@ Commands:
   context        Analyze or generate a context stub based on a given PlantUML file.
   run            Read a finite-state machine from a specified PlantUML file and run
                  it right away.
+  profile        Run the state machine profiler.
   help           Print this help message.
 
 For each command there's '--help' option (or '-h' for short) that prints a
@@ -37,6 +39,7 @@ help message for the given command.
   `((("compile")                ,command-compile)
     (("run")                    ,command-run)
     (("context")                ,command-context)
+    (("profile")                ,command-profile)
     (("help", "--help", "-h")   ,(lambda (rest)
                                    (print-help-and-exit)))))
 

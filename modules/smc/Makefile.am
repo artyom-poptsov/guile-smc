@@ -27,10 +27,13 @@ SOURCES = \
 	puml-context.scm \
 	puml-fsm.scm	\
 	puml.scm	\
+	trace-context.scm \
+	trace-fsm.scm	\
 	compiler.scm
 
 EXTRA_DIST += \
 	puml.puml	\
+	trace.puml	\
 	version.scm.in
 
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/
@@ -44,6 +47,14 @@ puml-fsm.scm: puml.puml
 	    --fsm-name "puml-fsm" \
 	    --fsm-module "(smc puml-fsm)" \
 	    --modules "((smc context char-context)(smc puml-context))" > $@
+
+trace-fsm.scm: trace.puml
+	@echo "  SMC      $<"
+	@cat $< | smc compile \
+		--load-path $(top_srcdir)/modules \
+		--fsm-name "trace-fsm" \
+		--fsm-module "(smc trace-fsm)" \
+		--modules "((smc trace-context))" > $@
 
 substitute = sed -e 's,[@]VERSION[@],$(PACKAGE_VERSION),g'
 

@@ -23,7 +23,8 @@ SOURCES = \
 	common.scm		\
 	command-compile.scm	\
 	command-context.scm	\
-	command-run.scm
+	command-run.scm		\
+	command-profile.scm
 
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/cli/
 godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/cli/
