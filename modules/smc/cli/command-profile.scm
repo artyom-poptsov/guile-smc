@@ -77,7 +77,7 @@ Options:
            (total-time (- (log-entry-timestamp-usec (car (trace-context-result context)))
                           (log-entry-timestamp-usec (car trace)))))
       (format #t "Total transitions: ~a~%" (length trace))
-      (format #t "Total time:        ~a~%" total-time)
+      (format #t "Total time:        ~a us~%" total-time)
       (display "Stats:\n")
       (for-each (lambda (kv)
                   (unless (string=? (car kv) "*")
