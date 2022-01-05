@@ -36,6 +36,7 @@
             <syslog>
             <port-log/us>
             log-add-handler!
+            log-clear-handlers!
             log
             log-error
             log-warning
@@ -170,6 +171,9 @@
 
 (define-method (log-add-handler! (handler <log-handler>))
   (add-handler! %logger handler))
+
+(define-method (log-clear-handlers!)
+  (slot-set! %logger 'log-handlers '()))
 
 
 (define-method-with-docs (log-use-stderr! (value <boolean>))
