@@ -186,10 +186,11 @@
                                                (puml-context-resolved-procedures
                                                 puml-context))
                                (lambda (y x)
-                                 (string<? (object->string y) (object->string x)))))
+                                 (string<? (object->string (cdr y))
+                                           (object->string (cdr x))))))
              (current-module #f))
     (unless (null? procedures)
-      (let* ((entry (car procedures))
+      (let* ((entry (cdar procedures))
              (module (car entry))
              (proc   (cdr entry)))
         (unless (equal? current-module module)
