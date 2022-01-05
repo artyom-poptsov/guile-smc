@@ -391,8 +391,6 @@
            (proc      (resolve-procedure ctx proc-name)))
       (if proc
           (begin
-            (set-add! (puml-context-resolved-procedures ctx)
-                      proc)
             (context-log-info ctx "[~a] Resolved \"~a\" from \"~a\""
                               state-name (cdr proc) (car proc))
             (cdr proc))
