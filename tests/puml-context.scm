@@ -41,7 +41,7 @@
                #:fsm-event-source 'test-event-source
                #:module           (list (resolve-module '(test-context))
                                         (current-module)))))
-    (cdar (set-content (puml-context-resolved-procedures ctx)))))
+    (cdr (hash-ref (puml-context-resolved-procedures ctx) 'test-event-source))))
 
 (test-assert "puml-context-unresolved-procedures: empty set"
   (let ((ctx (make <puml-context>
