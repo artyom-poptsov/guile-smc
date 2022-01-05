@@ -2,6 +2,7 @@
   #:use-module (ice-9 getopt-long)
   #:use-module (ice-9 pretty-print)
   #:use-module (ice-9 r5rs)
+  #:use-module (oop goops)
   #:use-module (smc core log)
   #:use-module (smc core set)
   #:use-module (smc compiler)
@@ -34,6 +35,9 @@ Options:
   --validate        Validate the output FSM and print the validation result.
                     The exit code is 0 if the validation is passed,
                     and a non-zero value otherwise.
+  --log-file <file> Log file to use.  Pass \"-\" as the file to use the standard
+                    error stream (stderr.)
+                    'smc run' logs to syslog by default.
   --debug           Enable the debug mode.
 "))
 
@@ -44,6 +48,7 @@ Options:
     (context                  (single-char #\C) (value #t))
     (modules                  (single-char #\U) (value #t))
     (validate                                   (value #f))
+    (log-file                                   (value #t))
     (debug                                      (value #f))))
 
 
@@ -67,6 +72,7 @@ Options:
                                        %default-context-thunk))
          (modules          (option-ref options 'modules   "()"))
          (debug-mode?      (option-ref options 'debug     #f))
+         (log-file         (option-ref options 'log-file  #f))
          (args             (option-ref options '()        #f)))
 
     (when (or (option-ref options 'help #f) (null? args))
@@ -75,6 +81,13 @@ Options:
 
     (log-use-stderr! debug-mode?)
     (add-to-load-path* (string-split extra-load-paths #\:))
+
+    (when log-file
+      (log-clear-handlers!)
+      (log-add-handler! (make <port-log/us>
+                          #:port (if (string=? log-file "-")
+                                     (current-error-port)
+                                     (open-output-file log-file)))))
 
     (let* ((port    (open-input-file (car args)))
            (fsm     (puml->fsm port
