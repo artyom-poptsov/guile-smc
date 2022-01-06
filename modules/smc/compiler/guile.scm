@@ -167,6 +167,16 @@ to specify a list of extra modules that required for the output FSM to work."
             (write-line ln dst)
             (loop (read-line src)))))))
 
+(define (mkdir* path)
+  "Create directories from a PATH recursively."
+  (let loop ((dirparts (string-split path #\/))
+             (dir      ""))
+    (unless (null? dirparts)
+      (let ((d (string-append dir (car dirparts) "/")))
+        (unless (file-exists? d)
+          (mkdir d))
+        (loop (cdr dirparts) d)))))
+
 (define (copy-dependencies output-directory root-module-name)
   "Copy dependencies to a sub-directory with ROOT-MODULE-NAME of an
 OUTPUT-DIRECTORY."
@@ -194,17 +204,17 @@ OUTPUT-DIRECTORY."
                                    ";;; Commentary:\n\n"
                                    (format #f ";; Copied from Guile-SMC ~a~%"
                                            (smc-version/string)))))))
-    (mkdir target-dir)
-    (mkdir (string-append target-dir "/smc"))
-    (mkdir (string-append target-dir "/smc/core"))
-    (mkdir (string-append target-dir "/smc/context"))
-
     (for-each (lambda (file)
-                (let ((src (string-append %guile-smc-modules-directory file))
-                      (dst (string-append target-dir "/smc/" file)))
-                (log-debug "copying: ~a -> ~a ..." src dst)
-                (copy-file/substitute src dst substitutes)
-                (log-debug "copying: ~a -> ~a ... done" src dst)))
+                (let* ((src (string-append %guile-smc-modules-directory file))
+                       (dst (string-append target-dir "/smc/" file))
+                       (dir (dirname dst)))
+                  (unless (file-exists? dir)
+                    (log-debug "creating \"~a\" ..." dir)
+                    (mkdir* (dirname dst))
+                    (log-debug "creating \"~a\" ... done" dir))
+                  (log-debug "copying: ~a -> ~a ..." src dst)
+                  (copy-file/substitute src dst substitutes)
+                  (log-debug "copying: ~a -> ~a ... done" src dst)))
               files)))
 
 ;;; guile.scm ends here.
