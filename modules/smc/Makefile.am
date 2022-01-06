@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -19,10 +19,11 @@
 
 include $(top_srcdir)/build-aux/am/guile.am
 
-SUBDIRS = core context compiler . cli
+SUBDIRS = core context . compiler cli
 
 SOURCES = \
 	version.scm	\
+	config.scm	\
 	fsm.scm 	\
 	puml-context.scm \
 	puml-fsm.scm	\
@@ -34,7 +35,8 @@ SOURCES = \
 EXTRA_DIST += \
 	puml.puml	\
 	trace.puml	\
-	version.scm.in
+	version.scm.in	\
+	config.scm.in
 
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/
 godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/
@@ -56,10 +58,17 @@ trace-fsm.scm: trace.puml
 		--fsm-module "(smc trace-fsm)" \
 		--modules "((smc trace-context))" > $@
 
+root_moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/
+config_substitute = sed -e 's,[@]MODDIR[@],$(root_moddir),g'
+
+config.scm: config.scm.in
+	@echo "  GEN      $@"
+	@$(config_substitute) "$^" > "$@"
+
 substitute = sed -e 's,[@]VERSION[@],$(PACKAGE_VERSION),g'
 
 version.scm: version.scm.in
 	@echo "  GEN      $@"
 	@$(substitute) "$^" > "$@"
 
-CLEANFILES += version.scm
+CLEANFILES += version.scm config.scm

@@ -20,21 +20,10 @@
 include $(top_srcdir)/build-aux/am/guile.am
 
 SOURCES = \
-	config.scm \
 	guile.scm
-
-EXTRA_DIST += \
-	config.scm.in
 
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/compiler/
 godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/compiler/
-
-root_moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/
-substitute = sed -e 's,[@]MODDIR[@],$(root_moddir),g'
-
-config.scm: config.scm.in
-	@echo "  GEN      $@"
-	@$(substitute) "$^" > "$@"
 
 # Makefile.am ends here
 

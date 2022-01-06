@@ -34,7 +34,7 @@
   #:use-module (smc version)
   #:use-module (smc fsm)
   #:use-module (smc puml)
-  #:use-module (smc compiler config)
+  #:use-module (smc config)
   #:export (write-header
             write-module
             write-use-modules

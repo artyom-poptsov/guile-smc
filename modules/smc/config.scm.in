@@ -23,7 +23,7 @@
 
 ;;; Code:
 
-(define-module (smc compiler config)
+(define-module (smc config)
   #:export (%guile-smc-modules-directory))
 
 
