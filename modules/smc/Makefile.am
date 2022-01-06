@@ -19,7 +19,7 @@
 
 include $(top_srcdir)/build-aux/am/guile.am
 
-SUBDIRS = core context . compiler cli
+SUBDIRS = core context compiler . cli
 
 SOURCES = \
 	version.scm	\
