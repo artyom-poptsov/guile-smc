@@ -3,6 +3,7 @@
   #:use-module (ice-9 pretty-print)
   #:use-module (smc core log)
   #:use-module (smc compiler)
+  #:use-module (smc compiler guile)
   #:use-module (smc fsm)
   #:use-module (smc puml)
   #:use-module (smc cli common)
@@ -34,6 +35,10 @@ Options:
   --validate        Validate the output FSM and print the validation result.
                     The exit code is 0 if the validation is passed,
                     and a non-zero value otherwise.
+  --target, -t <target>
+                    Compilation target.  Allowed values:
+                      \"guile\", \"guile-standalone\"
+                    Default value is \"guile\".
   --debug           Enable the debug mode.
 
 "))
@@ -46,13 +51,21 @@ Options:
     (modules                  (single-char #\U) (value #t))
     (fsm-name                 (single-char #\n) (value #t))
     (fsm-module               (single-char #\m) (value #t))
+    (target                   (single-char #\t) (value #t))
     (validate                                   (value #f))
     (debug                                      (value #f))))
 
 (define (command-compile args)
   (let* ((options          (getopt-long args %option-spec))
-         (extra-load-paths (option-ref options 'load-path ""))
-         (debug-mode?      (option-ref options 'debug     #f)))
+         (extra-load-paths (option-ref options 'load-path  ""))
+         (module           (option-ref options 'fsm-module #f))
+         (extra-modules    (option-ref options 'modules    #f))
+         (target           (option-ref options 'target     "guile"))
+         (debug-mode?      (option-ref options 'debug      #f))
+         (fsm-module        (and module
+                                 (eval-string/quote module)))
+         (fsm-extra-modules (and extra-modules
+                                 (eval-string/quote extra-modules))))
 
     (when (option-ref options 'help #f)
       (print-compile-help)
@@ -62,10 +75,13 @@ Options:
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
-    (let* ((modules      (option-ref options 'modules #f))
-           (fsm     (puml->fsm (current-input-port)
-                               #:module      (puml-modules modules)
-                               #:debug-mode? debug-mode?)))
+    (log-debug "Target: ~a" target)
+    (when (string=? target "guile-standalone")
+      (copy-dependencies "." fsm-module))
+
+    (let* ((fsm (puml->fsm (current-input-port)
+                           #:module      (puml-modules extra-modules)
+                           #:debug-mode? debug-mode?)))
       (when (option-ref options 'validate #f)
         (let ((validation-result (fsm-validate fsm)))
           (unless (null? validation-result)
@@ -75,11 +91,10 @@ Options:
        ((option-ref options 'print-transition-table #f)
         (pretty-print-transition-table fsm))
        (else
-        (let ((name   (option-ref options 'fsm-name 'custom-fsm))
-              (module (option-ref options 'fsm-module #f)))
+        (let ((name (option-ref options 'fsm-name 'custom-fsm)))
           (fsm-compile fsm
                        #:fsm-name      name
-                       #:fsm-module    (and module
-                                            (eval-string/quote module))
-                       #:extra-modules (and modules
-                                            (eval-string/quote modules)))))))))
+                       #:fsm-module    fsm-module
+                       #:extra-modules fsm-extra-modules
+                       #:standalone-mode? (string=? target
+                                                    "guile-standalone"))))))))

@@ -42,6 +42,7 @@
                       (fsm-name 'custom-fsm)
                       (fsm-module    #f)
                       (extra-modules '())
+                      (standalone-mode? #f)
                       (output-port (current-output-port)))
 
   (when (fsm-event-source-anonymous? fsm)
@@ -58,7 +59,11 @@
   (form-feed output-port)
   (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
     (if fsm-module
-        (write-module fsm-module extra-modules class-name output-port)
+        (write-module fsm-module
+                      #:extra-modules    extra-modules
+                      #:class-name       class-name
+                      #:port             output-port
+                      #:standalone-mode? standalone-mode?)
         (write-use-modules extra-modules output-port))
 
     (newline output-port)
