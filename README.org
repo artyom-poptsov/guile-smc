@@ -1,28 +1,32 @@
 * Guile-SMC
 [[https://github.com/artyom-poptsov/guile-smc/actions/workflows/guile2.2.yml/badge.svg]] [[https://github.com/artyom-poptsov/guile-smc/actions/workflows/guile3.0.yml/badge.svg]]
 
-GNU Guile state machine compiler.
+[[https://www.gnu.org/software/guile/][GNU Guile]] state machine compiler.
 
 ** License
-    Guile-SMC is free software: you can redistribute it and/or modify it under
-    the terms of the GNU General Public License as published by the Free
-    Software Foundation, either version 3 of the License, or (at your option)
-    any later version.  Please see =COPYING= file for the terms of GNU General
-    Public License.
+Guile-SMC is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.  Please see =COPYING= file for the terms of GNU General Public
+License.
 
 ** Requirements
-    - [[https://www.gnu.org/software/guile/][GNU Guile]], version 2.2 or later
-    - [[https://www.nongnu.org/guile-lib/][Guile Library]]
+- [[https://www.gnu.org/software/guile/][GNU Guile]], version 2.2 or later
+- [[https://www.nongnu.org/guile-lib/][Guile Library]]
 
 *** Build-time dependencies
-    - GNU Guile development files (something with =dev= suffix, e.g.
-      =guile-3.0-dev= on Ubuntu GNU/Linux)
-    - texinfo
-    - make
-    - automake
-    - autoconf
+- GNU Guile development files (something with =dev= suffix, e.g.
+  =guile-3.0-dev= on Ubuntu GNU/Linux)
+- texinfo
+- make
+- automake
+- autoconf
 
 ** Installation
+*** From package managers
+- GNU Guix: https://guix.gnu.org/en/packages/guile-smc-0.3.0/
+
+*** Manual
 #+BEGIN_EXAMPLE shell
 $ git clone https://github.com/artyom-poptsov/guile-smc.git
 $ cd guile-smc
@@ -32,69 +36,200 @@ $ make
 $ sudo make install
 #+END_EXAMPLE
 
-** Architecture
-   [[./doc/architecture.png]]
+** Quick start
+*NOTE:* To read the full Guile-SMC documentation run =info guile-smc=
 
-   Internally a state machine represented by a hash table and a directed
-   graph. A hash table is used to keep track of all the states in a FSM that
-   enables fast state searching by a state name.
+Although Guile-SMC API can be used from a Scheme code, it comes with =smc=
+tool that allows to compile, run and profile state machines from the shell:
 
-   A directed graph is produced by the fact that each state keeps references
-   to all the states it can transition too.
+#+BEGIN_EXAMPLE shell
+$ smc
+Usage: smc <command> [options]
 
-   There's also a reference to the current state of a FSM inside an =<fsm>=
-   instance; this reference changes each time the FSM transitions to a new
-   state.
+Commands:
+  compile        Compile a PlantUML state diagram to a Guile finite-state machine.
+  context        Analyze or generate a context stub based on a given PlantUML file.
+  run            Read a finite-state machine from a specified PlantUML file and run
+                 it right away.
+  profile        Run the state machine profiler.
+  help           Print this help message.
 
-*** Transition table
-    Each state holds a transition table in a form of
-#+BEGIN_EXAMPLE scheme
-(list (list guard:some-guard action:some-action state1)
-      (list guard:#t         action:some-action state2))
+For each command there's '--help' option (or '-h' for short) that prints a
+help message for the given command.
 #+END_EXAMPLE
 
-    When =state-run= method is called on a state, the state loops over its
-    transition table and applies each transition guard to the incoming event
-    and current context. When a guard returns #t, the state applies a related
-    transition action to the event and the context and returns two values: a
-    reference to the next state and a new context returned by the action
-    procedure.
-** Usage
-   PlantUML (<http://www.plantuml.com/>) state machine compiler:
-#+BEGIN_EXAMPLE scheme
-  (let ((fsm (puml->fsm (current-input-port))))
-    (format #t "output fsm: ~a~%" fsm)
-    (format #t "transition table:~%")
-    (pretty-print
-     (hash-table->transition-list (fsm-transition-table fsm))
-     #:display? #t)))
+*** The Compiler
+The state machine compiler allows to compile state machines from a formal
+description (currently only PlantUML format is supported.)
+
+#+BEGIN_EXAMPLE shell
+$ smc compile --help
+Usage: smc compile [options]
+
+The program reads a PlantUML transition diagram from the standard input.
+
+Options:
+  --help, -h        Print this message and exit.
+  --print-transition-table, -p
+                    Print the FSM transition table to the standard
+                    output.
+  --load-path, -L <paths>
+                    Add a paths separated by a colon to load paths.
+  --modules, -U <extra-modules>
+                    Load additional modules.  The value must be the same
+                    as for 'use-modules'.  Example value:
+                      "((smc context char-context) (smc puml-context))"
+  --fsm-name, -n <name>
+                    Set the name for the output FSM.
+  --fsm-module, -m <module>
+                    Set the module for the output FSM.  Example value:
+                      "(smc puml-fsm)"
+  --validate        Validate the output FSM and print the validation result.
+                    The exit code is 0 if the validation is passed,
+                    and a non-zero value otherwise.
+  --debug           Enable the debug mode.
 #+END_EXAMPLE
 
-  State machine validation:
+Usage example:
+#+BEGIN_EXAMPLE shell
+$ cat fsm.puml | smc compile -L . -U "((context))" -m "(custom-fsm)" > custom-fsm.scm
+#+END_EXAMPLE
+
+*** The State Machine Runner
+The state machine runner allows to run a state in /ad hoc/ fashion with the
+minimum amount of supporting code:
+
+#+BEGIN_EXAMPLE shell
+$ smc run --help
+Usage: smc run [options] <puml-file>
+
+Run a state machine.
+
+Options:
+  --help, -h        Print this message and exit.
+  --eval, -e <procedure>
+                    Eval a procedure with the resulting context as a parameter.
+                    Example value:
+                      "(lambda (context) (display context))"
+  --load-path, -L <load-path>
+                    Add an extra load path.
+  --context-thunk, -C <procedure>
+                    A thunk that produces the initial value for an FSM context.
+                    Example value: "(lambda () 0)"
+  --modules, -U <modules>
+                    Load additional modules.  The value must be the same
+                    as for 'use-modules'.  Example value:
+                      "((smc context char-context) (smc puml-context))"
+  --validate        Validate the output FSM and print the validation result.
+                    The exit code is 0 if the validation is passed,
+                    and a non-zero value otherwise.
+  --log-file <file> Log file to use.  Pass "-" as the file to use the standard
+                    error stream (stderr.)
+                    'smc run' logs to syslog by default.
+  --debug           Enable the debug mode.
+#+END_EXAMPLE
+
+Usage example:
+#+BEGIN_EXAMPLE shell
+$ smc run -L . -U "((context))" -C "(lambda () 0)" fsm.puml
+#+END_EXAMPLE
+
+*** The Profiler
+The profiler allows to analyze state machines using its logs (traces) and thus
+provides facilities to detect bottlenecks in state machines in terms of
+running time:
+
+Usage example:
+#+BEGIN_EXAMPLE shell
+$ smc profile fsm.log
+Total transitions: 99
+Total time:        14925 us
+Stats:
+  read: 3158 us (21.1591 %)
+  read_state_transition_guard: 1663 us (11.1424 %)
+  read_state_transition_to: 1483 us (9.9363 %)
+  read_word: 1259 us (8.4355 %)
+  read_state_description: 1014 us (6.7940 %)
+  read_state_right_arrow: 839 us (5.6214 %)
+  search_state_transition_to: 670 us (4.4891 %)
+  search_state_transition: 638 us (4.2747 %)
+  read_state_transition_action: 536 us (3.5913 %)
+  read_start_tag: 535 us (3.5846 %)
+  search_state_transition_guard: 428 us (2.8677 %)
+  read_state: 178 us (1.1926 %)
+  search_state_transition_action: 139 us (.9313 %)
+  read_state_action_arrow: 139 us (.9313 %)
+  search_state_action_arrow: 132 us (.8844 %)
+  read_end_tag: 125 us (.8375 %)
+#+END_EXAMPLE
+
+*** Programming interface
+**** Compilation
+PlantUML (<http://www.plantuml.com/>) state machine compiler can be used from
+a Scheme code as follows:
+#+BEGIN_EXAMPLE scheme
+(let ((fsm (puml->fsm (current-input-port))))
+  (format #t "output fsm: ~a~%" fsm)
+  (format #t "transition table:~%")
+  (pretty-print (hash-table->transition-list (fsm-transition-table fsm))
+                #:display? #t)))
+#+END_EXAMPLE
+
+**** Validation
 #+BEGIN_EXAMPLE scheme
 (let ((fsm (puml->fsm (current-input-port)))
   (format #t "validation report:~%")
   (pretty-print (fsm-validate fsm)))
 #+END_EXAMPLE
 
-   Want more finite-state machines? Now you can generate a FSM from the PlantUML
-   format that reads a FSM in the PlantUML format -- see
-   =examples/pumlpuml.scm=.
+** Architecture
+We won't discuss the system architecture in depth in this short manual (please
+refer to =info guile-smc= for details.)  Nevertheless, it's good to have
+overall picture of the system main concepts.
 
-   Also see other examples the =examples= directory.
+[[./doc/architecture.png]]
 
-   If you still wonder if there any practical use of that, please take a look at
-   Guile-INI: https://github.com/artyom-poptsov/guile-ini
+Internally a state machine represented by a hash table and a directed graph. A
+hash table is used to keep track of all the states in a FSM that enables fast
+state searching by a state name.
 
-** Ideas
-   - Write a PlantUML generator that take a =<fsm>= instance and produces a
-     PlantUML state diagram.
-   - I think it's possible to implement some FSM profiling facilities that will,
-     for example, measure how much time it takes to go from the entry state of
-     an FSM to an end state and calculate how much time an FSM spends in each
-     state.  This measurements can be used to optimize an FSM.
-   - Produce a timing diagram based on FSM log output in [[https://plantuml.com/timing-diagram][PlantUML format]].  That
-     would help with analyzing and optimizing an FSM.  It could be implemented
-     in the =smc= compiler as part of state machine benchmark suite.
-   - It is possible to add compilation to other languages aside from Scheme, but
-     it will be quite hard to implement indeed.
+A directed graph is produced by the fact that each state keeps references to
+all the states it can transition too.
+
+There's also a reference to the current state of a FSM inside an =<fsm>=
+instance; this reference changes each time the FSM transitions to a new state.
+
+*** Transition table
+Each state holds a transition table in a form of
+
+#+BEGIN_EXAMPLE scheme
+(list (list guard:some-guard action:some-action state1)
+      (list guard:#t         action:some-action state2))
+#+END_EXAMPLE
+
+When =state-run= method is called on a state, the state loops over its
+transition table and applies each transition guard to the incoming event and
+current context. When a guard returns =#t=, the state applies a related
+transition action to the event and the context and returns two values: a
+reference to the next state (or =#f= when the final transition is performed)
+and a new context returned by the action procedure.
+
+** Usage examples
+Guile-SMC can generate a FSM from the PlantUML format that reads a FSM in the
+PlantUML format -- see =examples/pumlpuml.scm=.
+
+Also see other examples the =examples= directory.
+
+*** Projects that use Guile-SMC
+- Guile-INI: https://github.com/artyom-poptsov/guile-ini
+
+** Ideas to implement
+- Write a PlantUML generator that take a =<fsm>= instance and produces a
+  PlantUML state diagram.
+- Produce a timing diagram based on FSM log output in [[https://plantuml.com/timing-diagram][PlantUML format]].  That
+  would help with analyzing and optimizing an FSM.  It could be implemented in
+  the =smc= compiler as part of state machine benchmark suite.
+- It is possible to add compilation to other languages aside from Scheme, but
+  it will be quite hard to implement indeed.
+- Add standalone-mode for the FSM compiler that will produce state machines
+  independent from Guile-SMC.
