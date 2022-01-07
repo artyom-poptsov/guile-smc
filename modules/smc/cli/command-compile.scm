@@ -65,7 +65,12 @@ Options:
          (fsm-module        (and module
                                  (eval-string/quote module)))
          (fsm-extra-modules (and extra-modules
-                                 (eval-string/quote extra-modules))))
+                                 (eval-string/quote extra-modules)))
+         (fsm-extra-modules-rewritten
+          (if (string=? target "guile-standalone")
+              (map (lambda (m) (cons (car fsm-module) m))
+                   fsm-extra-modules)
+              fsm-extra-modules)))
 
     (when (option-ref options 'help #f)
       (print-compile-help)
@@ -95,6 +100,6 @@ Options:
           (fsm-compile fsm
                        #:fsm-name      name
                        #:fsm-module    fsm-module
-                       #:extra-modules fsm-extra-modules
+                       #:extra-modules fsm-extra-modules-rewritten
                        #:standalone-mode? (string=? target
                                                     "guile-standalone"))))))))

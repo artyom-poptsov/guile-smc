@@ -242,7 +242,14 @@ OUTPUT-DIRECTORY."
                                        ";;; Commentary:\n\n"
                                        (format #f ";; Copied from Guile-SMC ~a~%"
                                                (smc-version/string))))
-                                substitutes)))
+                                substitutes))
+         (substitutes-extra (cons (cons "\\(define-module \\("
+                                        (format #f
+                                                "(define-module (~a "
+                                                (string-join (map symbol->string
+                                                                  root-module-name)
+                                                             " ")))
+                                  substitutes)))
 
     (log-debug "Copying core modules ...")
     (for-each (lambda (file)
@@ -256,7 +263,7 @@ OUTPUT-DIRECTORY."
     (for-each (lambda (mod)
                 (let* ((src (cdr mod))
                        (dst (string-append target-dir "/" (car mod))))
-                  (copy src dst substitutes)))
+                  (copy src dst substitutes-extra)))
               (modules->paths %load-path extra-modules))
     (log-debug "Copying extra modules ... done")))
 
