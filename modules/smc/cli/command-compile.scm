@@ -77,7 +77,7 @@ Options:
 
     (log-debug "Target: ~a" target)
     (when (string=? target "guile-standalone")
-      (copy-dependencies "." fsm-module))
+      (copy-dependencies "." fsm-module fsm-extra-modules))
 
     (let* ((fsm (puml->fsm (current-input-port)
                            #:module      (puml-modules extra-modules)

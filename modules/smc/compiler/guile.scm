@@ -177,9 +177,47 @@ to specify a list of extra modules that required for the output FSM to work."
           (mkdir d))
         (loop (cdr dirparts) d)))))
 
-(define (copy-dependencies output-directory root-module-name)
+(define (modules->paths load-path modules)
+  "Locate each module from a MODULES list in the directories from a LOAD-PATH
+list.  Return a list of pairs (module-file full-path)."
+  (let mod-loop ((mods   modules)
+                 (result '()))
+    (if (null? mods)
+        result
+        (let* ((mod       (car mods))
+               (mod-file  (string-append (string-join (map symbol->string mod)
+                                                      "/")
+                                         ".scm"))
+               (full-path (let path-loop ((paths load-path))
+                            (if (null? paths)
+                                #f
+                                (let ((path (string-append (car paths)
+                                                           "/"
+                                                           mod-file)))
+                                  (if (file-exists? path)
+                                      path
+                                      (path-loop (cdr paths))))))))
+          (if full-path
+              (mod-loop (cdr mods)
+                        (cons (cons mod-file full-path) result))
+              (mod-loop (cdr mods)
+                        result))))))
+
+(define (copy-dependencies output-directory root-module-name extra-modules)
   "Copy dependencies to a sub-directory with ROOT-MODULE-NAME of an
 OUTPUT-DIRECTORY."
+
+  (define (copy src dst substitutes)
+    (let ((dir (dirname dst)))
+
+      (unless (file-exists? dir)
+        (log-debug "  creating \"~a\" ..." dir)
+        (mkdir* (dirname dst))
+        (log-debug "  creating \"~a\" ... done" dir))
+      (log-debug "  copying: ~a -> ~a ..." src dst)
+      (copy-file/substitute src dst substitutes)
+      (log-debug "  copying: ~a -> ~a ... done" src dst)))
+
   (let* ((target-dir (format #f
                              "~a/~a"
                              output-directory
@@ -198,23 +236,28 @@ OUTPUT-DIRECTORY."
                                           "(~a smc "
                                           (string-join (map symbol->string
                                                             root-module-name)
-                                                       " ")))
-                            (cons ";;; Commentary:"
-                                  (string-append
-                                   ";;; Commentary:\n\n"
-                                   (format #f ";; Copied from Guile-SMC ~a~%"
-                                           (smc-version/string)))))))
+                                                       " ")))))
+         (substitutes-smc (cons (cons ";;; Commentary:"
+                                      (string-append
+                                       ";;; Commentary:\n\n"
+                                       (format #f ";; Copied from Guile-SMC ~a~%"
+                                               (smc-version/string))))
+                                substitutes)))
+
+    (log-debug "Copying core modules ...")
     (for-each (lambda (file)
                 (let* ((src (string-append %guile-smc-modules-directory file))
-                       (dst (string-append target-dir "/smc/" file))
-                       (dir (dirname dst)))
-                  (unless (file-exists? dir)
-                    (log-debug "creating \"~a\" ..." dir)
-                    (mkdir* (dirname dst))
-                    (log-debug "creating \"~a\" ... done" dir))
-                  (log-debug "copying: ~a -> ~a ..." src dst)
-                  (copy-file/substitute src dst substitutes)
-                  (log-debug "copying: ~a -> ~a ... done" src dst)))
-              files)))
+                       (dst (string-append target-dir "/smc/" file)))
+                  (copy src dst substitutes-smc)))
+              files)
+    (log-debug "Copying core modules ... done")
+
+    (log-debug "Copying extra modules ...")
+    (for-each (lambda (mod)
+                (let* ((src (cdr mod))
+                       (dst (string-append target-dir "/" (car mod))))
+                  (copy src dst substitutes)))
+              (modules->paths %load-path extra-modules))
+    (log-debug "Copying extra modules ... done")))
 
 ;;; guile.scm ends here.
