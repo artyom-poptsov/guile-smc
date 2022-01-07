@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -18,6 +18,7 @@
 ## along with Guile-SMC.  If not, see <http://www.gnu.org/licenses/>.
 
 SCM_TESTS = \
+	log.scm		\
 	transition.scm	\
 	state.scm	\
 	set.scm		\
