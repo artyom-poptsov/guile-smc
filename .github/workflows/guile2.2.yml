@@ -32,6 +32,9 @@ jobs:
       - name: Configure
         run: ./configure
 
+      - name: Build
+        run: make -j$(nproc)
+
       - name: Run tests
-        run: make check
+        run: make -j$(nproc) check
 
