@@ -10,6 +10,17 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
 * Unreleased
 ** Add FSM profiler
    Add =smc profile= command.
+** =smc compile= now has "standalone" mode
+   The "standalone" mode allows to compile a FSM in such way that the output
+   code does not depend on Guile-SMC.
+
+   When the "standalone" mode is enabled the compiler copies all the required
+   Guile-SMC modules to a separated directory along with the specified extra
+   modules.
+** =smc compile= now allows to pass input file as an argument
+   The state machine compiler now either read input FSM description in
+   PlantUML format from the standard input or from a file specified as an
+   argument.
 ** Optimize the PlantUML parser
    PlantUML parser now about 25% faster.
 * Version 0.3.0 (2021-12-04)
