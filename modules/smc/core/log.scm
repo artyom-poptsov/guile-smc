@@ -97,7 +97,7 @@
       (newline))))
 
 (define-class-with-docs <port-log/us> (<log-handler>)
-  "Millisecond version of <port-log> from (logging port-log)."
+  "Microsecond version of <port-log> from (logging port-log)."
 
   ;; <port>
   (port
