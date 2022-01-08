@@ -12,9 +12,13 @@
 
 (define (print-compile-help)
   (display "\
-Usage: smc compile [options]
+Usage: smc compile [options] [input-file]
 
-The program reads a PlantUML transition diagram from the standard input.
+The program reads a PlantUML transition diagram from an INPUT-FILE or the
+standard input if no file specified, and creates a finite-state machine (FSM)
+from the formal description.
+
+Then the FSM can be validated and/or compiled.
 
 Options:
   --help, -h        Print this message and exit.
@@ -70,7 +74,8 @@ Options:
           (if (string=? target "guile-standalone")
               (map (lambda (m) (cons (car fsm-module) m))
                    fsm-extra-modules)
-              fsm-extra-modules)))
+              fsm-extra-modules))
+         (args             (option-ref options '()        #f)))
 
     (when (option-ref options 'help #f)
       (print-compile-help)
@@ -84,7 +89,14 @@ Options:
     (when (string=? target "guile-standalone")
       (copy-dependencies "." fsm-module fsm-extra-modules))
 
-    (let* ((fsm (puml->fsm (current-input-port)
+    (log-debug "arguments: ~a" args)
+    (let* ((port (if (null? args)
+                     (current-input-port)
+                     (let ((p (open-input-file (car args))))
+                       (unless p
+                         (error "Could not open a file" (car args)))
+                       p)))
+           (fsm (puml->fsm port
                            #:module      (puml-modules extra-modules)
                            #:debug-mode? debug-mode?)))
       (when (option-ref options 'validate #f)
