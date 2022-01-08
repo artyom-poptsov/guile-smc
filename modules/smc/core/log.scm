@@ -35,6 +35,7 @@
   #:export (<precise-logger>
             <syslog>
             <port-log/us>
+            precise-logger?
             log-add-handler!
             log-clear-handlers!
             log
@@ -52,6 +53,10 @@
 
 (define-class-with-docs <precise-logger> (<logger>)
   "Guile-SMC precise logger that prints log with microsecond accuracy.")
+
+(define (precise-logger? x)
+  "Check if X is a <precise-logger> instance."
+  (is-a? x <precise-logger>))
 
 
 
