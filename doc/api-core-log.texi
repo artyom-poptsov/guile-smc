@@ -8,6 +8,10 @@
 
 @code{(smc core log)} module contains Guile-SMC logging facilities.
 
+@deftp {Class} <syslog>
+This is a log handler which writes logs to the syslog.
+@end deftp
+
 @deffn {Scheme Procedure} log-use-stderr! (value <boolean>)
 Change whether the logger must print messages to the stderr as well as to
 syslog, or not.
@@ -19,6 +23,24 @@ syslog, or not.
 @deffnx {Scheme Procedure} log-info fmt . args
 @deffnx {Scheme Procedure} log-debug fmt . args
 Log a formatted message of a specified logging @var{level} to syslog.
+@end deffn
+
+@subsection Precise logging
+
+@deftp {Class} <precise-logger>
+Guile-SMC precise logger that prints log with microsecond accuracy.
+@end deftp
+
+@deftp {Class} <port-log/us>
+Microsecond version of @code{<port-log>} from @code{(logging port-log)}.
+@end deftp
+
+@deffn {Scheme Procedure} %precise-log-formatter lvl time str
+The precise log formatter for @code{<precise-logger>}.
+@end deffn
+
+@deffn {Scheme Procedure} precise-logger? x
+Check if @var{x} is a @code{<precise-logger>} instance.
 @end deffn
 
 @c Local Variables:
