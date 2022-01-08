@@ -95,6 +95,111 @@ Usage example:
 $ cat fsm.puml | smc compile -L . -U "((context))" -m "(custom-fsm)" > custom-fsm.scm
 #+END_EXAMPLE
 
+**** Standalone Mode
+The compiler can be configured in such way that it will copy all the modules
+that are needed to run the output FSM so the FSM will not depend on Guile-SMC.
+
+For example, let's imagine that we have the following file set:
+#+BEGIN_EXAMPLE shell
+.
+├── context.scm
+├── fsm.puml
+├── main.scm
+└── README.org
+
+0 directories, 4 files
+#+END_EXAMPLE
+
+The =context.scm= contains all actions, guards and event sources for FSM to run:
+#+BEGIN_EXAMPLE scheme
+(define-module (context)
+  #:use-module (opp goops)
+  #:use-module (ice-9 textual-ports)
+  #:use-module (smc context char-context)
+  #:re-export (guard:#t
+               guard:semicolon?
+               guard:double-quote?
+               guard:newline?
+               guard:eof-object?
+               action:no-op)
+  #:export (event-source
+            action:count
+            action:validate))
+
+(define-method (event-source (ctx <number>))
+  (get-char (current-input-port)))
+
+(define (action:count ctx char)
+  (cond
+   ((char=? char #\()
+    (+ ctx 1))
+   ((char=? char #\))
+    (- ctx 1))
+   (else
+    ctx)))
+
+(define (action:validate ctx char)
+  (unless (zero? ctx)
+    (error "Parenthesis mismatch" ctx))
+  ctx)
+#+END_EXAMPLE
+
+The =fsm.puml= file contains the FSM description:
+#+BEGIN_EXAMPLE
+@startuml
+[*] --> DEFAULT
+DEFAULT: Count parenthesis.
+DEFAULT --> [*]: guard:eof-object? -> action:validate
+DEFAULT --> COMMENT: guard:semicolon?
+DEFAULT --> STRING: guard:double-quote?
+DEFAULT --> DEFAULT: guard:#t -> action:count
+
+COMMENT: Skip a comment.
+COMMENT --> DEFAULT: guard:newline?
+COMMENT --> COMMENT
+
+STRING: Skip a string.
+STRING --> DEFAULT: guard:double-quote?
+STRING -> STRING
+@enduml
+#+END_EXAMPLE
+
+Now let's compile the FSM, using the "guile-standalone" target:
+#+BEGIN_EXAMPLE shell
+$ cat fsm.puml | /usr/bin/smc compile -L . -U "((context))" -m "(custom-fsm)" \
+    --target guile-standalone > custom-fsm.scm
+#+END_EXAMPLE
+
+Now the project root directory looks like this:
+#+BEGIN_EXAMPLE shell
+$ tree
+.
+├── context.scm
+├── custom-fsm
+│   ├── context.scm
+│   └── smc
+│       ├── context
+│       │   ├── char-context.scm
+│       │   └── context.scm
+│       ├── core
+│       │   ├── common.scm
+│       │   ├── log.scm
+│       │   ├── stack.scm
+│       │   ├── state.scm
+│       │   └── transition.scm
+│       └── fsm.scm
+├── custom-fsm.scm
+├── fsm.puml
+├── main.scm
+└── README.org
+
+4 directories, 14 files
+#+END_EXAMPLE
+
+=custom-fsm= directory contains all the required Guile-SMC modules that the
+output FSM needs to run, plus the extra modules (like =(context)=) specified
+for the compiler.
+
 *** The State Machine Runner
 The state machine runner allows to run a state in /ad hoc/ fashion with the
 minimum amount of supporting code:
