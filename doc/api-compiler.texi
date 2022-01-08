@@ -42,7 +42,24 @@ added to to the output FSM module requirements.
 @item #:output-port (port <port>)
 The port to write the output FSM to.
 
+@item #:standalone-mode? (value <boolean>)
+Enable or disable the ``standalone'' mode (disabled by default.)
+
+When the ``standalone'' mode is enabled, the compiler adds the
+@code{fsm-module} before all the SMC modules.
+
 @end table
+
+Usage example:
+
+@lisp
+(fsm-compile (puml->fsm (current-input-port)
+                        #:module (puml-modules '((context))))
+             #:fsm-name      "custom-fsm"
+             #:fsm-module    '(custom-fsm)
+             #:extra-modules '((context)))
+@end lisp
+
 
 @end deffn
 
