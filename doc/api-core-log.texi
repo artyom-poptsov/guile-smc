@@ -12,6 +12,10 @@
 This is a log handler which writes logs to the syslog.
 @end deftp
 
+@deffn {Scheme Procedure} syslog? x
+Check if @var{x} is a @code{<syslog>} instance.
+@end deffn
+
 @deffn {Scheme Procedure} log-use-stderr! (value <boolean>)
 Change whether the logger must print messages to the stderr as well as to
 syslog, or not.
@@ -41,10 +45,6 @@ The precise log formatter for @code{<precise-logger>}.
 
 @deffn {Scheme Procedure} precise-logger? x
 Check if @var{x} is a @code{<precise-logger>} instance.
-@end deffn
-
-@deffn {Scheme Procedure} syslog? x
-Check if @var{x} is a @code{<syslog>} instance.
 @end deffn
 
 @deffn {Scheme Procedure} port-log/us? x
