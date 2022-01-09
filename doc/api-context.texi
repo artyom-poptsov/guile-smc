@@ -26,12 +26,20 @@ This class holds two kinds of stack memory: a buffer to store events (data
 chunks) and a stanza that store a logical unit of data.
 @end deftp
 
+@deffn {Scheme Procedure} context? x
+Check if an @var{x} is a @code{<context>} instance.
+@end deffn
+
 @deffn {Scheme Procedure} context-buffer-clear! (context <context>)
 Clear the @var{context} buffer.
 @end deffn
 
 @deffn {Scheme Procedure} context-stanza-clear! (context <context>)
 Clear the @var{context} stanza.
+@end deffn
+
+@deffn {Scheme Procedure} context-clear! (context <context>)
+Clear both the @var{context} buffer and the current context stanza.
 @end deffn
 
 @deffn {Scheme Procedure} action:store context event
@@ -63,7 +71,11 @@ Returns the current row number for a context @var{ctx}.
 Returns the current column number for a context @var{ctx}.
 @end deffn
 
+@cindex Guard
 @subsubsection Guards
+Each transition path in a FSM is guarded by a @dfn{guard}, when a guard
+returns @code{#t} the FSM transitions to the next state guarded by the guard
+and a @dfn{transition action} is performed.
 
 @deffn  {Scheme Procedure} guard:asterisk? ctx ch
 @deffnx {Scheme Procedure} guard:equals-sign? ctx ch
@@ -83,7 +95,54 @@ Returns the current column number for a context @var{ctx}.
 These procedures check if a @var{ch} is a specific symbol.
 @end deffn
 
+@cindex Action
 @subsubsection Actions
+An action can be attached to a state transition (thus producing a
+@dfn{transition action}) or to a state itself (in the form of either
+@dfn{entry action} or @dfn{exit action}.)
+
+A @dfn{transition action} is performed when its transition guard returns
+@code{#t}.
+
+@deffn {Scheme Procedure} action:no-op context event
+This is ``no operation'' action that just returns the @var{context} as is.
+@end deffn
+
+@subsubsection Character Context
+@deftp {Class} <char-context>
+A context to handle streams of characters.
+@end deftp
+
+@deffn {Scheme Procedure} char-context-port (context <char-context>)
+
+@end deffn
+
+@deffn {Scheme Procedure} char-context-counter (context <char-context>)
+Get the @var{context} character counter.
+@end deffn
+
+@deffn {Scheme Procedure} char-context-row (context <char-context>)
+
+@end deffn
+
+@deffn {Scheme Procedure} char-context-col (context <char-context>)
+
+@end deffn
+
+@deffn {Scheme Procedure} char-context-update-counters! (context <char-context>)
+
+@end deffn
+
+@deffn {Scheme Procedure} event-source (context <char-context>)
+
+@end deffn
+
+@deffn  {Scheme Procedure} context-log-error ctx fmt . rest
+@deffnx {Scheme Procedure} context-log-warning ctx fmt . rest
+@deffnx {Scheme Procedure} context-log-info ctx fmt . rest
+@deffnx {Scheme Procedure} context-log-debug ctx fmt . rest
+Context logging procedures.
+@end deffn
 
 @deffn {Scheme Procedure} action:syntax-error ctx ch
 Throw a syntactic error with the current symbol @var{ch}, row, column and the
