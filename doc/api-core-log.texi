@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @c This file is part of Guile-SMC Reference Manual.
-@c Copyright (C) 2021 Artyom V. Poptsov
+@c Copyright (C) 2021-2022 Artyom V. Poptsov
 @c See the file guile-smc.texi for copying conditions.
 
 @node Log
@@ -41,6 +41,14 @@ The precise log formatter for @code{<precise-logger>}.
 
 @deffn {Scheme Procedure} precise-logger? x
 Check if @var{x} is a @code{<precise-logger>} instance.
+@end deffn
+
+@deffn {Scheme Procedure} syslog? x
+Check if @var{x} is a @code{<syslog>} instance.
+@end deffn
+
+@deffn {Scheme Procedure} port-log/us? x
+Check if @var{x} is a @code{<port-log/us>} instance.
 @end deffn
 
 @c Local Variables:

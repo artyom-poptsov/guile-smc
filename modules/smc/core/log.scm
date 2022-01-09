@@ -36,6 +36,8 @@
             <syslog>
             <port-log/us>
             precise-logger?
+            port-log/us?
+            syslog?
             log-add-handler!
             log-clear-handlers!
             log
@@ -86,6 +88,9 @@
    #:getter       syslog-use-stderr?
    #:setter       syslog-use-stderr!))
 
+(define (syslog? x)
+  (is-a? x <syslog>))
+
 
 ;; The precise logger API is inspired by (logging logger) API.
 
@@ -109,6 +114,9 @@
    #:init-keyword #:port
    #:init-value   #f
    #:accessor     port))
+
+(define (port-log/us? x)
+  (is-a? x <port-log/us>))
 
 (define-method (initialize (self <port-log/us>) args)
   (next-method)
