@@ -1,6 +1,6 @@
 ;; guix.scm --- GNU Guix package recipe    -*- coding: utf-8 -*-
 ;;
-;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This file is part of Guile-SMC.
 ;;
@@ -32,36 +32,103 @@
 ;;; Code:
 
 
-(use-modules (guix packages)
+(use-modules (guix gexp)
+             (guix packages)
              (guix licenses)
              (guix git-download)
              (guix build-system gnu)
              (gnu packages autotools)
              (gnu packages guile)
+             (gnu packages bash)
+             (gnu packages admin)
+             (gnu packages guile-xyz)
              (gnu packages pkg-config)
              (gnu packages texinfo))
 
-(package
- (name "guile-smc")
- (version "0.2.0")
- (source (string-append "./" name "-" version ".tar.gz"))
- (build-system gnu-build-system)
- (native-inputs
-  `(("autoconf" ,autoconf)
-    ("automake" ,automake)
-    ("pkg-config" ,pkg-config)
-    ("texinfo" ,texinfo)))
- (inputs `(("guile" ,guile-2.2)))
+
+(define %source-dir (dirname (current-filename)))
 
- (arguments
-  '(#:phases (modify-phases
-              %standard-phases
-              (add-after 'unpack 'autoreconf
-                         (lambda _
-                           (zero? (system* "autoreconf" "-vfi")))))))
+
+(define-public guile-smc
+  (package
+    (name "guile-smc")
+    (version "git")
+    (source (local-file %source-dir
+                        #:recursive? #t
+                        #:select? (git-predicate %source-dir)))
+    (build-system gnu-build-system)
+    (arguments
+     `(#:make-flags '("GUILE_AUTO_COMPILE=0")     ;to prevent guild warnings
+       #:modules (((guix build guile-build-system)
+                   #:select (target-guile-effective-version))
+                  ,@%gnu-build-system-modules)
+       #:imported-modules ((guix build guile-build-system)
+                           ,@%gnu-build-system-modules)
+       #:phases
+       (modify-phases %standard-phases
+         (delete 'strip)
+         (add-after 'configure 'patch
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (substitute* "modules/smc/core/log.scm"
+               (("  #:use-module \\(logging logger\\)")
+                (string-append
+                 "  #:use-module (logging logger)\n"
+                 "  #:use-module (logging rotating-log)"))
+               (("#:init-value \"logger\"")
+                (format #f
+                        "#:init-value \"~a/bin/logger\""
+                        (assoc-ref inputs "inetutils")))
+               (("\\(make <precise-logger>\\)")
+                "(make <logger>)")
+               (("\\(add-handler! %logger %syslog\\)")
+                (string-append
+                 "(add-handler! %logger\n"
+                 "              (make <rotating-log>\n"
+                 "                    #:file-name \"/tmp/smc.log\"))\n")))
+             #t))
+         (add-after 'install 'wrap-program
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out       (assoc-ref outputs "out"))
+                    (bin       (string-append out "/bin"))
+                    (guile-lib (assoc-ref inputs "guile-lib"))
+                    (version   (target-guile-effective-version))
+                    (scm       (string-append "/share/guile/site/"
+                                              version))
+                    (go        (string-append  "/lib/guile/"
+                                               version "/site-ccache")))
+               (wrap-program (string-append bin "/smc")
+                 `("GUILE_LOAD_PATH" prefix
+                   (,(string-append out scm)
+                    ,(string-append guile-lib scm)))
+                 `("GUILE_LOAD_COMPILED_PATH" prefix
+                   (,(string-append out go)
+                    ,(string-append guile-lib go)))))
+             #t)))))
+    (native-inputs
+     (list autoconf
+           automake
+           pkg-config
+           texinfo))
+    (inputs
+     (list bash-minimal
+           guile-3.0
+           guile-lib
+           inetutils))
+    (home-page "https://github.com/artyom-poptsov/guile-smc")
+    (synopsis "GNU Guile state machine compiler")
+    (description
+     "Guile-SMC is a state machine compiler that allows users to describe
+finite state machines (FSMs) in Scheme in terms of transition tables.  It is
+capable to generate such transition tables from a @url{https://plantuml.com/,
+PlantUML} state diagrams.
 
-  (home-page "https://github.com/artyom-poptsov/guile-smc")
-  (synopsis "GNU Guile State Machine Compiler")
-  (description
-   "GNU Guile State Machine Compiler")
-  (license gpl3+))
+A transition table can be verified and checked for dead-ends and infinite
+loops.  Also Guile-SMC FSMs gather statistics when they run.
+
+Guile-SMC comes with a Scheme program called @command{smc} -- a state machine
+compiler itself.  It produces a Scheme code for an FSM from the PlantUML
+format.  This tool is meant to be called on a PlantUML file when a program
+with a FSM is being built (for example, from a Makefile.)")
+    (license gpl3)))
+
+guile-smc
