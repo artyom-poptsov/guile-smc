@@ -18,6 +18,7 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
    Guile-SMC modules to a separated directory along with the specified extra
    modules.
 ** =smc compile= now allows to pass input file as an argument
+** =smc= now handles =--version= option
    The state machine compiler now either read input FSM description in
    PlantUML format from the standard input or from a file specified as an
    argument.
