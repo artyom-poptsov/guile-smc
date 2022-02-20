@@ -7,6 +7,7 @@
              (ice-9 eval-string)
              (smc core log)
              (smc fsm)
+             (smc version)
              (smc cli common)
              (smc cli command-compile)
              (smc cli command-context)
@@ -33,6 +34,18 @@ help message for the given command.
 ")
   (exit 0))
 
+(define (print-version)
+  (format #t "smc ~a~%" (smc-version/string))
+  (display "\
+Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Artyom V. Poptsov.
+"))
+
+
 
 
 (define %commands
@@ -40,6 +53,8 @@ help message for the given command.
     (("run")                    ,command-run)
     (("context")                ,command-context)
     (("profile")                ,command-profile)
+    (("--version" "version")    ,(lambda (rest)
+                                   (print-version)))
     (("help", "--help", "-h")   ,(lambda (rest)
                                    (print-help-and-exit)))))
 
