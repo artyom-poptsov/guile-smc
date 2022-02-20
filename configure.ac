@@ -68,10 +68,16 @@ AC_CONFIG_FILES([
         tests/Makefile
 ])
 
+dnl Manual pages.
+AM_MISSING_PROG([HELP2MAN], [help2man])
+
 dnl texinfo package required to make the documentation in Texinfo format.
 AC_CHECK_PROG(MAKEINFO_CHECK, makeinfo, yes)
 AS_IF([test x"$MAKEINFO_CHECK" != x"yes"],
             [ AC_MSG_ERROR([Please install texinfo before configuring])])
+
+AC_CONFIG_FILES([pre-inst-env:build-aux/pre-inst-env.in],
+        [chmod +x pre-inst-env])
 
 # Generate a Makefile, based on the results.
 AC_OUTPUT

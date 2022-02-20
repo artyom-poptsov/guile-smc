@@ -17,5 +17,7 @@ config.status
 .deps
 autom4te.cache
 
+pre-inst-env
+
 TAGS
 tags

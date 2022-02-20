@@ -24,6 +24,9 @@ SUBDIRS = build-aux modules/smc utils doc tests examples/png
 EXTRA_DIST = \
 	.dir-locals.el
 
+nodist_noinst_SCRIPTS =				\
+	pre-inst-env
+
 gen-ChangeLog:
 	if test -d .git; then				\
 	  $(top_srcdir)/build-aux/gitlog-to-changelog	\

@@ -35,4 +35,21 @@ guile_smc_TEXINFOS = \
 	indices.texi		\
 	fdl.texi
 
+dist_man1_MANS =		\
+	smc.1
+
+## Silent rules.
+AM_V_HELP2MAN = $(AM_V_HELP2MAN_$(V))
+AM_V_HELP2MAN_ = $(AM_V_HELP2MAN_$(AM_DEFAULT_VERBOSITY))
+AM_V_HELP2MAN_0 = @echo "  HELP2MAN" $@;
+##
+gen_man =							\
+	LANGUAGE= $(top_builddir)/pre-inst-env $(HELP2MAN)	\
+	$(HELP2MANFLAGS)
+
+HELP2MANFLAGS = --source=GNU --info-page=$(PACKAGE_TARNAME)
+
+smc.1: $(abs_top_srcdir)/utils/smc
+	-$(AM_V_HELP2MAN)$(gen_man) --output="$@" "$<"
+
 ## Makefile.am ends here
