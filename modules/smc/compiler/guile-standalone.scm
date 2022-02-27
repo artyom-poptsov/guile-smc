@@ -98,6 +98,9 @@ not depend on Guile-SMC.."
                                    1))
          (proc-name (string->symbol (string-append "run-" cname))))
     `(define (,proc-name context)
+       ,(if (fsm-description fsm)
+            (fsm-description fsm)
+            "")
        ,@(fsm-transition-table->standalone-code fsm)
        ,(list (state-name (fsm-current-state fsm)) 'context))))
 
