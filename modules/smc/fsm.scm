@@ -34,6 +34,7 @@
   #:use-module (smc core log)
   #:use-module (smc core transition)
   #:use-module (smc core state)
+  #:use-module (smc core set)
   #:export (<fsm>
             fsm?
             fsm-description
@@ -55,6 +56,7 @@
             fsm-run!
             fsm-statistics
             fsm-pretty-print-statistics
+            fsm-procedures
 
             fsm-parent
             fsm-parent-set!
@@ -502,7 +504,22 @@ list is empty then no errors were found."
                         (set! errors (cons (cons state-name "Potentially a dead-end state.")
                                            errors))))
                     (fsm-transition-table self))
+    (log-debug "fsm-validate ... done")
     errors))
+
+(define-method-with-docs (fsm-procedures (self <fsm>))
+  "Get the list of procedures involved in SELF FSM."
+  (let ((procs (make <set>)))
+    (hash-map->list (lambda (state-name state)
+                      (set-add! procs (fsm-event-source self))
+                      (set-add! procs (state-entry-action state))
+                      (set-add! procs (state-exit-action state))
+                      (for-each (lambda (tr)
+                                  (set-add! procs (transition:guard  tr))
+                                  (set-add! procs (transition:action tr)))
+                                (state-transitions state)))
+                    (fsm-transition-table self))
+    (set-content procs)))
 
 ;;; fsm.scm ends here.
 
