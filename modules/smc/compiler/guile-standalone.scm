@@ -91,11 +91,12 @@ not depend on Guile-SMC.."
            (state->standalone-code fsm state))
          transition-list)))
 
+(define (string-drop-both str)
+  (string-drop-right (string-drop str 1) 1))
+
 (define-method-with-docs (fsm->standalone-code (fsm <fsm>))
   "Convert an @var{fsm} to a procedure that does not depend on Guile-SMC."
-  (let* ((cname (string-drop-right (string-drop (symbol->string (class-name (class-of fsm)))
-                                                1)
-                                   1))
+  (let* ((cname (string-drop-both (symbol->string (class-name (class-of fsm)))))
          (proc-name (string->symbol (string-append "run-" cname))))
     `(define (,proc-name context)
        ,(if (fsm-description fsm)
