@@ -150,28 +150,23 @@
               (p              (hash-ref resolved-procs proc-name)))
          (if p
              p
-             (let ((modules (puml-context-module ctx)))
-               (let loop ((mods modules))
-                 (if (null? mods)
-                     (begin
-                       (context-log-error ctx
-                                          "Could not find \"~a\" procedure in provided modules: ~a"
-                                          proc-name
-                                          modules)
-                       (context-log-error ctx
-                                          "Stanza: ~a"
-                                          (stanza->list-of-symbols
-                                           (context-stanza ctx)))
-                       (set-add! (puml-context-unresolved-procedures ctx) proc-name)
-                       #f)
-                     (let ((proc (safe-module-ref (car mods) proc-name)))
-                       (if proc
-                           (let ((result (cons (car mods) proc)))
-                             (hash-set! (puml-context-resolved-procedures ctx)
+             (let* ((modules (puml-context-module ctx))
+                    (result  (safe-module-list-ref modules proc-name)))
+               (if result
+                   (begin
+                     (hash-set! resolved-procs proc-name result)
+                     result)
+                   (begin
+                     (context-log-error ctx
+                                        "Could not find \"~a\" procedure in provided modules: ~a"
                                         proc-name
-                                        result)
-                             result)
-                           (loop (cdr mods)))))))))))
+                                        modules)
+                     (context-log-error ctx
+                                        "Stanza: ~a"
+                                        (stanza->list-of-symbols
+                                         (context-stanza ctx)))
+                     (set-add! (puml-context-unresolved-procedures ctx) proc-name)
+                     #f)))))))
 
 (define (module-name module)
   (let ((str (object->string module)))

@@ -27,13 +27,26 @@
   #:use-module (scheme documentation)
   #:export (define-method-with-docs
              object-address/hex-string
-             safe-module-ref))
+             safe-module-ref
+             safe-module-list-ref))
 
 (define (safe-module-ref module proc-name)
   (catch #t
     (lambda ()
       (module-ref module proc-name))
     (const #f)))
+
+(define (safe-module-list-ref modules proc-name)
+  "Try to find a PROC-NAME in a MODULES list.  Return a pair that consists of
+a procedure name and a procedure itself when the procedure is found, or #f
+otherwise."
+  (let loop ((mods modules))
+    (if (null? mods)
+        #f
+        (let ((proc (safe-module-ref (car mods) proc-name)))
+          (if proc
+              (cons (car mods) proc)
+              (loop (cdr mods)))))))
 
 (define (object-address/hex-string object)
   (number->string (object-address object) 16))
