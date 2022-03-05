@@ -1,8 +1,6 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (oop goops)
-             ((smc core stack)
-              #:prefix smc:)
              (smc context char-context))
 
 
@@ -47,26 +45,26 @@
   (and (context? (make <context>))
        (not (context? "not a context"))))
 
-(test-assert "<context>: buffer and stanza initially must be empty stacks"
+(test-assert "<context>: buffer and stanza initially must be empty lists"
   (let ((ctx (make <context>)))
-    (and (smc:stack?       (context-buffer ctx))
-         (smc:stack-empty? (context-buffer ctx))
-         (smc:stack?       (context-stanza ctx))
-         (smc:stack-empty? (context-stanza ctx)))))
+    (and (list? (context-buffer ctx))
+         (null? (context-buffer ctx))
+         (list? (context-stanza ctx))
+         (null? (context-stanza ctx)))))
 
 (test-equal "action:store"
   '("world" "hello")
   (let ((ctx (make <context>)))
     (action:store (action:store ctx "hello") "world")
-    (smc:stack-content (context-buffer ctx))))
+    (context-buffer ctx)))
 
 (test-assert "action:update-stanza"
   (let ((ctx (make <context>)))
     (action:store (action:store ctx "hello") "world")
     (action:update-stanza ctx #f)
-    (and (equal? (smc:stack-content (context-stanza ctx))
+    (and (equal? (context-stanza ctx)
                  '(("hello" "world")))
-         (smc:stack-empty? (context-buffer ctx)))))
+         (null? (context-buffer ctx)))))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))

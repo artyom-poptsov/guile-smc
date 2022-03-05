@@ -202,10 +202,10 @@
 
 ;;; Misc. helper procedures.
 
-(define-method (stanza->list-of-symbols (stanza <stack>))
+(define-method (stanza->list-of-symbols (stanza <list>))
   (map (lambda (elem)
          (string->symbol (list->string elem)))
-       (stack-content/reversed stanza)))
+       (reverse stanza)))
 
 (define-method (stack-content->string (stack <stack>))
   (list->string (stack-content/reversed stack)))

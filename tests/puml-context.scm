@@ -20,10 +20,7 @@
 
 (test-equal "stanza->list-of-symbols"
   '(s1 s2)
-  (let ((s (make <stack>)))
-    (stack-push! s '(#\s #\1))
-    (stack-push! s '(#\s #\2))
-    (stanza->list-of-symbols s)))
+  (stanza->list-of-symbols '((#\s #\2) (#\s #\1))))
 
 (test-equal "stack-content->string"
   "ab"

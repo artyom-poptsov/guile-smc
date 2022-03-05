@@ -36,7 +36,6 @@
   #:use-module (scheme documentation)
   #:use-module (oop goops)
   #:use-module (smc core log)
-  #:use-module (smc core stack)
   #:export (<context>
             context?
             context-debug-mode?
@@ -68,7 +67,7 @@
 
   ;; The buffer holds read symbols.
   ;;
-  ;; <stack>
+  ;; <list>
   (buffer
    #:init-value '()
    #:getter     context-buffer
@@ -76,9 +75,9 @@
 
   ;; The stanza holds a logical unit of parsing (e.g. a key/value pair)
   ;;
-  ;;<stack>
+  ;;<list>
   (stanza
-   #:init-thunk (lambda () (make <stack>))
+   #:init-value '()
    #:getter     context-stanza
    #:setter     context-stanza-set!))
 
@@ -96,7 +95,11 @@
                        (cons value (context-buffer ctx))))
 
 (define-method (context-stanza-clear! (ctx <context>))
-  (stack-clear! (context-stanza ctx)))
+  (context-stanza-set! ctx '()))
+
+(define-method (context-stanza-add! (ctx <context>) value)
+  (context-stanza-set! ctx
+                       (cons value (context-stanza ctx))))
 
 (define-method (context-clear! (ctx <context>))
   (context-buffer-clear! ctx)
@@ -120,15 +123,15 @@
   ctx)
 
 (define (action:update-stanza ctx event)
-  (let ((buf    (reverse (context-buffer ctx)))
-        (stanza (context-stanza ctx)))
+  (let ((buf (reverse (context-buffer ctx))))
     (unless (null? buf)
       (when (context-debug-mode? ctx)
-        (log-debug "action:update-stanza: event: ~a; buffer: ~a; stanza: ~a"
-                   event
-                   buf
-                   (stack-content/reversed stanza)))
-      (stack-push! stanza buf)
+        (let ((stanza (reverse (context-stanza ctx))))
+          (log-debug "action:update-stanza: event: ~a; buffer: ~a; stanza: ~a"
+                     event
+                     buf
+                     stanza)))
+      (context-stanza-add! ctx buf)
       (context-buffer-clear! ctx))
     ctx))
 
