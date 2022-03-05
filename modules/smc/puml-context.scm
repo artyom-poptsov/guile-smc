@@ -212,7 +212,7 @@
 
 ;; Convert a context buffer of PUML-CONTEXT to a string.
 (define-method (context-buffer->string (puml-context <puml-context>))
-  (stack-content->string (context-buffer puml-context)))
+  (list->string (reverse (context-buffer puml-context))))
 
 
 ;;; Error reporting.
@@ -288,7 +288,7 @@
 
 (define (action:add-state-transition ctx ch)
 
-  (unless (stack-empty? (context-buffer ctx))
+  (unless (null? (context-buffer ctx))
     (action:update-stanza ctx ch))
 
   (let* ((fsm     (puml-context-fsm ctx))

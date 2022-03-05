@@ -70,7 +70,7 @@
   ;;
   ;; <stack>
   (buffer
-   #:init-thunk (lambda () (make <stack>))
+   #:init-value '()
    #:getter     context-buffer
    #:setter     context-buffer-set!)
 
@@ -89,7 +89,11 @@
 
 
 (define-method (context-buffer-clear! (ctx <context>))
-  (stack-clear! (context-buffer ctx)))
+  (context-buffer-set! ctx '()))
+
+(define-method (context-buffer-add! (ctx <context>) value)
+  (context-buffer-set! ctx
+                       (cons value (context-buffer ctx))))
 
 (define-method (context-stanza-clear! (ctx <context>))
   (stack-clear! (context-stanza ctx)))
@@ -107,25 +111,25 @@
   (when (context-debug-mode? ctx)
     (log-debug "action:store: event: ~a; buffer: ~a"
                event (context-buffer ctx)))
-  (stack-push! (context-buffer ctx) event)
+  (context-buffer-add! ctx event)
   ctx)
 
 (define (action:clear-buffer ctx event)
   "Clear the context CTX buffer."
-  (stack-clear! (context-buffer ctx))
+  (context-buffer-clear! ctx)
   ctx)
 
 (define (action:update-stanza ctx event)
-  (let ((buf    (context-buffer ctx))
+  (let ((buf    (reverse (context-buffer ctx)))
         (stanza (context-stanza ctx)))
     (unless (null? buf)
       (when (context-debug-mode? ctx)
         (log-debug "action:update-stanza: event: ~a; buffer: ~a; stanza: ~a"
                    event
-                   (stack-content/reversed buf)
+                   buf
                    (stack-content/reversed stanza)))
-      (stack-push! stanza (stack-content/reversed buf))
-      (stack-clear! buf))
+      (stack-push! stanza buf)
+      (context-buffer-clear! ctx))
     ctx))
 
 (define (guard:#t ctx event)
