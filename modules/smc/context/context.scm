@@ -33,7 +33,6 @@
 ;;; Code:
 
 (define-module (smc context context)
-  #:use-module (scheme documentation)
   #:use-module (oop goops)
   #:use-module (smc core log)
   #:export (<context>
@@ -55,8 +54,8 @@
 
 
 
-(define-class-with-docs <context> ()
-  "This class describes a generic parser context."
+;; This class describes a generic parser context.
+(define-class <context> ()
 
   ;; <boolean>
   (debug-mode?
