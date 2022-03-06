@@ -1,6 +1,7 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (oop goops)
+             (smc context context)
              (smc context char-context))
 
 
@@ -52,6 +53,23 @@
          (list? (context-stanza ctx))
          (null? (context-stanza ctx)))))
 
+
+(test-equal "context-buffer-add!"
+  '(3 2 1)
+  (let ((ctx (make <context>)))
+    (context-buffer-add! ctx 1)
+    (context-buffer-add! ctx 2)
+    (context-buffer-add! ctx 3)
+    (context-buffer ctx)))
+
+(test-equal "context-stanza-add!"
+  '("hello" "world")
+  (let ((ctx (make <context>)))
+    (context-stanza-add! ctx "world")
+    (context-stanza-add! ctx "hello")
+    (context-stanza ctx)))
+
+
 (test-equal "action:store"
   '("world" "hello")
   (let ((ctx (make <context>)))
