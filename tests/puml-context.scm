@@ -22,13 +22,6 @@
   '(s1 s2)
   (stanza->list-of-symbols '((#\s #\2) (#\s #\1))))
 
-(test-equal "stack-content->string"
-  "ab"
-  (let ((s (make <stack>)))
-    (stack-push! s #\a)
-    (stack-push! s #\b)
-    (stack-content->string s)))
-
 
 
 (test-equal "puml-context-resolved-procedures: check set content"

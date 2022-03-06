@@ -46,7 +46,6 @@
             %puml-error
             puml-error
             stanza->list-of-symbols
-            stack-content->string
             context-buffer->string
             resolve-procedure
             parse-event-source
@@ -206,9 +205,6 @@
   (map (lambda (elem)
          (string->symbol (list->string elem)))
        (reverse stanza)))
-
-(define-method (stack-content->string (stack <stack>))
-  (list->string (stack-content/reversed stack)))
 
 ;; Convert a context buffer of PUML-CONTEXT to a string.
 (define-method (context-buffer->string (puml-context <puml-context>))
