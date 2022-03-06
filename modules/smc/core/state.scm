@@ -60,6 +60,7 @@
             state:description
             state:event-source
             state:entry-action
+            state:exit-action
             state:transitions
 
             list->state
@@ -287,6 +288,9 @@ of a STATE, specified by the 'event-source' slot."
 
 (define (state:entry-action state)
   (assoc-ref state 'entry-action))
+
+(define (state:exit-action state)
+  (assoc-ref state 'exit-action))
 
 (define (state:event-source/name state)
   (let ((proc (assoc-ref state 'event-source)))
