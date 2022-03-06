@@ -36,6 +36,7 @@
   #:use-module (smc version)
   #:use-module (smc fsm)
   #:export (fsm->standalone-code
+            fsm-define-module
             state->standalone-code
             fsm-transition-table->standalone-code))
 
@@ -93,6 +94,20 @@ not depend on Guile-SMC.."
 
 (define (string-drop-both str)
   (string-drop-right (string-drop str 1) 1))
+
+(define* (fsm-define-module fsm
+                            module
+                            #:key
+                            extra-modules)
+  (let* ((cname (string-drop-both (symbol->string (class-name (class-of fsm)))))
+         (proc-name (string->symbol (string-append "run-" cname))))
+    (let loop ((lst `(define-module ,module
+                       #:use-module (oop goops)))
+               (em  extra-modules))
+      (if (or (not em) (null? em))
+          (append lst `(#:export (,proc-name)))
+          (loop (append lst `(#:use-module ,(car em)))
+                (cdr em))))))
 
 (define-method-with-docs (fsm->standalone-code (fsm <fsm>))
   "Convert an @var{fsm} to a procedure that does not depend on Guile-SMC."
