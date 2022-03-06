@@ -37,6 +37,7 @@
   #:use-module (smc fsm)
   #:export (fsm->standalone-code
             fsm-define-module
+            fsm-get-context-code
             state->standalone-code
             fsm-transition-table->standalone-code))
 
@@ -108,6 +109,28 @@ not depend on Guile-SMC.."
           (append lst `(#:export (,proc-name)))
           (loop (append lst `(#:use-module ,(car em)))
                 (cdr em))))))
+
+(define (fsm-get-context-code guile-smc-modules-path)
+  "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the
+code as a list."
+  (define (read-module path module-name)
+    (let ((port (open-input-file (string-append path "/" module-name))))
+      ;; Skip the 'define-module' part.
+      (read port)
+      (let loop ((sexp   (read port))
+                 (result '()))
+        (display sexp)
+        (newline)
+        (if (not (eof-object? sexp))
+            (loop (read port)
+                  (cons sexp result))
+            (begin
+              (close port)
+              (reverse result))))))
+              
+  (let ((path (string-append guile-smc-modules-path "context")))
+    (list (read-module path "context.scm")
+          (read-module path "char-context.scm"))))
 
 (define-method-with-docs (fsm->standalone-code (fsm <fsm>))
   "Convert an @var{fsm} to a procedure that does not depend on Guile-SMC."
