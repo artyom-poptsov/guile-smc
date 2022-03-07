@@ -119,18 +119,16 @@ code as a list."
       (read port)
       (let loop ((sexp   (read port))
                  (result '()))
-        (display sexp)
-        (newline)
         (if (not (eof-object? sexp))
             (loop (read port)
                   (cons sexp result))
             (begin
               (close port)
               (reverse result))))))
-              
+
   (let ((path (string-append guile-smc-modules-path "context")))
-    (list (read-module path "context.scm")
-          (read-module path "char-context.scm"))))
+    `(,@(read-module path "context.scm")
+      ,@(read-module path "char-context.scm"))))
 
 (define-method-with-docs (fsm->standalone-code (fsm <fsm>))
   "Convert an @var{fsm} to a procedure that does not depend on Guile-SMC."
