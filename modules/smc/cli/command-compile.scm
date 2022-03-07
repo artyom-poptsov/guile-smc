@@ -41,7 +41,7 @@ Options:
                     and a non-zero value otherwise.
   --target, -t <target>
                     Compilation target.  Allowed values:
-                      \"guile\", \"guile-standalone-copy\"
+                      \"guile\", \"guile-standalone\", \"guile-standalone-copy\"
                     Default value is \"guile\".
   --debug           Enable the debug mode.
 

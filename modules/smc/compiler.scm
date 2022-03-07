@@ -1,6 +1,6 @@
 ;;; compiler.scm -- Guile-SMC state machine compiler.
 
-;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -32,7 +32,9 @@
   #:use-module (smc version)
   #:use-module (smc fsm)
   #:use-module (smc puml)
+  #:use-module (smc config)
   #:use-module (smc compiler guile)
+  #:use-module (smc compiler guile-standalone)
   #:export (fsm-compile))
 
 
@@ -114,6 +116,23 @@
 
         (newline output-port)))
 
+(define* (fsm-compile/guile-standalone fsm
+                                       #:key
+                                       fsm-name
+                                       fsm-module
+                                       extra-modules
+                                       output-port)
+  (pretty-print (fsm-define-module fsm '(custom-fsm))
+                #:display? #f)
+  (newline)
+  (for-each (lambda (sexp)
+              (pretty-print sexp #:display? #f)
+              (newline))
+            (fsm-get-context-code %guile-smc-modules-directory))
+  (newline)
+  (pretty-print (fsm->standalone-code fsm)
+                #:display? #f))
+
 
 (define* (fsm-compile fsm
                       #:key
@@ -136,6 +155,12 @@
                         #:fsm-module    fsm-module
                         #:extra-modules extra-modules
                         #:output-port   output-port))
+    ((guile-standalone)
+     (fsm-compile/guile-standalone fsm
+                                   #:fsm-name      fsm-name
+                                   #:fsm-module    fsm-module
+                                   #:extra-modules extra-modules
+                                   #:output-port   output-port))
     ((guile-standalone-copy)
      (fsm-compile/guile-standalone-copy fsm
                                         #:fsm-name      fsm-name
