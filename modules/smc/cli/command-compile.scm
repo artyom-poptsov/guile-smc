@@ -41,7 +41,7 @@ Options:
                     and a non-zero value otherwise.
   --target, -t <target>
                     Compilation target.  Allowed values:
-                      \"guile\", \"guile-standalone\"
+                      \"guile\", \"guile-standalone-copy\"
                     Default value is \"guile\".
   --debug           Enable the debug mode.
 
@@ -71,7 +71,7 @@ Options:
          (fsm-extra-modules (and extra-modules
                                  (eval-string/quote extra-modules)))
          (fsm-extra-modules-rewritten
-          (if (string=? target "guile-standalone")
+          (if (string=? target "guile-standalone-copy")
               (map (lambda (m) (cons (car fsm-module) m))
                    fsm-extra-modules)
               fsm-extra-modules))
@@ -86,7 +86,7 @@ Options:
     (add-to-load-path* (string-split extra-load-paths #\:))
 
     (log-debug "Target: ~a" target)
-    (when (string=? target "guile-standalone")
+    (when (string=? target "guile-standalone-copy")
       (copy-dependencies "." fsm-module fsm-extra-modules))
 
     (log-debug "arguments: ~a" args)
@@ -113,5 +113,4 @@ Options:
                        #:fsm-name      name
                        #:fsm-module    fsm-module
                        #:extra-modules fsm-extra-modules-rewritten
-                       #:standalone-mode? (string=? target
-                                                    "guile-standalone"))))))))
+                       #:target        (string->symbol target))))))))

@@ -36,21 +36,12 @@
   #:export (fsm-compile))
 
 
-
-(define* (fsm-compile fsm
-                      #:key
-                      (fsm-name 'custom-fsm)
-                      (fsm-module    #f)
-                      (extra-modules '())
-                      (standalone-mode? #f)
-                      (output-port (current-output-port)))
-
-  (when (fsm-event-source-anonymous? fsm)
-    (let ((error-message
-           "Cannot compile the FSM as the event source is set to an anonymous procedure"))
-      (log-error "~a: ~a" error-message fsm)
-      (error error-message fsm)))
-
+(define* (fsm-compile/guile fsm
+                            #:key
+                            fsm-name
+                            fsm-module
+                            extra-modules
+                            output-port)
   (write-header output-port)
 
   (when (fsm-parent fsm)
@@ -63,24 +54,97 @@
                       #:extra-modules    extra-modules
                       #:class-name       class-name
                       #:port             output-port
-                      #:standalone-mode? standalone-mode?)
+                      #:standalone-mode? #f)
+
         (write-use-modules extra-modules output-port))
 
-    (newline output-port)
+        (newline output-port)
 
-    (form-feed output-port)
-    (write-transition-table fsm output-port)
+        (form-feed output-port)
+        (write-transition-table fsm output-port)
 
-    (newline output-port)
+        (newline output-port)
 
-    (form-feed output-port)
-    (write-define-class class-name output-port)
+        (form-feed output-port)
+        (write-define-class class-name output-port)
 
-    (newline output-port)
+        (newline output-port)
 
-    (form-feed output-port)
-    (write-initialize fsm class-name output-port)
+        (form-feed output-port)
+        (write-initialize fsm class-name output-port)
 
-    (newline output-port)))
+        (newline output-port)))
+
+(define* (fsm-compile/guile-standalone-copy fsm
+                                            #:key
+                                            fsm-name
+                                            fsm-module
+                                            extra-modules
+                                            output-port)
+  (write-header output-port)
+
+  (when (fsm-parent fsm)
+    (write-parent-fsm-info fsm output-port))
+
+  (form-feed output-port)
+  (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
+    (if fsm-module
+        (write-module fsm-module
+                      #:extra-modules    extra-modules
+                      #:class-name       class-name
+                      #:port             output-port
+                      #:standalone-mode? #t)
+
+        (write-use-modules extra-modules output-port))
+
+        (newline output-port)
+
+        (form-feed output-port)
+        (write-transition-table fsm output-port)
+
+        (newline output-port)
+
+        (form-feed output-port)
+        (write-define-class class-name output-port)
+
+        (newline output-port)
+
+        (form-feed output-port)
+        (write-initialize fsm class-name output-port)
+
+        (newline output-port)))
+
+
+(define* (fsm-compile fsm
+                      #:key
+                      (fsm-name      'custom-fsm)
+                      (fsm-module    #f)
+                      (extra-modules '())
+                      (target        'guile)
+                      (output-port   (current-output-port)))
+
+  (when (fsm-event-source-anonymous? fsm)
+    (let ((error-message
+           "Cannot compile the FSM as the event source is set to an anonymous procedure"))
+      (log-error "~a: ~a" error-message fsm)
+      (error error-message fsm)))
+
+  (case target
+    ((guile)
+     (fsm-compile/guile fsm
+                        #:fsm-name      fsm-name
+                        #:fsm-module    fsm-module
+                        #:extra-modules extra-modules
+                        #:output-port   output-port))
+    ((guile-standalone-copy)
+     (fsm-compile/guile-standalone-copy fsm
+                                        #:fsm-name      fsm-name
+                                        #:fsm-module    fsm-module
+                                        #:extra-modules extra-modules
+                                        #:output-port   output-port))
+    (else
+     (error "Unknown compilation target" target))))
+
+
 
 ;;; compiler.scm ends here.
