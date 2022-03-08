@@ -111,6 +111,7 @@ not depend on Guile-SMC.."
          transition-list)))
 
 (define (string-drop-both str)
+  "Drop one symbol from both left and right parts of a STR."
   (string-drop-right (string-drop str 1) 1))
 
 (define* (fsm-define-module fsm
@@ -131,6 +132,7 @@ not depend on Guile-SMC.."
                 (cdr em))))))
 
 (define (tree-contains? root elem)
+  "Check if a ROOT contains an ELEM."
   (cond
    ((pair? root)
     (or (tree-contains? (car root) elem)
@@ -139,6 +141,8 @@ not depend on Guile-SMC.."
     (equal? root elem))))
 
 (define (prune-unused-definitions definitions hardwired-definitions)
+  "Remove all the definitions from the DEFINITIONS list that are not used
+neither in the DEFINITIONS nor HARDWIRED-DEFINITIONS lists."
   (let main-loop ((defs   definitions)
                   (result '()))
     (if (null? defs)
