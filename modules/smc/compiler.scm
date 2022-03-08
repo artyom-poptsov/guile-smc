@@ -130,7 +130,7 @@
     (write-parent-fsm-info fsm output-port))
 
   (pretty-print (fsm-define-module fsm
-                                   '(custom-fsm)
+                                   fsm-module
                                    #:extra-modules extra-modules)
                 output-port
                 #:display? #f)
