@@ -69,19 +69,29 @@ Guile-SMC."
                          (nstate (and (transition:next-state transition)
                                       (state-name (transition:next-state transition)))))
                      (list (list (procedure-name tguard) 'context 'event)
-                           (list 'let (list (list 'context
-                                                  (list (procedure-name action)
-                                                        'context
-                                                        'event)))
-                                 (if nstate
-                                     (if (or (not exit-action) (null? exit-action))
-                                         (list nstate 'context)
-                                         (list nstate (list (procedure-name exit-action)
-                                                            'context)))
-                                     (if (or (not exit-action) (null? exit-action))
+                           `(let ,(list (list 'context
+                                              (list (procedure-name action)
+                                                    'context
+                                                    'event)))
+                              ,@(if nstate
+                                    (list
+                                      (list 'log-debug
+                                            "[~a] -> [~a]"
+                                            name
+                                            nstate)
+                                      (if (or (not exit-action) (null? exit-action))
+                                          (list nstate 'context)
+                                          (list nstate (list (procedure-name exit-action)
+                                                             'context))))
+                                    (list
+                                     (list 'log-debug
+                                           "[~a] -> [*]"
+                                           name)
+                                     (if (or (not exit-action)
+                                             (null? exit-action))
                                          'context
                                          (list (procedure-name exit-action)
-                                               'context)))))))
+                                               'context))))))))
                  transitions))))))
 
 (define-method-with-docs (fsm-transition-table->standalone-code (fsm <fsm>))
@@ -103,7 +113,9 @@ not depend on Guile-SMC.."
   (let* ((cname (string-drop-both (symbol->string (class-name (class-of fsm)))))
          (proc-name (string->symbol (string-append "run-" cname))))
     (let loop ((lst `(define-module ,module
-                       #:use-module (oop goops)))
+                       #:use-module (oop goops)
+                       #:use-module (logging logger)
+                       #:use-module (scheme documentation)))
                (em  extra-modules))
       (if (or (not em) (null? em))
           (append lst `(#:export (,proc-name)))
@@ -126,9 +138,12 @@ code as a list."
               (close port)
               (reverse result))))))
 
-  (let ((path (string-append guile-smc-modules-path "context")))
-    `(,@(read-module path "context.scm")
-      ,@(read-module path "char-context.scm"))))
+  (let ((core-path    (string-append guile-smc-modules-path "core"))
+        (context-path (string-append guile-smc-modules-path "context")))
+    `(,@(read-module core-path "common.scm")
+      ,@(read-module core-path "log.scm")
+      ,@(read-module context-path "context.scm")
+      ,@(read-module context-path "char-context.scm"))))
 
 (define-method-with-docs (fsm->standalone-code (fsm <fsm>))
   "Convert an @var{fsm} to a procedure that does not depend on Guile-SMC."
