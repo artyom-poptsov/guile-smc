@@ -39,6 +39,7 @@
             fsm-define-module
             fsm-get-context-code
             state->standalone-code
+            prune-unused-definitions
             fsm-transition-table->standalone-code))
 
 
@@ -128,6 +129,31 @@ not depend on Guile-SMC.."
           (append lst `(#:export (,proc-name)))
           (loop (append lst `(#:use-module ,(car em)))
                 (cdr em))))))
+
+(define (tree-contains? root elem)
+  (cond
+   ((pair? root)
+    (or (tree-contains? (car root) elem)
+        (tree-contains? (cdr root) elem)))
+   (else
+    (equal? root elem))))
+
+(define (prune-unused-definitions definitions hardwired-definitions)
+  (let main-loop ((defs   definitions)
+                  (result '()))
+    (if (null? defs)
+        result
+        (let* ((def (car defs))
+               (sym (if (pair? (cadr def))
+                        (caadr def)
+                        (cadr def))))
+          (if (or (tree-contains? (cdr defs) sym)
+                  (tree-contains? result sym)
+                  (tree-contains? hardwired-definitions sym))
+              (main-loop (cdr defs)
+                         (append result (list def)))
+              (main-loop (cdr defs)
+                         result))))))
 
 (define (fsm-get-context-code guile-smc-modules-path)
   "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the

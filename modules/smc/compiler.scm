@@ -123,7 +123,8 @@
                                        fsm-name
                                        fsm-module
                                        extra-modules
-                                       output-port)
+                                       output-port
+                                       (optimize? #t))
   (write-header output-port)
 
   (when (fsm-parent fsm)
@@ -136,15 +137,22 @@
                 #:display? #f)
   (newline output-port)
   (form-feed output-port)
-  (for-each (lambda (sexp)
-              (pretty-print sexp output-port #:display? #f)
-              (newline))
-            (fsm-get-context-code %guile-smc-modules-directory))
-  (newline output-port)
-  (form-feed output-port)
-  (pretty-print (fsm->standalone-code fsm)
-                output-port
-                #:display? #f)
+
+  (let ((context-code (fsm-get-context-code %guile-smc-modules-directory))
+        (fsm-code     (fsm->standalone-code fsm)))
+    (for-each (lambda (sexp)
+                (pretty-print sexp output-port #:display? #f)
+                (newline))
+              (if optimize?
+                  (prune-unused-definitions
+                   (prune-unused-definitions context-code (list fsm-code))
+                   (list fsm-code))
+                  context-code))
+    (newline output-port)
+    (form-feed output-port)
+    (pretty-print fsm-code
+                  output-port
+                  #:display? #f))
 
   (newline output-port)
   (write-footer fsm-name output-port))
