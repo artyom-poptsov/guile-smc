@@ -83,8 +83,8 @@ Guile-SMC."
                                         (list
                                          (list 'log-debug
                                                "[~a] -> [~a]"
-                                               name
-                                               nstate)
+                                               (list 'quote name)
+                                               (list 'quote nstate))
                                          (if (or (not exit-action) (null? exit-action))
                                              (list nstate 'context)
                                              (list nstate (list (procedure-name exit-action)
@@ -92,7 +92,7 @@ Guile-SMC."
                                     (list
                                      (list 'log-debug
                                            "[~a] -> [*]"
-                                           name)
+                                           (list 'quote name))
                                      (if (or (not exit-action)
                                              (null? exit-action))
                                          'context
