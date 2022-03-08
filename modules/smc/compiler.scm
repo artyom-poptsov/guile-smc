@@ -127,11 +127,13 @@
                                    #:extra-modules extra-modules)
                 #:display? #f)
   (newline)
+  (form-feed output-port)
   (for-each (lambda (sexp)
               (pretty-print sexp #:display? #f)
               (newline))
             (fsm-get-context-code %guile-smc-modules-directory))
   (newline)
+  (form-feed output-port)
   (pretty-print (fsm->standalone-code fsm)
                 #:display? #f))
 
