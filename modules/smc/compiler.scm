@@ -122,7 +122,9 @@
                                        fsm-module
                                        extra-modules
                                        output-port)
-  (pretty-print (fsm-define-module fsm '(custom-fsm))
+  (pretty-print (fsm-define-module fsm
+                                   '(custom-fsm)
+                                   #:extra-modules extra-modules)
                 #:display? #f)
   (newline)
   (for-each (lambda (sexp)
