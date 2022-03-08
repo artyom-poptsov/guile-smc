@@ -122,6 +122,11 @@
                                        fsm-module
                                        extra-modules
                                        output-port)
+  (write-header output-port)
+
+  (when (fsm-parent fsm)
+    (write-parent-fsm-info fsm output-port))
+
   (pretty-print (fsm-define-module fsm
                                    '(custom-fsm)
                                    #:extra-modules extra-modules)
