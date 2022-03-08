@@ -33,6 +33,7 @@
   #:use-module (smc fsm)
   #:use-module (smc puml)
   #:use-module (smc config)
+  #:use-module (smc compiler guile-common)
   #:use-module (smc compiler guile)
   #:use-module (smc compiler guile-standalone)
   #:export (fsm-compile))
@@ -114,7 +115,8 @@
         (form-feed output-port)
         (write-initialize fsm class-name output-port)
 
-        (newline output-port)))
+        (newline output-port)
+        (write-footer fsm-name output-port)))
 
 (define* (fsm-compile/guile-standalone fsm
                                        #:key
@@ -142,7 +144,10 @@
   (form-feed output-port)
   (pretty-print (fsm->standalone-code fsm)
                 output-port
-                #:display? #f))
+                #:display? #f)
+
+  (newline output-port)
+  (write-footer fsm-name output-port))
 
 
 (define* (fsm-compile fsm
