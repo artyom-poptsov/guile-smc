@@ -125,16 +125,18 @@
   (pretty-print (fsm-define-module fsm
                                    '(custom-fsm)
                                    #:extra-modules extra-modules)
+                output-port
                 #:display? #f)
-  (newline)
+  (newline output-port)
   (form-feed output-port)
   (for-each (lambda (sexp)
-              (pretty-print sexp #:display? #f)
+              (pretty-print sexp output-port #:display? #f)
               (newline))
             (fsm-get-context-code %guile-smc-modules-directory))
-  (newline)
+  (newline output-port)
   (form-feed output-port)
   (pretty-print (fsm->standalone-code fsm)
+                output-port
                 #:display? #f))
 
 
