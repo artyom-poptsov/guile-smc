@@ -121,7 +121,8 @@ not depend on Guile-SMC.."
     (let loop ((lst `(define-module ,module
                        #:use-module (oop goops)
                        #:use-module (logging logger)
-                       #:use-module (scheme documentation)))
+                       #:use-module (scheme documentation)
+                       #:use-module (ice-9 textual-ports)))
                (em  extra-modules))
       (if (or (not em) (null? em))
           (append lst `(#:export (,proc-name)))
