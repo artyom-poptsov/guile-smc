@@ -74,15 +74,21 @@ Guile-SMC."
                                                     'context
                                                     'event)))
                               ,@(if nstate
-                                    (list
-                                      (list 'log-debug
-                                            "[~a] -> [~a]"
-                                            name
-                                            nstate)
-                                      (if (or (not exit-action) (null? exit-action))
-                                          (list nstate 'context)
-                                          (list nstate (list (procedure-name exit-action)
-                                                             'context))))
+                                    (if (equal? nstate name)
+                                        (list
+                                         (if (or (not exit-action) (null? exit-action))
+                                             (list nstate 'context)
+                                             (list nstate (list (procedure-name exit-action)
+                                                                'context))))
+                                        (list
+                                         (list 'log-debug
+                                               "[~a] -> [~a]"
+                                               name
+                                               nstate)
+                                         (if (or (not exit-action) (null? exit-action))
+                                             (list nstate 'context)
+                                             (list nstate (list (procedure-name exit-action)
+                                                                'context)))))
                                     (list
                                      (list 'log-debug
                                            "[~a] -> [*]"
