@@ -84,6 +84,9 @@ Options:
   --fsm-module, -m <module>
                     Set the module for the output FSM.  Example value:
                       "(smc puml-fsm)"
+  --target, -t <target>
+                    Compilation target.  Allowed values:
+                      \"guile\", \"guile-standalone\", \"guile-standalone-copy\"
   --validate        Validate the output FSM and print the validation result.
                     The exit code is 0 if the validation is passed,
                     and a non-zero value otherwise.
@@ -95,7 +98,65 @@ Usage example:
 $ cat fsm.puml | smc compile -L . -U "((context))" -m "(custom-fsm)" > custom-fsm.scm
 #+END_EXAMPLE
 
-**** Standalone Mode
+**** Targets
+***** =guile=
+The default compilation target.  The code produced by the compiler for this
+target is dependent on the Guile-SMC.
+
+***** =guile-standalone=
+This compilation target produces GNU Guile FSM code in a single file that does
+not dependent on Guile-SMC.
+
+All required Guile-SMC procedures will be copied to the output stream, and the
+extra procedures that are not used in the output code are removed by pruning.
+
+Here's an example of an output FSM (without the auxiliary code copied from
+Guile-SMC that normally goes before this procedure):
+#+BEGIN_EXAMPLE scheme
+(define (run-fsm context)
+  ""
+  (define (DEFAULT context)
+    "Count parenthesis."
+    (let ((event (event-source context)))
+      (cond ((guard:eof-object? context event)
+             (let ((context (action:validate context event)))
+               (log-debug "[~a] -> [*]" 'DEFAULT)
+               context))
+            ((guard:semicolon? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'DEFAULT 'COMMENT)
+               (COMMENT context)))
+            ((guard:double-quote? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'DEFAULT 'STRING)
+               (STRING context)))
+            ((#{guard:#t}# context event)
+             (let ((context (action:count context event)))
+               (DEFAULT context))))))
+  (define (STRING context)
+    "Skip a string."
+    (let ((event (event-source context)))
+      (cond ((guard:double-quote? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'STRING 'DEFAULT)
+               (DEFAULT context)))
+            ((#{guard:#t}# context event)
+             (let ((context (action:no-op context event)))
+               (STRING context))))))
+  (define (COMMENT context)
+    "Skip a comment."
+    (let ((event (event-source context)))
+      (cond ((guard:newline? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'COMMENT 'DEFAULT)
+               (DEFAULT context)))
+            ((#{guard:#t}# context event)
+             (let ((context (action:no-op context event)))
+               (COMMENT context))))))
+  (DEFAULT context))
+#+END_EXAMPLE
+
+***** =guile-standalone-copy=
 The compiler can be configured in such way that it will copy all the modules
 that are needed to run the output FSM so the FSM will not depend on Guile-SMC.
 
@@ -167,7 +228,7 @@ STRING -> STRING
 Now let's compile the FSM, using the "guile-standalone" target:
 #+BEGIN_EXAMPLE shell
 $ cat fsm.puml | /usr/bin/smc compile -L . -U "((context))" -m "(custom-fsm)" \
-    --target guile-standalone > custom-fsm.scm
+    --target guile-standalone-copy > custom-fsm.scm
 #+END_EXAMPLE
 
 Now the project root directory looks like this:
