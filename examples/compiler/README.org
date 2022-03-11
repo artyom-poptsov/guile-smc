@@ -1,0 +1,6 @@
+* Guile-SMC compilation example
+
+#+BEGIN_EXAMPLE shell
+$ ../../pre-inst-env guile -L . main.scm > fsm.scm
+$ echo "hello world" | ../../pre-inst-env guile -L . run.scm
+#+END_EXAMPLE
