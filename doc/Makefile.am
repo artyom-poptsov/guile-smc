@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ## 
@@ -50,7 +50,10 @@ gen_man =							\
 
 HELP2MANFLAGS = --source=GNU --info-page=$(PACKAGE_TARNAME)
 
-smc.1: $(abs_top_srcdir)/utils/smc
+smc.1: $(abs_top_builddir)/utils/smc
 	-$(AM_V_HELP2MAN)$(gen_man) --output="$@" "$<"
+
+CLEANFILES = \
+	smc.1
 
 ## Makefile.am ends here
