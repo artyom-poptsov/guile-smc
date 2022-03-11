@@ -32,6 +32,7 @@ guile_smc_TEXINFOS = \
 	api-puml.texi		\
 	api-compiler.texi	\
 	api-version.texi	\
+	cli.texi		\
 	indices.texi		\
 	fdl.texi
 

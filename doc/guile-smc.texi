@@ -56,6 +56,7 @@ Documentation License.''
 * Introduction::
 * Installation::
 * API Reference::
+* Command-Line Interface::
 
 Appendices
 
@@ -111,6 +112,8 @@ Context:
 @include api-core-state.texi
 @include api-core-stack.texi
 @include api-context.texi
+
+@include cli.texi
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License

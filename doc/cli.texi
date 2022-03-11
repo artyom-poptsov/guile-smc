@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2022 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node Command-Line Interface
+@chapter Command-Line Interface
+@cindex CLI
+
+Guile-SMC has a @acronym{CLI, Command-Line Interface} that provides access to
+its features.  It is built upon @code{(smc cli)} module that contains
+@acronym{API, Application Programming Interface} for the tool.
+
+The CLI tool is called simply @file{smc}.  Please see @command{smc --help}
+output or @command{man smc} for usage information.
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:
