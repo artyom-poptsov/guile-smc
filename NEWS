@@ -7,16 +7,29 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
-* Unreleased
+* Version 0.4.0 (2022-03-11)
 ** Add FSM profiler
-   Add =smc profile= command.
-** =smc compile= now has "standalone" mode
-   The "standalone" mode allows to compile a FSM in such way that the output
-   code does not depend on Guile-SMC.
+   Add =smc profile= command.  Currently the profiler allows to measure the
+   time a FSM spends in each state.
+** Add =guile-standalone= compilation target
+   This compilation target produces GNU Guile FSM code in a single file that
+   does not dependent on Guile-SMC.
 
-   When the "standalone" mode is enabled the compiler copies all the required
-   Guile-SMC modules to a separated directory along with the specified extra
-   modules.
+   All required Guile-SMC procedures will be copied to the output stream, and
+   the extra procedures that are not used in the output code are removed by
+   pruning.
+
+   Here's an example of an output FSM (without the auxiliary code copied from
+   Guile-SMC that normally goes before this procedure):
+** Add =guile-standalone-copy= compilation target
+   The compiler can be configured in such way that it will copy all the
+   modules that are needed to run the output FSM so the FSM will not depend on
+   Guile-SMC.
+** =smc compile= now accepts =--target= option
+   This option allows to set the compilation target.  Allowed targets are:
+   - guile
+   - guile-standalone
+   - guile-standalone-copy
 ** =smc compile= now allows to pass input file as an argument
 ** =smc= now handles =--version= option
    The state machine compiler now either read input FSM description in
@@ -24,6 +37,9 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
    argument.
 ** Optimize the PlantUML parser
    PlantUML parser now about 25% faster.
+** Add new examples
+** Add =smc= man page
+** Update/expand the documentation
 * Version 0.3.0 (2021-12-04)
 ** Bootstrap PlantUML parser by itself
    Now Guile-SMC uses itself to generate an FSM for PlantUML format.
