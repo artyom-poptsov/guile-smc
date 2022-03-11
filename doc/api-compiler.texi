@@ -8,11 +8,13 @@
 @cindex Compiler
 
 The Guile-SMC finite state machines generated from a PlantUML format can be
-used for their purpose ``as is''.  But it can be costly to read the PlantUML
-each time a program run.
+used for their purpose ``as is''.  But it can be costly to read a PlantUML
+@acronym{FSM, Finite-State Machine} description each time a program run.
 
 To solve this problem Guile-SMC provides a compiler that can translate the
 internal representation of a state machine into a Scheme code.
+
+The procedures below are defined in @code{(smc compiler)} module.
 
 @deffn {Scheme Procedure} fsm-compile fsm @
                [#:fsm-name='custom-fsm]   @
@@ -50,8 +52,11 @@ The compilation target.  Allowed values are:
 This is the default mode.  The output FSM will depend on Guile-SMC and won't
 work if it is not installed on a target system.
 @item guile-standalone
-This target allows to create a FSM-in-a-single-file that does not depend on
+This target allows to create a single file FSM that does not depend on
 Guile-SMC in any way.
+
+The compiler collects the required code from Guile-SMC and then removes all
+unused parts from it, then the code is being printed to a @var{output-port}.
 @item guile-standalone-copy
 Copy Guile-SMC core modules to a directory with the same name as the
 @var{fsm-name} and re-write all the modules such that each Guile-SMC module
@@ -73,8 +78,13 @@ Usage example:
              #:extra-modules '((context)))
 @end lisp
 
-
 @end deffn
+
+@c --------------------------------------------------------------------------------
+@subsection Examples
+
+For more examples, take a look into @file{examples/compiler} directory in the
+project repository.
 
 @c Local Variables:
 @c TeX-master: "guile-smc.texi"
