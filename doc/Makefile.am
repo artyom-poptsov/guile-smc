@@ -54,6 +54,7 @@ smc.1: $(abs_top_builddir)/utils/smc
 	-$(AM_V_HELP2MAN)$(gen_man) --output="$@" "$<"
 
 CLEANFILES = \
-	smc.1
+	smc.1	\
+	smc.log.1
 
 ## Makefile.am ends here
