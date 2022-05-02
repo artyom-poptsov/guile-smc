@@ -123,6 +123,7 @@ not depend on Guile-SMC.."
     (let loop ((lst `(define-module ,module
                        #:use-module (oop goops)
                        #:use-module (logging logger)
+                       #:use-module (logging rotating-log)
                        #:use-module (scheme documentation)
                        #:use-module (ice-9 textual-ports)))
                (em  extra-modules))
