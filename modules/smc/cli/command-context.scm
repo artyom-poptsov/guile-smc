@@ -11,9 +11,10 @@
 
 (define (print-help)
   (display "\
-Usage: smc context [options]
+Usage: smc context [options] [input-file]
 
-Analyze or generate a context stub based on a given PlantUML file.
+Analyze or generate a context stub based on a given PlantUML file.  If
+INPUT-FILE is not provided, than the command will read the standard input.
 
 Options:
   --help, -h        Print this message and exit.
@@ -100,7 +101,8 @@ Options:
          (resolve?         (option-ref options 'resolve   #f))
          (generate?        (option-ref options 'generate  #f))
          (generate-module  (option-ref options 'generate-module #f))
-         (debug-mode?      (option-ref options 'debug     #f)))
+         (debug-mode?      (option-ref options 'debug     #f))
+         (args             (option-ref options '()        #f)))
 
     (when (option-ref options 'help #f)
       (print-help)
@@ -110,32 +112,39 @@ Options:
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
-    (cond
-     (resolve?
-      (let ((fsm (puml->fsm (current-input-port)
-                            #:module      (puml-modules modules)
-                            #:keep-going? #t
-                            #:debug-mode? debug-mode?)))
-        (puml-context-print-resolver-status (fsm-parent-context fsm)
-                                            (current-output-port))))
-     (generate?
-      (let ((fsm (puml->fsm (current-input-port)
-                            #:module      (puml-modules modules)
-                            #:keep-going? #t
-                            #:debug-mode? debug-mode?)))
-        (generate-context #f
-                          (set-content (puml-context-unresolved-procedures
-                                        (fsm-parent-context fsm)))
-                          (current-output-port))))
-     (generate-module
-      (let ((fsm (puml->fsm (current-input-port)
-                            #:module      (puml-modules modules)
-                            #:keep-going? #t
-                            #:debug-mode? debug-mode?)))
-        (generate-context generate-module
-                          (set-content (puml-context-unresolved-procedures
-                                        (fsm-parent-context fsm)))
-                          (current-output-port)))))))
+    (let ((port (if (null? args)
+                    (current-input-port)
+                    (let ((p (open-input-file (car args))))
+                      (unless p
+                        (error "Could not open a file" (car args)))
+                      p))))
+
+      (cond
+       (resolve?
+        (let ((fsm (puml->fsm port
+                              #:module      (puml-modules modules)
+                              #:keep-going? #t
+                              #:debug-mode? debug-mode?)))
+          (puml-context-print-resolver-status (fsm-parent-context fsm)
+                                              (current-output-port))))
+       (generate?
+        (let ((fsm (puml->fsm port
+                              #:module      (puml-modules modules)
+                              #:keep-going? #t
+                              #:debug-mode? debug-mode?)))
+          (generate-context #f
+                            (set-content (puml-context-unresolved-procedures
+                                          (fsm-parent-context fsm)))
+                            (current-output-port))))
+       (generate-module
+        (let ((fsm (puml->fsm port
+                              #:module      (puml-modules modules)
+                              #:keep-going? #t
+                              #:debug-mode? debug-mode?)))
+          (generate-context generate-module
+                            (set-content (puml-context-unresolved-procedures
+                                          (fsm-parent-context fsm)))
+                            (current-output-port))))))))
 
 ;;; command-context.scm ends here.
 
