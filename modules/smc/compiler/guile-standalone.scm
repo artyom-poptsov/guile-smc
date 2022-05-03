@@ -160,13 +160,16 @@ neither in the DEFINITIONS nor HARDWIRED-DEFINITIONS lists."
               (main-loop (cdr defs)
                          result))))))
 
-(define (fsm-get-context-code guile-smc-modules-path)
+(define* (fsm-get-context-code guile-smc-modules-path #:key (skip-define-module? #t))
   "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the
 code as a list."
   (define (read-module path module-name)
-    (let ((port (open-input-file (string-append path "/" module-name))))
+
+    (when skip-define-module?
       ;; Skip the 'define-module' part.
-      (read port)
+      (read port))
+
+    (let ((port (open-input-file (string-append path "/" module-name))))
       (let loop ((sexp   (read port))
                  (result '()))
         (if (not (eof-object? sexp))
