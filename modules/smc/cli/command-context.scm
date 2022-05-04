@@ -67,6 +67,8 @@ Options:
   (newline port))
 
 (define (generate-context module procedures port)
+  "Generate a context stub that can be used as the foundation for user
+context."
   (when module
     (%generate-context-module module procedures port))
 
@@ -91,11 +93,15 @@ Options:
 
 
 (define (get-module-exports defmod)
+  "Get all the exports from a module definition DEFMOD as a list."
   (if (equal? (car defmod) '#:export)
       (cadr defmod)
       (get-module-exports (cdr defmod))))
 
 (define (generate-smc-context module output-port)
+  "Generate a Guile-SMC context that can server as intermediate module for the
+derivative contexts.  The context is placed into a MODULE and printed to a
+specified OUTPUT-PORT."
   (let* ((context-code (fsm-get-context-code %guile-smc-modules-directory
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
@@ -123,6 +129,9 @@ Options:
                                           output-port
                                           #:key
                                           (optimize? #f))
+  "Generate a Guile-SMC context that contains everything that is needed for
+derivative contexts.  The context is placed into a MODULE and printed to a
+specified OUTPUT-PORT."
   (write-header output-port)
   (newline)
   (let* ((context-code (fsm-get-context-code %guile-smc-modules-directory
