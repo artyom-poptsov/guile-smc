@@ -146,13 +146,22 @@ specified OUTPUT-PORT."
                              '()
                              context-code)))
 
-    (%generate-context-module module exports output-port)
+    (pretty-print `(define-module ,(eval-string
+                                    (string-append "(quote " module ")"))
+                     #:use-module (oop goops)
+                     #:use-module (logging logger)
+                     #:use-module (logging rotating-log)
+                     #:use-module (scheme documentation)
+                     #:use-module (ice-9 textual-ports)
+                     #:use-module (ice-9 format)
+                     #:export     ,exports))
     (newline output-port)
     (form-feed output-port)
 
     (for-each (lambda (sexp)
-                (pretty-print sexp output-port #:display? #f)
-                (newline))
+                (unless (equal? (car sexp) 'define-module)
+                  (pretty-print sexp output-port #:display? #f)
+                  (newline)))
               (if optimize?
                   (prune-unused-definitions
                    (prune-unused-definitions context-code (list fsm-code))
