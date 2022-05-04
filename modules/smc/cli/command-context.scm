@@ -156,12 +156,16 @@ specified OUTPUT-PORT."
                      #:use-module (ice-9 format)
                      #:export     ,exports))
     (newline output-port)
-    (form-feed output-port)
 
     (for-each (lambda (sexp)
-                (unless (equal? (car sexp) 'define-module)
-                  (pretty-print sexp output-port #:display? #f)
-                  (newline)))
+                (if (equal? (car sexp) 'define-module)
+                    (begin
+                      (form-feed output-port)
+                      (format output-port
+                              ";;; Code from ~a~%"
+                              (cadr sexp)))
+                    (pretty-print sexp output-port #:display? #f))
+                (newline output-port))
               (if optimize?
                   (prune-unused-definitions
                    (prune-unused-definitions context-code (list fsm-code))
