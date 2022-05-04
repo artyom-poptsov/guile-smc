@@ -108,8 +108,9 @@ specified OUTPUT-PORT."
                                (cond
                                 ((equal? (car sexp) 'define-module)
                                  (append (get-module-exports sexp) prev))
-                                ((or (equal? (car sexp) 'define-public)
-                                     (equal? (car sexp) 'make-char-guard))
+                                ((equal? (car sexp) 'define-public)
+                                 (append (list (caadr sexp)) prev))
+                                ((equal? (car sexp) 'make-char-guard)
                                  (append (list (cadr sexp)) prev))
                                 (else
                                  prev)))
