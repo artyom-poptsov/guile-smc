@@ -37,6 +37,7 @@
   #:use-module (smc fsm)
   #:export (fsm->standalone-code
             fsm-define-module
+            fsm-get-class-code
             fsm-get-context-code
             state->standalone-code
             prune-unused-definitions
@@ -185,6 +186,15 @@ code as a list."
       ,@(read-module core-path "log.scm")
       ,@(read-module context-path "context.scm")
       ,@(read-module context-path "char-context.scm"))))
+
+(define (fsm-get-class-code fsm-name)
+  (let ((cname (string->symbol (format #f "<~a>" fsm-name))))
+    `(define-class ,cname ()
+       (debug-mode?
+        #:init-value   #f
+        #:init-keyword #:debug-mode?
+        #:getter       fsm-debug-mode?
+        #:setter       fsm-debug-mode-set!))))
 
 (define-method-with-docs (fsm->standalone-code (fsm <fsm>))
   "Convert an @var{fsm} to a procedure that does not depend on Guile-SMC."
