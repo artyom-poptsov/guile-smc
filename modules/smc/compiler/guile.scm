@@ -65,7 +65,8 @@ to specify a list of extra modules that required for the output FSM to work."
              (em  extra-modules))
     (if (or (not em) (null? em))
         (begin
-          (pretty-print (append lst `(#:export (,class-name)))
+          (pretty-print (append lst `(#:re-export (fsm-run!)
+                                      #:export    (,class-name)))
                         port)
           (newline port))
         (loop (append lst `(#:use-module ,(car em)))
