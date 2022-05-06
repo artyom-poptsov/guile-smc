@@ -139,11 +139,11 @@ specified OUTPUT-PORT."
   (let* ((context-code (fsm-get-context-code %guile-smc-modules-directory
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
-                              (cond
-                               ((equal? (car sexp) 'define-module)
-                                (append (get-module-exports sexp) prev))
-                               (else
-                                prev)))
+                               (cond
+                                ((equal? (car sexp) 'define-module)
+                                 (append (get-module-exports sexp) prev))
+                                (else
+                                 prev)))
                              '()
                              context-code)))
 
@@ -160,11 +160,8 @@ specified OUTPUT-PORT."
 
     (for-each (lambda (sexp)
                 (if (equal? (car sexp) 'define-module)
-                    (begin
-                      (form-feed output-port)
-                      (format output-port
-                              ";;; Code from ~a~%"
-                              (cadr sexp)))
+                    (write-section-header (format #f "Code from ~a" (cadr sexp))
+                                          output-port)
                     (pretty-print sexp output-port #:display? #f))
                 (newline output-port))
               (if optimize?
