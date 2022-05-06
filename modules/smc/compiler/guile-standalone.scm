@@ -116,11 +116,11 @@ not depend on Guile-SMC.."
   (string-drop-right (string-drop str 1) 1))
 
 (define* (fsm-define-module fsm
+                            fsm-name
                             module
                             #:key
                             extra-modules)
-  (let* ((cname (string-drop-both (symbol->string (class-name (class-of fsm)))))
-         (proc-name (string->symbol (string-append "run-" cname))))
+  (let ((cname (string->symbol (format #f "<~a>" fsm-name))))
     (let loop ((lst `(define-module ,module
                        #:use-module (oop goops)
                        #:use-module (logging logger)
@@ -129,7 +129,10 @@ not depend on Guile-SMC.."
                        #:use-module (ice-9 textual-ports)))
                (em  extra-modules))
       (if (or (not em) (null? em))
-          (append lst `(#:export (,proc-name)))
+          (append lst `(#:export (,cname
+                                  fsm-run!
+                                  fsm-debug-mode?
+                                  fsm-debug-mode-set!)))
           (loop (append lst `(#:use-module ,(car em)))
                 (cdr em))))))
 
@@ -165,12 +168,12 @@ neither in the DEFINITIONS nor HARDWIRED-DEFINITIONS lists."
   "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the
 code as a list."
   (define (read-module path module-name)
-
-    (when skip-define-module?
-      ;; Skip the 'define-module' part.
-      (read port))
-
     (let ((port (open-input-file (string-append path "/" module-name))))
+
+      (when skip-define-module?
+        ;; Skip the 'define-module' part.
+        (read port))
+
       (let loop ((sexp   (read port))
                  (result '()))
         (if (not (eof-object? sexp))
@@ -196,11 +199,10 @@ code as a list."
         #:getter       fsm-debug-mode?
         #:setter       fsm-debug-mode-set!))))
 
-(define-method-with-docs (fsm->standalone-code (fsm <fsm>))
+(define-method-with-docs (fsm->standalone-code (fsm <fsm>) fsm-name)
   "Convert an @var{fsm} to a procedure that does not depend on Guile-SMC."
-  (let* ((cname (string-drop-both (symbol->string (class-name (class-of fsm)))))
-         (proc-name (string->symbol (string-append "run-" cname))))
-    `(define (,proc-name context)
+  (let ((cname (string->symbol (format #f "<~a>" fsm-name))))
+    `(define-method (fsm-run! (fsm ,cname) context)
        ,(if (fsm-description fsm)
             (fsm-description fsm)
             "")

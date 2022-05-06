@@ -131,6 +131,7 @@
     (write-parent-fsm-info fsm output-port))
 
   (pretty-print (fsm-define-module fsm
+                                   fsm-name
                                    fsm-module
                                    #:extra-modules extra-modules)
                 output-port
@@ -138,8 +139,15 @@
   (newline output-port)
   (form-feed output-port)
 
+  (pretty-print (fsm-get-class-code fsm-name)
+                output-port
+                #:display? #f)
+
+  (newline output-port)
+  (form-feed output-port)
+
   (let ((context-code (fsm-get-context-code %guile-smc-modules-directory))
-        (fsm-code     (fsm->standalone-code fsm)))
+        (fsm-code     (fsm->standalone-code fsm fsm-name)))
     (for-each (lambda (sexp)
                 (pretty-print sexp output-port #:display? #f)
                 (newline))
