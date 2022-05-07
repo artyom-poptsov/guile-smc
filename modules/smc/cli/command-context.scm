@@ -192,9 +192,11 @@ specified OUTPUT-PORT."
          (generate?        (option-ref options 'generate  #f))
          (standalone?      (option-ref options 'standalone #f))
          (debug-mode?      (option-ref options 'debug     #f))
+         (help-needed?     (option-ref options 'help      #f))
          (args             (option-ref options '()        #f)))
 
-    (when (option-ref options 'help #f)
+    (when (or (option-ref options 'help #f)
+              (null? args))
       (print-help)
       (exit 0))
 
