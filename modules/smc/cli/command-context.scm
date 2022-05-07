@@ -195,8 +195,7 @@ specified OUTPUT-PORT."
          (help-needed?     (option-ref options 'help      #f))
          (args             (option-ref options '()        #f)))
 
-    (when (or (option-ref options 'help #f)
-              (null? args))
+    (when (option-ref options 'help #f)
       (print-help)
       (exit 0))
 
