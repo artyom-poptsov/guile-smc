@@ -75,6 +75,7 @@
   ;;
   ;; <port>
   (port
+   #:init-value   (current-input-port)
    #:init-keyword #:port
    #:getter       char-context-port)
 
