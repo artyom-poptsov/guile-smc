@@ -170,7 +170,7 @@ specified OUTPUT-PORT."
                    (list fsm-code))
                   context-code))
 
-    (newline output-port)))
+    (write-footer "Guile-SMC context" output-port)))
 
 
 (define %option-spec
