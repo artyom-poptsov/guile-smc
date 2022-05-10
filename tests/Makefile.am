@@ -27,7 +27,8 @@ SCM_TESTS = \
 	fsm.scm		\
 	puml-context.scm	\
 	puml.scm		\
-	compiler.scm
+	compiler.scm		\
+	cli.scm
 
 TESTS = ${SCM_TESTS}
 
