@@ -1,9 +1,12 @@
+(add-to-load-path (getenv "abs_top_srcdir"))
+
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (ice-9 receive)
              (ice-9 regex)
              (oop goops)
              (smc context char-context)
+             (tests test-context)
              (smc fsm)
              (smc core state))
 
@@ -136,6 +139,25 @@
   (let ((fsm (make <fsm>)))
     (fsm-state-add! fsm (make <state> #:name 'state-1))
     (fsm-state fsm 'state-1)))
+
+
+;;; fsm-procedures
+
+(test-assert "fsm-procedures"
+  (let ((fsm (make <fsm>
+               #:event-source     test-event-source
+               #:transition-table `(((name . state-1)
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-2)
+                                      (,guard:#t ,action:no-op state-1)))
+                                    ((name . state-2)
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-1)
+                                      (,guard:#t ,action:no-op state-3)))
+                                    ((name . state-3)
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-1)))))))
+    (fsm-procedures fsm)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
