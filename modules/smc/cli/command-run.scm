@@ -138,8 +138,12 @@ Options:
         (eval
          `(begin
             (fsm-event-source-set! fsm event-source)
-            (let ((context (fsm-run! fsm ((eval-string ,context-thunk)))))
-              ((eval-string ,eval-proc) context)))
+            (let ((proc   (eval-string ,context-thunk)))
+              (unless (thunk? proc)
+                (error "context-thunk must be a procedure with zero parameters."
+                       ,context-thunk))
+              (let ((context (fsm-run! fsm (proc))))
+                ((eval-string ,eval-proc) context))))
          env)))))
 
 ;;; command-run.scm ends here.
