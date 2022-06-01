@@ -18,7 +18,8 @@
 
 ;;; Commentary:
 
-;; Implementation of 'smc run' command.
+;; Implementation of 'smc run' command.  This command allows to run a state
+;; machine without the need of explicit intermediate steps.
 
 
 ;;; Code:
@@ -87,6 +88,7 @@ Options:
 
 
 (define (command-run args)
+  "Handle the 'run' CLI command with the given ARGS."
   (let* ((options          (getopt-long args %option-spec))
          (eval-proc        (option-ref options
                                        'eval
