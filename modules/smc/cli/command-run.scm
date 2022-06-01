@@ -86,6 +86,15 @@ Options:
   "(lambda () #f)")
 
 
+(define (configure-logging! log-file)
+  "Configure Guile-SMC logging to use a LOG-FILE."
+  (log-clear-handlers!)
+  (log-add-handler! (make <port-log/us>
+                      #:port (if (string=? log-file "-")
+                                 (current-error-port)
+                                 (open-output-file log-file)))))
+
+
 
 (define (command-run args)
   "Handle the 'run' CLI command with the given ARGS."
@@ -110,11 +119,7 @@ Options:
     (add-to-load-path* (string-split extra-load-paths #\:))
 
     (when log-file
-      (log-clear-handlers!)
-      (log-add-handler! (make <port-log/us>
-                          #:port (if (string=? log-file "-")
-                                     (current-error-port)
-                                     (open-output-file log-file)))))
+      (configure-logging! log-file))
 
     (let* ((port    (open-input-file (car args)))
            (fsm     (puml->fsm port
