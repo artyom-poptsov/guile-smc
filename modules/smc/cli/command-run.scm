@@ -121,7 +121,8 @@ Options:
     (when log-file
       (configure-logging! log-file))
 
-    (let* ((port    (open-input-file (car args)))
+    (let* ((puml-file (car args))
+           (port    (open-input-file puml-file))
            (fsm     (puml->fsm port
                                #:module      (puml-modules modules)
                                #:debug-mode? debug-mode?)))
@@ -143,11 +144,25 @@ Options:
         (eval
          `(begin
             (fsm-event-source-set! fsm event-source)
+            (fsm-debug-mode-set! fsm ,debug-mode?)
             (let ((proc   (eval-string ,context-thunk)))
               (unless (thunk? proc)
                 (error "context-thunk must be a procedure with zero parameters."
                        ,context-thunk))
               (let ((context (fsm-run! fsm (proc))))
+                (when ,debug-mode?
+                  (let ((bname ,(basename puml-file)))
+                    (display ";;;\n" (current-error-port))
+                    (format (current-error-port)
+                            ";;; [~a] Statistics:\n"
+                            bname)
+                    (for-each (lambda (record)
+                                (format (current-error-port)
+                                        ";;; [~a]   ~20,,a ~10,,@a~%"
+                                        bname
+                                        (format #f "~a:" (car record))
+                                        (cdr record)))
+                              (fsm-statistics fsm))))
                 ((eval-string ,eval-proc) context))))
          env)))))
 
