@@ -27,6 +27,7 @@ guile_smc_TEXINFOS = \
 	api-core-log.texi	\
 	api-core-stack.texi 	\
 	api-core-state.texi 	\
+	api-core-transition.texi 	\
 	api-context.texi	\
 	api-fsm.texi		\
 	api-puml.texi		\

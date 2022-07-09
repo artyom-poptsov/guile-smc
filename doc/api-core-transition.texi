@@ -1,0 +1,123 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2022 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@node Transition
+@section Transition
+@cindex Transition
+@cindex Transition Guard
+@cindex Transition Action
+@cindex Transition Next State
+
+The @code{(smc core transition)} module contains the implementation of FSM
+transition class.
+
+In the realm of finite-state machines a @dfn{transition} is a set of actions
+to be executed when a condition is fulfilled or when an event is received.
+
+A Guile-SMC transition instance contains a transition @dfn{guard} that allows
+the transition to happen.  When the guard returns @code{#t} (that is, when the
+transition condition specified by the guard is fulfilled) a transition
+@dfn{action} is performed.
+
+Each Guile-SMC transition has single @dfn{next state} that points to the next
+state to which transition switches the parent finite-state machine.
+
+A single transition take the following form:
+@example lisp
+(list guard:some-guard action:some-action 'state1)
+@end example
+
+The first part of the transition in the example is @code{guard:some-guard}
+that represent a Guile-SMC guard procedure.
+
+The second part is @code{action:some-action} -- the transition action that is
+performed when the guard returns @code{#t}.
+
+The third part is @code{'state-1} -- the next state to which the transition
+will switch the parent FSM.
+
+Note that the next state can be either a state name (as a Guile symbol) or a
+reference to a @code{<state>} instance.
+
+@c -----------------------------------------------------------------------------
+@subsection Transition Accessors
+
+A Guile-SMC transition content can be conveniently accessed by means of the
+following procedures.
+
+@deffn {Scheme Procedure} transition:guard (transition <list>)
+Get the @var{transition} guard procedure.
+@end deffn
+
+@deffn {Scheme Procedure} transition:action (transition <list>)
+Get the @var{transition} action procedure.
+@end deffn
+
+@deffn {Scheme Procedure} transition:next-state (transition <list>)
+Get the @var{transition} next state.
+@end deffn
+
+@c -----------------------------------------------------------------------------
+@subsection Transition Table
+@cindex Transition Table
+
+Guile-SMC transitions are grouped into @dfn{transition tables}.  Let's take a
+look at the following example:
+
+@example lisp
+(list (list guard:some-guard action:action-1 'state1)
+      (list guard:#t         action:action-2 'state2))
+@end example
+
+This transition table consists of two possible transitions: to @code{state-1}
+and to @code{state-2}.  In the closer look this form resembles classic
+state-transition tables:
+
+@example
+current state | input            | output (action) | next state
+--------------+------------------+-----------------+-------------------
+state-2       | guard:some-guard | action:action-1 | state-1
+state-2       | guard:#t         | action:action-2 | state-2
+@end example
+
+In the above example of Guile-SMC transition table there's no ``current
+state'' as a @code{<state>} instance holds its transition table so there's no
+need to store the current state in the transition table itself.
+
+@deffn {Scheme Procedure} transition-table-count (predicate <procedure>) (tlist <list>)
+Return number of the elements in the @var{tlist} transition table for which
+@var{predicate} returns #t.
+
+@var{predicate} is called on each transition.
+
+To get the total number of transitions in a transition table pass @code{(const
+#t)} procedure as predicate:
+
+@example lisp
+(transition-table-count (const #t) some-transition-table)
+@end example
+
+@end deffn
+
+@deffn {Scheme Procedure} transition-table-run (tlist <list>) event context
+Run a @var{tlist} transition table on the specified @var{event} and a
+@var{context}, return two values: the next state and a new context.
+
+If no guards returned @code{#t} the procedure returns @code{#f} as the next
+state.
+@end deffn
+
+@deffn {Scheme Procedure} transition-table-append (tlist <list>) @@
+                                                  (tguard <procedure>) @@
+                                                  (action <procedure>) @@
+                                                  next-state)
+
+Append a new transition to the end of a @var{tlist} transition table. Return a
+new transition table with the new transition.
+@end deffn
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:
