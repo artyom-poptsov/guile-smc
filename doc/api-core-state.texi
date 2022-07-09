@@ -1,10 +1,31 @@
 @c -*-texinfo-*-
 @c This file is part of Guile-SMC Reference Manual.
-@c Copyright (C) 2021 Artyom V. Poptsov
+@c Copyright (C) 2021-2022 Artyom V. Poptsov
 @c See the file guile-smc.texi for copying conditions.
 
 @node State
 @section State
+
+The @code{(smc core state)} module contains FSM state implementation.  The
+@emph{state} term is very important in the realm of finite-state machines as
+the FSMs consist of states and transitions between them.
+
+A state can take one of two forms: it can be either a associative list or an
+instance of @code{<state>} class.  There are converters between these forms.
+
+@c -----------------------------------------------------------------------------
+@subsection Actions
+
+Basically an @emph{action} is a procedure that is called when some event
+happen.
+
+The main Guile-SMC allow to attach actions to transitions as well as to the
+state entry/exit events.
+
+Note that a state does not run its entry/exit actions when @code{state-run}
+method is called because it has insufficient information about when to call
+entry/exit action procedures.  Those procedures are run by a FSM that owns the
+state.
 
 @c -----------------------------------------------------------------------------
 @subsection Default entry/exit actions
@@ -141,6 +162,9 @@ Get the state transitions as a list.
                (action <procedure>) @
                next-state
 Add a new transition to the @var{state}.
+
+A transition consists of a transition guard @var{tguard} (which must be a
+predicate) and a transition @var{action}.
 @end deffn
 
 @deffn {Scheme Procedure} state-transition-count (state <state>)
