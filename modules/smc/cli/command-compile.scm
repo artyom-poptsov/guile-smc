@@ -46,6 +46,9 @@ from the formal description.
 
 Then the FSM can be validated and/or compiled.
 
+If no INPUT-FILE is specified, then the input PlantUML transition diagram is
+read from the standard input.
+
 Options:
   --help, -h        Print this message and exit.
   --print-transition-table, -p
