@@ -29,7 +29,6 @@
   #:use-module (oop goops)
   #:use-module (ice-9 regex)
   #:use-module (smc core common)
-  #:use-module (smc core stack)
   #:use-module (smc core set)
   #:use-module (smc core state)
   #:use-module (smc context char-context)

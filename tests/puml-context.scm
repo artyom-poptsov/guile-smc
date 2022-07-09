@@ -7,7 +7,6 @@
              (smc context char-context)
              (smc fsm)
              (smc puml-context)
-             (smc core stack)
              (smc core state)
              (smc core set)
              (tests test-context))

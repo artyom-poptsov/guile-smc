@@ -32,7 +32,6 @@
   #:use-module (smc fsm)
   #:use-module (smc core common)
   #:use-module (smc core log)
-  #:use-module (smc core stack)
   #:use-module (smc core set)
   #:use-module (smc context char-context)
   #:use-module (smc puml-context)

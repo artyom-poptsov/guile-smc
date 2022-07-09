@@ -4,7 +4,6 @@
   #:use-module (ice-9 regex)
   #:use-module (ice-9 rdelim)
   #:use-module (smc core common)
-  #:use-module (smc core stack)
   #:use-module (smc context char-context)
   #:re-export (guard:#t
                guard:eof-object?

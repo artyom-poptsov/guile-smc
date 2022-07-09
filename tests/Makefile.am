@@ -23,7 +23,6 @@ SCM_TESTS = \
 	state.scm	\
 	set.scm		\
 	context.scm	\
-	stack.scm	\
 	fsm.scm		\
 	puml-context.scm	\
 	puml.scm		\

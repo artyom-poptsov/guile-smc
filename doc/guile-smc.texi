@@ -97,7 +97,6 @@ Core:
 * Log::         Logging facilities.
 * State::       A FSM state.
 * Transition::  A FSM transition.
-* Stack::       Stack data structure implementation.
 
 Context:
 
@@ -112,7 +111,6 @@ Context:
 @include api-core-log.texi
 @include api-core-state.texi
 @include api-core-transition.texi
-@include api-core-stack.texi
 @include api-context.texi
 
 @include cli.texi
