@@ -245,7 +245,6 @@ $ tree
 │       ├── core
 │       │   ├── common.scm
 │       │   ├── log.scm
-│       │   ├── stack.scm
 │       │   ├── state.scm
 │       │   └── transition.scm
 │       └── fsm.scm
@@ -254,7 +253,7 @@ $ tree
 ├── main.scm
 └── README.org
 
-4 directories, 14 files
+4 directories, 13 files
 #+END_EXAMPLE
 
 =custom-fsm= directory contains all the required Guile-SMC modules that the
