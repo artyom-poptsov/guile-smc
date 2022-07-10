@@ -5,6 +5,7 @@
 
 @node State
 @section State
+@cindex State
 
 The @code{(smc core state)} module contains FSM state implementation.  The
 @emph{state} term is very important in the realm of finite-state machines as

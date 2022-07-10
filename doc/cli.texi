@@ -14,6 +14,302 @@ its features.  It is built upon @code{(smc cli)} module that contains
 The CLI tool is called simply @file{smc}.  Please see @command{smc --help}
 output or @command{man smc} for usage information.
 
+@section The Compiler
+The state machine compiler allows to compile state machines from a formal
+description (currently only PlantUML format is supported.)
+
+The compiler can be invoked by @code{smc compile} command.
+
+You can get the actual help message for @code{smc compile} by passing it the
+@code{--help} option.
+
+@subsection Compilation Targets
+@cindex Compilation Targets
+
+A Guile-SMC @dfn{compilation target} changes the compiler behavior so it
+produces the code in different form.
+
+@subsubsection @code{guile} target
+The default compilation target.  The code produced by the compiler for this
+target is dependent on the Guile-SMC.
+
+@subsubsection @code{guile-standalone} target
+This compilation target produces GNU Guile FSM code in a single file that does
+not dependent on Guile-SMC.
+
+All required Guile-SMC procedures will be copied to the output stream, and the
+extra procedures that are not used in the output code are removed by pruning.
+
+The output code is similar to hand-crafted recursive code that a Scheme
+programmer could write given the knowledge of automata-based programming.
+
+Here's an example of an output FSM (without the auxiliary code copied from
+Guile-SMC that normally goes before this procedure):
+
+@example lisp
+(define (run-fsm context)
+  ""
+  (define (DEFAULT context)
+    "Count parenthesis."
+    (let ((event (event-source context)))
+      (cond ((guard:eof-object? context event)
+             (let ((context (action:validate context event)))
+               (log-debug "[~a] -> [*]" 'DEFAULT)
+               context))
+            ((guard:semicolon? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'DEFAULT 'COMMENT)
+               (COMMENT context)))
+            ((guard:double-quote? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'DEFAULT 'STRING)
+               (STRING context)))
+            ((#@{guard:#t@}# context event)
+             (let ((context (action:count context event)))
+               (DEFAULT context))))))
+  (define (STRING context)
+    "Skip a string."
+    (let ((event (event-source context)))
+      (cond ((guard:double-quote? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'STRING 'DEFAULT)
+               (DEFAULT context)))
+            ((#@{guard:#t@}# context event)
+             (let ((context (action:no-op context event)))
+               (STRING context))))))
+  (define (COMMENT context)
+    "Skip a comment."
+    (let ((event (event-source context)))
+      (cond ((guard:newline? context event)
+             (let ((context (action:no-op context event)))
+               (log-debug "[~a] -> [~a]" 'COMMENT 'DEFAULT)
+               (DEFAULT context)))
+            ((#@{guard:#t@}# context event)
+             (let ((context (action:no-op context event)))
+               (COMMENT context))))))
+  (DEFAULT context))
+@end example
+
+@subsubsection @code{guile-standalone-copy} target
+The compiler can be configured in such way that it will copy all the modules
+that are needed to run the output FSM so the FSM will not depend on Guile-SMC.
+
+For example, let's imagine that we have the following file set:
+
+@example shell
+.
+├── context.scm
+├── fsm.puml
+├── main.scm
+└── README.org
+
+0 directories, 4 files
+@end example
+
+The @file{context.scm} contains all actions, guards and event sources for FSM
+to run:
+
+@example lisp
+(define-module (context)
+  #:use-module (opp goops)
+  #:use-module (ice-9 textual-ports)
+  #:use-module (smc context char-context)
+  #:re-export (guard:#t
+               guard:semicolon?
+               guard:double-quote?
+               guard:newline?
+               guard:eof-object?
+               action:no-op)
+  #:export (event-source
+            action:count
+            action:validate))
+
+(define-method (event-source (ctx <number>))
+  (get-char (current-input-port)))
+
+(define (action:count ctx char)
+  (cond
+   ((char=? char #\()
+    (+ ctx 1))
+   ((char=? char #\))
+    (- ctx 1))
+   (else
+    ctx)))
+
+(define (action:validate ctx char)
+  (unless (zero? ctx)
+    (error "Parenthesis mismatch" ctx))
+  ctx)
+@end example
+
+The @file{fsm.puml} file contains the FSM description in the PlantUML format:
+
+@example
+@@startuml
+[*] --> DEFAULT
+DEFAULT: Count parenthesis.
+DEFAULT --> [*]: guard:eof-object? -> action:validate
+DEFAULT --> COMMENT: guard:semicolon?
+DEFAULT --> STRING: guard:double-quote?
+DEFAULT --> DEFAULT: guard:#t -> action:count
+
+COMMENT: Skip a comment.
+COMMENT --> DEFAULT: guard:newline?
+COMMENT --> COMMENT
+
+STRING: Skip a string.
+STRING --> DEFAULT: guard:double-quote?
+STRING -> STRING
+@@enduml
+@end example
+
+Now let's compile the FSM, using the @code{guile-standalone} target:
+@example shell
+$ cat fsm.puml | /usr/bin/smc compile -L . -U "((context))" -m "(custom-fsm)" \
+    --target guile-standalone-copy > custom-fsm.scm
+@end example
+
+Now the project root directory looks like this:
+@example shell
+$ tree
+.
+├── context.scm
+├── custom-fsm
+│   ├── context.scm
+│   └── smc
+│       ├── context
+│       │   ├── char-context.scm
+│       │   └── context.scm
+│       ├── core
+│       │   ├── common.scm
+│       │   ├── log.scm
+│       │   ├── state.scm
+│       │   └── transition.scm
+│       └── fsm.scm
+├── custom-fsm.scm
+├── fsm.puml
+├── main.scm
+└── README.org
+
+4 directories, 13 files
+@end example
+
+@file{custom-fsm} directory contains all the required Guile-SMC modules that
+the output FSM needs to run, plus the extra modules (like @code{(context)})
+specified for the compiler.
+
+@section The Context Generator and Analyzer
+@command{smc context} allows to generate and analyze Guile-SMC FSM contexts.
+
+There are two modes of context generation: the command either can generate a
+custom context stub based on an input PlantUML state machine description, or
+generate a standalone (intermediate) context that can be used by custom
+contexts to relax the dependency on Guile-SMC modules (and allow to compile
+custom FSMs in standalone mode in the future.)
+
+When @code{--resolve} option is provided the command prints to the standard
+output the list of resolved and unresolved procedures based on the input
+PlantUML file.
+
+@section The Profiler
+@cindex Profiler
+
+The profiler allows to analyze state machines using its logs (traces) and thus
+provides facilities to detect bottlenecks in state machines in terms of
+running time.
+
+Usage example:
+
+@example shell
+$ smc profile fsm.log
+Total transitions: 99
+Total time:        14925 us
+Stats:
+  read: 3158 us (21.1591 %)
+  read_state_transition_guard: 1663 us (11.1424 %)
+  read_state_transition_to: 1483 us (9.9363 %)
+  read_word: 1259 us (8.4355 %)
+  read_state_description: 1014 us (6.7940 %)
+  read_state_right_arrow: 839 us (5.6214 %)
+  search_state_transition_to: 670 us (4.4891 %)
+  search_state_transition: 638 us (4.2747 %)
+  read_state_transition_action: 536 us (3.5913 %)
+  read_start_tag: 535 us (3.5846 %)
+  search_state_transition_guard: 428 us (2.8677 %)
+  read_state: 178 us (1.1926 %)
+  search_state_transition_action: 139 us (.9313 %)
+  read_state_action_arrow: 139 us (.9313 %)
+  search_state_action_arrow: 132 us (.8844 %)
+  read_end_tag: 125 us (.8375 %)
+@end example
+
+@section The Finite State Machine Runner
+The state machine runner allows to run a state in @emph{ad hoc} fashion with
+the minimum amount of supporting code:
+
+@example shell
+$ smc run --help
+Usage: smc run [options] <puml-file>
+
+Run a state machine.
+
+Options:
+  --help, -h        Print this message and exit.
+  --eval, -e <procedure>
+                    Eval a procedure with the resulting context as a parameter.
+                    Example value:
+                      "(lambda (context) (display context))"
+  --load-path, -L <load-path>
+                    Add an extra load path.
+  --context-thunk, -C <procedure>
+                    A thunk that produces the initial value for an FSM context.
+                    Example value: "(lambda () 0)"
+  --modules, -U <modules>
+                    Load additional modules.  The value must be the same
+                    as for 'use-modules'.  Example value:
+                      "((smc context char-context) (smc puml-context))"
+  --validate        Validate the output FSM and print the validation result.
+                    The exit code is 0 if the validation is passed,
+                    and a non-zero value otherwise.
+  --log-file <file> Log file to use.  Pass "-" as the file to use the standard
+                    error stream (stderr.)
+                    'smc run' logs to syslog by default.
+  --debug           Enable the debug mode.
+@end example
+
+Usage example:
+
+@example shell
+$ smc run -L . -U "((context))" -C "(lambda () 0)" fsm.puml
+@end example
+
+@c -----------------------------------------------------------------------------
+@section Programming API
+
+@subsection @code{(smc cli command-compile)}
+
+@deffn {Scheme Procedure} command-compile args
+Handle @command{smc compile} command.
+@end deffn
+
+@subsection @code{(smc cli command-context)}
+
+@deffn {Scheme Procedure} command-context args
+Handle @command{smc context} command.
+@end deffn
+
+@subsection @code{(smc cli command-profile)}
+
+@deffn {Scheme Procedure} command-profile args
+Handle @command{smc profile} command.
+@end deffn
+
+@subsection @code{(smc cli command-run)}
+
+@deffn {Scheme Procedure} command-run args
+Handle @command{smc run} command.
+@end deffn
+
 @c Local Variables:
 @c TeX-master: "guile-smc.texi"
 @c End:

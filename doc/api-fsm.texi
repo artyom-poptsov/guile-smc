@@ -5,6 +5,7 @@
 
 @node FSM
 @section FSM
+@cindex FSM
 
 @c -----------------------------------------------------------------------------
 @subsection The main class
