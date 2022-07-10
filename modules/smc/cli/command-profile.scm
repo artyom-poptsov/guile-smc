@@ -45,7 +45,7 @@
   (display "\
 Usage: smc profile [options] <log-file>
 
-Run a state machine.
+Profile a state machine using a logged execution trace.
 
 Options:
   --help, -h        Print this message and exit.
