@@ -7,6 +7,27 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
+* Unreleased
+** Compiler changes
+*** =guile-standalone=: Add missing dependency for the target code
+*** =guile-standalone=: API change: Target now produces =fsm-run!= procedure
+Guile-SMC now generates =fsm-run!= procedure when =guile-standalone= target is
+set to provide the same API as for other targets.
+*** =guile-standalone=: Improve the output code layout
+Code from different modules now separated by section headers.
+** core: API change: =(smc core stack)= is removed
+** =smc context=: API change: Implement intermediate contexts
+Now =smc context= allows to generate intermediate contexts that can be used
+from custom contexts.  Intermediate contexts can be used to implement some
+custom code (e.g. user contexts) that is indifferent to target compiler.
+** =smc context=: Allow to read input from a provided file
+=smc context= now can read the input PlantUML data from a provided file.
+** =smc profile=: Fix the help message
+** =smc run= 
+*** Ensure that the =context-thunk= is a procedure with zero parameters
+*** debug mode: Now print stats for both parent and child FSMs
+*** Improve help messages
+** Update the Texinfo documentation
 * Version 0.4.0 (2022-03-11)
 ** Add FSM profiler
    Add =smc profile= command.  Currently the profiler allows to measure the
