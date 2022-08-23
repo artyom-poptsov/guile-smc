@@ -22,5 +22,5 @@ pre-inst-env
 TAGS
 tags
 
-# Ignore Guile-SMC build directories and distributsions.
+# Ignore Guile-SMC build directories and distributions.
 guile-smc-*
