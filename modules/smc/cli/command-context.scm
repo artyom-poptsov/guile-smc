@@ -154,9 +154,7 @@ specified OUTPUT-PORT."
                      #:re-export ,exports))))
 
 (define* (generate-smc-context/standalone module
-                                          output-port
-                                          #:key
-                                          (optimize? #f))
+                                          output-port)
   "Generate a Guile-SMC context that contains everything that is needed for
 derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
@@ -190,11 +188,7 @@ specified OUTPUT-PORT."
                                           output-port)
                     (pretty-print sexp output-port #:display? #f))
                 (newline output-port))
-              (if optimize?
-                  (prune-unused-definitions
-                   (prune-unused-definitions context-code (list fsm-code))
-                   (list fsm-code))
-                  context-code))
+              context-code)
 
     (write-footer "Guile-SMC context" output-port)))
 
