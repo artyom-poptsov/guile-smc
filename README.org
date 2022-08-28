@@ -23,8 +23,16 @@ License.
 - autoconf
 
 ** Installation
-*** From package managers
-- GNU Guix: https://guix.gnu.org/en/packages/guile-smc-0.3.0/
+*** GNU Guix
+#+BEGIN_EXAMPLE shell
+$ guix install guile-smc
+#+END_EXAMPLE
+
+Development version from =guix.scm=:
+#+BEGIN_EXAMPLE shell
+$ guix build -f guix.scm
+$ guix package -f guix.scm
+#+END_EXAMPLE
 
 *** Manual
 #+BEGIN_EXAMPLE shell
