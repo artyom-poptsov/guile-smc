@@ -185,7 +185,8 @@ code as a list."
 
   (let ((core-path    (string-append guile-smc-modules-path "core"))
         (context-path (string-append guile-smc-modules-path "context")))
-    `(,@(read-module core-path "common.scm")
+    `(,@(read-module core-path "config.scm")
+      ,@(read-module core-path "common.scm")
       ,@(read-module core-path "log.scm")
       ,@(read-module context-path "context.scm")
       ,@(read-module context-path "char-context.scm"))))
