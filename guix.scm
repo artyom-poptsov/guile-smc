@@ -75,10 +75,6 @@
                 (string-append
                  "  #:use-module (logging logger)\n"
                  "  #:use-module (logging rotating-log)"))
-               (("#:init-value \"logger\"")
-                (format #f
-                        "#:init-value \"~a/bin/logger\""
-                        (assoc-ref inputs "inetutils")))
                (("\\(make <precise-logger>\\)")
                 "(make <logger>)")
                (("\\(add-handler! %logger %syslog\\)")

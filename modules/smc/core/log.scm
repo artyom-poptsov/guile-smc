@@ -1,6 +1,6 @@
 ;;; log.scm -- Guile-SMC logging facilities.
 
-;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
   #:use-module (ice-9 format)
   #:use-module (logging logger)
   #:use-module (oop goops)
+  #:use-module (smc core config)
   #:use-module (smc core common)
   #:use-module (smc core state)
   #:export (<precise-logger>
@@ -69,7 +70,7 @@
   ;;
   ;; <string>
   (logger
-   #:init-value "logger"
+   #:init-value %logger-binary
    #:getter     syslog-logger)
 
   ;; syslog process tag that will be logged.
