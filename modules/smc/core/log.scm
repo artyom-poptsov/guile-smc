@@ -54,6 +54,8 @@
             %precise-log-helper))
 
 
+;;; Constants.
+
 (define-with-docs %default-port-log-file
   "The full path to the default log file used with <port-log/us>."
   "/var/log/smc.log")
@@ -63,6 +65,7 @@
   "guile-smc")
 
 
+;;; Precise Logger.
 
 (define-class-with-docs <precise-logger> (<logger>)
   "Guile-SMC precise logger that prints log with microsecond accuracy.")
@@ -71,7 +74,29 @@
   "Check if X is a <precise-logger> instance."
   (is-a? x <precise-logger>))
 
+(define (level-enabled? lgr lvl)
+  "Check if a log level LVL is enabled for a logger LGR."
+  (hashq-ref (slot-ref lgr 'levels) lvl #t))
+
+(define-method (%precise-log-helper (self <precise-logger>) level objs)
+  (when (level-enabled? self level)
+    (let ((cur-time (gettimeofday)))
+      (for-each (lambda (str)
+                  (unless (string-null? str)
+                    ;; pass the string to each log handler for SELF.
+                    (for-each (lambda (handler)
+                                (accept-log handler level cur-time str))
+                              (slot-ref self 'log-handlers))))
+                ;; split the string at newlines into different log statements
+                (string-split
+                 (with-output-to-string (lambda () (for-each (lambda (o) (display o)) objs)))
+                 #\nl)))))
+
+(define-method (log-msg (lgr <precise-logger>) lvl . objs)
+  (%precise-log-helper lgr lvl objs))
+
 
+;;; syslog handler.
 
 (define-class-with-docs <syslog> (<log-handler>)
   "This is a log handler which writes logs to the syslog."
@@ -102,20 +127,21 @@
 (define (syslog? x)
   (is-a? x <syslog>))
 
-
-;; The precise logger API is inspired by (logging logger) API.
+(define-method (accept-log (log <syslog>) level time str)
+  (let* ((command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
+                          (syslog-logger log)
+                          (if (syslog-use-stderr? log)
+                              "-s"
+                              "")
+                          level
+                          (syslog-tag log)
+                          str))
+         (result (system command)))
+    (unless (zero? result)
+      (error "Could not log a message"))))
 
-(define (%precise-log-formatter lvl time str)
-  (with-output-to-string
-    (lambda ()
-      (display (strftime "%F %H:%M:%S" (localtime (car time))))
-      (display ".")
-      (format #t "~6,'0d" (cdr time))
-      (display " (")
-      (display (symbol->string lvl))
-      (display "): ")
-      (display str)
-      (newline))))
+
+;;; The precise logger API is inspired by (logging logger) API.
 
 (define-class-with-docs <port-log/us> (<log-handler>)
   "Microsecond version of <port-log> from (logging port-log)."
@@ -129,30 +155,21 @@
 (define (port-log/us? x)
   (is-a? x <port-log/us>))
 
+(define (%precise-log-formatter lvl time str)
+  (with-output-to-string
+    (lambda ()
+      (display (strftime "%F %H:%M:%S" (localtime (car time))))
+      (display ".")
+      (format #t "~6,'0d" (cdr time))
+      (display " (")
+      (display (symbol->string lvl))
+      (display "): ")
+      (display str)
+      (newline))))
+
 (define-method (initialize (self <port-log/us>) args)
   (next-method)
   (slot-set! self 'formatter %precise-log-formatter))
-
-(define (level-enabled? lgr lvl)
-  "Check if a log level LVL is enabled for a logger LGR."
-  (hashq-ref (slot-ref lgr 'levels) lvl #t))
-
-(define-method (%precise-log-helper (self <precise-logger>) level objs)
-  (when (level-enabled? self level)
-    (let ((cur-time (gettimeofday)))
-      (for-each (lambda (str)
-                  (unless (string-null? str)
-                    ;; pass the string to each log handler for SELF.
-                    (for-each (lambda (handler)
-                                (accept-log handler level cur-time str))
-                              (slot-ref self 'log-handlers))))
-                ;; split the string at newlines into different log statements
-                (string-split
-                 (with-output-to-string (lambda () (for-each (lambda (o) (display o)) objs)))
-                 #\nl)))))
-
-(define-method (log-msg (lgr <precise-logger>) lvl . objs)
-  (%precise-log-helper lgr lvl objs))
 
 (define-method (emit-log (self <port-log/us>) str)
   (display str (port self)))
@@ -163,21 +180,6 @@
 (define-method (close-log! (self <port-log/us>))
   (close-port (port self))
   (set! (port self) (%make-void-port "w")))
-
-
-
-(define-method (accept-log (log <syslog>) level time str)
-  (let* ((command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
-                          (syslog-logger log)
-                          (if (syslog-use-stderr? log)
-                              "-s"
-                              "")
-                          level
-                          (syslog-tag log)
-                          str))
-         (result (system command)))
-    (unless (zero? result)
-      (error "Could not log a message"))))
 
 
 
