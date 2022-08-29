@@ -40,9 +40,9 @@
             port-log/us?
             syslog?
             smc-log-init!
+            smc-log
             log-add-handler!
             log-clear-handlers!
-            log
             log-error
             log-warning
             log-info
@@ -218,7 +218,7 @@
   #f)
   ;; (syslog-use-stderr! %syslog value))
 
-(define (log level fmt . args)
+(define (smc-log level fmt . args)
   (let ((message (apply format #f fmt args)))
     (log-msg %logger level message)))
 
@@ -226,18 +226,18 @@
 
 (define (log-error fmt . args)
   "Log a formatted error message."
-  (apply log 'ERROR fmt args))
+  (apply smc-log 'ERROR fmt args))
 
 (define (log-warning fmt . args)
   "Log a formatted warning message."
-  (apply log 'WARNING fmt args))
+  (apply smc-log 'WARNING fmt args))
 
 (define (log-info fmt . args)
   "Log a formatted informational message."
-  (apply log 'INFO fmt args))
+  (apply smc-log 'INFO fmt args))
 
 (define (log-debug fmt . args)
   "Log a formatted debug message."
-  (apply log 'DEBUG fmt args))
+  (apply smc-log 'DEBUG fmt args))
 
 ;;; log.scm ends here.
