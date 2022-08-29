@@ -39,7 +39,7 @@
             precise-logger?
             port-log/us?
             syslog?
-            log-init!
+            smc-log-init!
             log-add-handler!
             log-clear-handlers!
             log
@@ -194,7 +194,7 @@
 (define-method (log-clear-handlers!)
   (slot-set! %logger 'log-handlers '()))
 
-(define-method (log-init! (driver <string>) (options <list>))
+(define-method (smc-log-init! (driver <string>) (options <list>))
   (log-clear-handlers!)
   (cond
    ((string=? driver "syslog")
@@ -210,7 +210,7 @@
 
 ;; Initialize the default logger.
 
-(log-init! "syslog" '())
+(smc-log-init! "syslog" '())
 
 
 (define-method-with-docs (log-use-stderr! (value <boolean>))
