@@ -46,6 +46,7 @@ SUFFIXES = .in
 puml-fsm.scm: puml.puml
 	@echo "  SMC      $<"
 	@cat $< | smc compile \
+	    --load-path "$(abs_top_srcdir)/modules" \
 	    --fsm-name "puml-fsm" \
 	    --fsm-module "(smc puml-fsm)" \
 	    --modules "((smc context char-context)(smc puml-context))" > $@
@@ -53,7 +54,7 @@ puml-fsm.scm: puml.puml
 trace-fsm.scm: trace.puml
 	@echo "  SMC      $<"
 	@cat $< | smc compile \
-		--load-path $(top_srcdir)/modules \
+		--load-path $(abs_top_srcdir)/modules \
 		--fsm-name "trace-fsm" \
 		--fsm-module "(smc trace-fsm)" \
 		--modules "((smc trace-context))" > $@
