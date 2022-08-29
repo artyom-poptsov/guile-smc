@@ -39,6 +39,7 @@
             precise-logger?
             port-log/us?
             syslog?
+            log-init!
             log-add-handler!
             log-clear-handlers!
             log
@@ -51,6 +52,15 @@
             ;; Helper procedures.
             %precise-log-formatter
             %precise-log-helper))
+
+
+(define-with-docs %default-port-log-file
+  "The full path to the default log file used with <port-log/us>."
+  "/var/log/smc.log")
+
+(define-with-docs %default-guile-smc-syslog-tag
+  "The default syslog tag used for Guile-SMC."
+  "guile-smc")
 
 
 
@@ -171,15 +181,10 @@
 
 
 
-(define-with-docs %syslog
-  "Default syslog handler instance for Guile-SMC."
-  (make <syslog> #:tag "guile-smc"))
-
 (define-with-docs %logger
   "Default logger instance for Guile-SMC."
   (make <precise-logger>))
 
-(add-handler! %logger %syslog)
 (set-default-logger! %logger)
 (open-log! %logger)
 
@@ -189,10 +194,29 @@
 (define-method (log-clear-handlers!)
   (slot-set! %logger 'log-handlers '()))
 
+(define-method (log-init! (driver <string>) (options <list>))
+  (log-clear-handlers!)
+  (cond
+   ((string=? driver "syslog")
+    (log-add-handler! (make <syslog> #:tag %default-guile-smc-syslog-tag)))
+   ((string=? driver "port")
+    (let* ((file (or (assoc-ref options "file")
+                     %default-port-log-file))
+           (port (open-output-file file)))
+      (log-add-handler! (make <port-log/us> #:port port))))
+   (else
+    (error "Unknown log driver" driver options))))
+
+
+;; Initialize the default logger.
+
+(log-init! "syslog" '())
+
 
 (define-method-with-docs (log-use-stderr! (value <boolean>))
   "Enable or disable logging to stderr."
-  (syslog-use-stderr! %syslog value))
+  #f)
+  ;; (syslog-use-stderr! %syslog value))
 
 (define (log level fmt . args)
   (let ((message (apply format #f fmt args)))
