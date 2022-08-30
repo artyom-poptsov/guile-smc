@@ -35,6 +35,7 @@
   #:use-module (smc core state)
   #:export (<precise-logger>
             <syslog>
+            <null-log-handler>
             <port-log/us>
             precise-logger?
             port-log/us?
@@ -94,6 +95,16 @@
 
 (define-method (log-msg (lgr <precise-logger>) lvl . objs)
   (%precise-log-helper lgr lvl objs))
+
+
+;;; null log handler.
+
+(define-class-with-docs <null-log-handler> <log-handler>
+  "A log handler that discards all the log messages.")
+
+(define-method-with-docs (accept-log (log <null-log-handler>) level time str)
+  "This method discards all the parameters and always return #t."
+  #t)
 
 
 ;;; syslog handler.
