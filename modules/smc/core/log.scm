@@ -34,12 +34,12 @@
   #:use-module (smc core common)
   #:use-module (smc core state)
   #:export (<precise-logger>
-            <syslog>
+            <syslog-handler>
             <null-log-handler>
             <port-log/us>
             precise-logger?
             port-log/us?
-            syslog?
+            syslog-handler?
             smc-log-init!
             smc-log
             log-add-handler!
@@ -109,7 +109,7 @@
 
 ;;; syslog handler.
 
-(define-class-with-docs <syslog> (<log-handler>)
+(define-class-with-docs <syslog-handler> (<log-handler>)
   "This is a log handler which writes logs to the syslog."
 
   ;; Syslog logger console command.
@@ -117,14 +117,14 @@
   ;; <string>
   (logger
    #:init-value %logger-binary
-   #:getter     syslog-logger)
+   #:getter     syslog-handler-logger)
 
   ;; syslog process tag that will be logged.
   ;;
   ;; <string>
   (tag
    #:init-keyword #:tag
-   #:getter       syslog-tag)
+   #:getter       syslog-handler-tag)
 
   ;; Should the logger log to stderr?
   ;;
@@ -132,20 +132,20 @@
   (use-stderr?
    #:init-value   #f
    #:init-keyword #:use-stderr?
-   #:getter       syslog-use-stderr?
-   #:setter       syslog-use-stderr!))
+   #:getter       syslog-handler-use-stderr?
+   #:setter       syslog-handler-use-stderr!))
 
-(define (syslog? x)
-  (is-a? x <syslog>))
+(define (syslog-handler? x)
+  (is-a? x <syslog-handler>))
 
-(define-method (accept-log (log <syslog>) level time str)
+(define-method (accept-log (log <syslog-handler>) level time str)
   (let* ((command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
-                          (syslog-logger log)
-                          (if (syslog-use-stderr? log)
+                          (syslog-handler-logger log)
+                          (if (syslog-handler-use-stderr? log)
                               "-s"
                               "")
                           level
-                          (syslog-tag log)
+                          (syslog-handler-tag log)
                           str))
          (result (system command)))
     (unless (zero? result)
@@ -158,7 +158,7 @@
   "Microsecond version of <port-log> from (logging port-log)."
 
   ;; <port>
-  (port
+  (portp
    #:init-keyword #:port
    #:init-value   #f
    #:accessor     port))
@@ -211,7 +211,7 @@
   (log-clear-handlers!)
   (cond
    ((string=? driver "syslog")
-    (log-add-handler! (make <syslog> #:tag %default-guile-smc-syslog-tag)))
+    (log-add-handler! (make <syslog-handler> #:tag %default-guile-smc-syslog-tag)))
    ((string=? driver "port")
     (let* ((file (or (assoc-ref options "file")
                      %default-port-log-file))
@@ -231,7 +231,7 @@
 (define-method-with-docs (log-use-stderr! (value <boolean>))
   "Enable or disable logging to stderr."
   #f)
-  ;; (syslog-use-stderr! %syslog value))
+  ;; (syslog-handler-use-stderr! %syslog value))
 
 (define (smc-log level fmt . args)
   (let ((message (apply format #f fmt args)))
