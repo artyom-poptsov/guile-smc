@@ -31,7 +31,8 @@
             eval-string/quote
             pretty-print-transition-table
             string-any=?
-            command-match))
+            command-match
+            cli-options->alist))
 
 
 (define (pretty-print-transition-table fsm)
@@ -82,5 +83,12 @@
   (if (string-any=? command (caar command-list))
       (cadar command-list)
       (command-match command (cdr command-list))))
+
+(define (cli-options->alist opt-string)
+  "Convert a CLI string with options to an alist.  Return the alist."
+  (map (lambda (opt)
+         (let ((lst (string-split opt #\=)))
+           (cons (string->symbol (car lst)) (cadr lst))))
+       (string-split opt-string #\,)))
 
 ;;; common.scm ends here.
