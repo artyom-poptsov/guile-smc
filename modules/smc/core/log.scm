@@ -212,8 +212,8 @@
   (cond
    ((string=? driver "syslog")
     (log-add-handler! (make <syslog-handler> #:tag %default-guile-smc-syslog-tag)))
-   ((string=? driver "port")
-    (let* ((file (or (assoc-ref options "file")
+   ((string=? driver "file")
+    (let* ((file (or (assoc-ref options 'file)
                      %default-port-log-file))
            (port (open-output-file file)))
       (log-add-handler! (make <port-log/us> #:port port))))
