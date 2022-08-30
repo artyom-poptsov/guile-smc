@@ -217,6 +217,8 @@
                      %default-port-log-file))
            (port (open-output-file file)))
       (log-add-handler! (make <port-log/us> #:port port))))
+   ((string=? driver "null")
+    (log-add-handler! (make <null-log-handler>)))
    (else
     (error "Unknown log driver" driver options))))
 
