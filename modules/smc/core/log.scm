@@ -99,7 +99,7 @@
 
 ;;; null log handler.
 
-(define-class-with-docs <null-log-handler> <log-handler>
+(define-class-with-docs <null-log-handler> (<log-handler>)
   "A log handler that discards all the log messages.")
 
 (define-method-with-docs (accept-log (log <null-log-handler>) level time str)
