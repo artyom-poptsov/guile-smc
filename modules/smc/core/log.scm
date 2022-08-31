@@ -152,11 +152,8 @@
   (is-a? x <system-log>))
 
 (define-method (accept-log (log <system-log>) level time str)
-  (let* ((command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
+  (let* ((command (format #f "~a -p 'user.~a' -t '~a' '~a'"
                           (syslog-handler-logger log)
-                          (if (syslog-handler-use-stderr? log)
-                              "-s"
-                              "")
                           level
                           (syslog-handler-tag log)
                           str))
