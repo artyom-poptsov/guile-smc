@@ -34,17 +34,23 @@
   #:use-module (smc core common)
   #:use-module (smc core state)
   #:export (<precise-logger>
+            precise-logger?
+
             <system-log>
             system-log?
+
             <null-log>
             null-log?
+
             <precise-port-log>
+            precise-port-log?
+
             <stderr-log>
             stderr-log?
-            precise-logger?
-            precise-port-log?
+
             smc-log-init!
             smc-log
+
             log-add-handler!
             log-clear-handlers!
             log-error
