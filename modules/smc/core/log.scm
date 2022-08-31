@@ -37,6 +37,7 @@
             <system-log>
             <null-log>
             <precise-port-log>
+            <stderr-log>
             precise-logger?
             precise-port-log?
             syslog-handler?
@@ -190,6 +191,26 @@
 
 (define-method (close-log! (self <precise-port-log>))
   (close-port (port self))
+  (set! (port self) (%make-void-port "w")))
+
+
+;;; stderr logger.
+
+(define-class-with-docs <stderr-log> (<log-handler>)
+  "A log handler that logs to the stderr stream.")
+
+(define-method (initialize (self <stderr-log>) args)
+  (next-method)
+  (slot-set! self 'port (current-error-port))
+  (slot-set! self 'formatter %precise-log-formatter))
+
+(define-method (emit-log (self <stderr-log>) str)
+  (display str (port self)))
+
+(define-method (flush-log (self <stderr-log>))
+  (force-output (port self)))
+
+(define-method (close-log! (self <precise-port-log>))
   (set! (port self) (%make-void-port "w")))
 
 
