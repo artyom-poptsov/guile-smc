@@ -35,6 +35,7 @@
   #:use-module (smc core state)
   #:export (<precise-logger>
             <system-log>
+            system-log?
             <null-log>
             null-log?
             <precise-port-log>
@@ -42,7 +43,6 @@
             stderr-log?
             precise-logger?
             precise-port-log?
-            syslog-handler?
             smc-log-init!
             smc-log
             log-add-handler!
@@ -142,7 +142,7 @@
    #:getter       syslog-handler-use-stderr?
    #:setter       syslog-handler-use-stderr!))
 
-(define (syslog-handler? x)
+(define (system-log? x)
   (is-a? x <system-log>))
 
 (define-method (accept-log (log <system-log>) level time str)
