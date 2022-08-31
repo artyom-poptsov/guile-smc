@@ -36,6 +36,7 @@
   #:export (<precise-logger>
             <system-log>
             <null-log>
+            null-log?
             <precise-port-log>
             <stderr-log>
             stderr-log?
@@ -103,6 +104,10 @@
 
 (define-class-with-docs <null-log> (<log-handler>)
   "A log handler that discards all the log messages.")
+
+(define (null-log? x)
+  "Check if X is a <null-log> instance."
+  (is-a? x <null-log>))
 
 (define-method-with-docs (accept-log (log <null-log>) level time str)
   "This method discards all the parameters and always return #t."
