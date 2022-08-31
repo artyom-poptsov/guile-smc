@@ -35,7 +35,7 @@
   #:use-module (smc core state)
   #:export (<precise-logger>
             <syslog-handler>
-            <null-log-handler>
+            <null-log>
             <precise-port-log>
             precise-logger?
             precise-port-log?
@@ -99,10 +99,10 @@
 
 ;;; null log handler.
 
-(define-class-with-docs <null-log-handler> (<log-handler>)
+(define-class-with-docs <null-log> (<log-handler>)
   "A log handler that discards all the log messages.")
 
-(define-method-with-docs (accept-log (log <null-log-handler>) level time str)
+(define-method-with-docs (accept-log (log <null-log>) level time str)
   "This method discards all the parameters and always return #t."
   #t)
 
@@ -218,7 +218,7 @@
            (port (open-output-file file)))
       (log-add-handler! (make <precise-port-log> #:port port))))
    ((string=? driver "null")
-    (log-add-handler! (make <null-log-handler>)))
+    (log-add-handler! (make <null-log>)))
    (else
     (error "Unknown log driver" driver options))))
 
