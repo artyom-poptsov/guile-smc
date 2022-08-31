@@ -34,7 +34,7 @@
   #:use-module (smc core common)
   #:use-module (smc core state)
   #:export (<precise-logger>
-            <syslog-handler>
+            <system-log>
             <null-log>
             <precise-port-log>
             precise-logger?
@@ -109,7 +109,7 @@
 
 ;;; syslog handler.
 
-(define-class-with-docs <syslog-handler> (<log-handler>)
+(define-class-with-docs <system-log> (<log-handler>)
   "This is a log handler which writes logs to the syslog."
 
   ;; Syslog logger console command.
@@ -136,9 +136,9 @@
    #:setter       syslog-handler-use-stderr!))
 
 (define (syslog-handler? x)
-  (is-a? x <syslog-handler>))
+  (is-a? x <system-log>))
 
-(define-method (accept-log (log <syslog-handler>) level time str)
+(define-method (accept-log (log <system-log>) level time str)
   (let* ((command (format #f "~a ~a -p 'user.~a' -t '~a' '~a'"
                           (syslog-handler-logger log)
                           (if (syslog-handler-use-stderr? log)
@@ -211,7 +211,7 @@
   (log-clear-handlers!)
   (cond
    ((string=? driver "syslog")
-    (log-add-handler! (make <syslog-handler> #:tag %default-guile-smc-syslog-tag)))
+    (log-add-handler! (make <system-log> #:tag %default-guile-smc-syslog-tag)))
    ((string=? driver "file")
     (let* ((file (or (assoc-ref options 'file)
                      %default-port-log-file))
