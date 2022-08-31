@@ -49,11 +49,31 @@ Profile a state machine using a logged execution trace.
 
 Options:
   --help, -h        Print this message and exit.
+  --log-driver <driver>
+                    Set the log driver.
+                    Supported values:
+                    - \"syslog\" -- use syslog as the logging driver.
+                    - \"file\" -- log to a specified file. Output files are
+                      rotated as needed.
+                      Options:
+                      \"file\" -- the full path to the log file.
+                    - \"none\" -- disable logging (discard all the messages.)
+
+                    Default value is \"syslog\"
+  --log-opt <options>
+                    Set the logging options.  The set of options depends on
+                    the logging driver.
+                    Format:
+                      \"key1=value1,key2=value2\"
+                    Example:
+                      \"file=/tmp/smc.log\"
   --debug           Enable the debug mode.
 "))
 
 (define %option-spec
   '((help                     (single-char #\h) (value #f))
+    (log-driver                                 (value #t))
+    (log-opt                                    (value #t))
     (debug                                      (value #f))))
 
 (define-method (trace-profile-time (trace <list>))
@@ -85,13 +105,19 @@ Options:
 (define (command-profile args)
   (let* ((options          (getopt-long args %option-spec))
          (debug-mode?      (option-ref options 'debug     #f))
+         (log-driver       (option-ref options 'log-driver "syslog"))
+         (log-opt          (cli-options->alist
+                            (option-ref options 'log-opt "")))
          (args             (option-ref options '()        #f)))
 
     (when (or (option-ref options 'help #f) (null? args))
       (print-help)
       (exit 0))
 
-    (log-use-stderr! debug-mode?)
+    (when debug-mode?
+      (log-use-stderr! debug-mode?))
+
+    (smc-log-init! log-driver log-opt)
 
     (let* ((port    (open-input-file (car args)))
            (context (fsm-run! (make <trace-fsm>

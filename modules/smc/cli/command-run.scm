@@ -61,7 +61,30 @@ Options:
   --validate        Validate the output FSM and print the validation result.
                     The exit code is 0 if the validation is passed,
                     and a non-zero value otherwise.
-  --log-file <file> Log file to use.  Pass \"-\" as the file to use the standard
+  --log-driver <driver>
+                    Set the log driver.
+                    Supported values:
+                    - \"syslog\" -- use syslog as the logging driver.
+                    - \"file\" -- log to a specified file. Output files are
+                      rotated as needed.
+                      Options:
+                      \"file\" -- the full path to the log file.
+                    - \"none\" -- disable logging (discard all the messages.)
+
+                    Default value is \"syslog\"
+  --log-opt <options>
+                    Set the logging options.  The set of options depends on
+                    the logging driver.
+                    Format:
+                      \"key1=value1,key2=value2\"
+                    Example:
+                      \"file=/tmp/smc.log\"
+  --log-file <file>
+                    *This option is deprecated and will be removed in the
+                    Guile-SMC 0.6.0.  Use \"--log-driver\" and \"--log-opt\"
+                    instead.*
+
+                    Log file to use.  Pass \"-\" as the file to use the standard
                     error stream (stderr.)
                     'smc run' logs to syslog by default.
   --debug           Enable the debug mode.
@@ -74,6 +97,8 @@ Options:
     (context                  (single-char #\C) (value #t))
     (modules                  (single-char #\U) (value #t))
     (validate                                   (value #f))
+    (log-driver                                 (value #t))
+    (log-opt                                    (value #t))
     (log-file                                   (value #t))
     (debug                                      (value #f))))
 
@@ -84,15 +109,6 @@ Options:
 
 (define %default-context-thunk
   "(lambda () #f)")
-
-
-(define (configure-logging! log-file)
-  "Configure Guile-SMC logging to use a LOG-FILE."
-  (log-clear-handlers!)
-  (log-add-handler! (make <port-log/us>
-                      #:port (if (string=? log-file "-")
-                                 (current-error-port)
-                                 (open-output-file log-file)))))
 
 
 
@@ -108,18 +124,27 @@ Options:
                                        %default-context-thunk))
          (modules          (option-ref options 'modules   "()"))
          (debug-mode?      (option-ref options 'debug     #f))
-         (log-file         (option-ref options 'log-file  #f))
+         (log-driver       (option-ref options 'log-driver "syslog"))
+         (log-opt          (cli-options->alist
+                            (option-ref options 'log-opt "")))
+         (log-file         (option-ref options 'log-file  #f)) ; deprecated
          (args             (option-ref options '()        #f)))
 
     (when (or (option-ref options 'help #f) (null? args))
       (print-help)
       (exit 0))
 
-    (log-use-stderr! debug-mode?)
-    (add-to-load-path* (string-split extra-load-paths #\:))
+    ;; XXX: "--log-file" option is deprecated.  The option must be removed in
+    ;; Guile-SMC 0.6.0.
 
-    (when log-file
-      (configure-logging! log-file))
+    (if log-file
+        (smc-log-init! "file" `((file . ,log-file)))
+        (smc-log-init! log-driver log-opt))
+
+    (when debug-mode?
+      (log-use-stderr! debug-mode?))
+
+    (add-to-load-path* (string-split extra-load-paths #\:))
 
     (let* ((puml-file (car args))
            (port    (open-input-file puml-file))
