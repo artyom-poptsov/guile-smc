@@ -229,7 +229,7 @@
 (define-method (flush-log (self <stderr-log>))
   (force-output (port self)))
 
-(define-method (close-log! (self <precise-port-log>))
+(define-method (close-log! (self <stderr-log>))
   (set! (port self) (%make-void-port "w")))
 
 
