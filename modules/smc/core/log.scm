@@ -197,7 +197,13 @@
 ;;; stderr logger.
 
 (define-class-with-docs <stderr-log> (<log-handler>)
-  "A log handler that logs to the stderr stream.")
+  "A log handler that logs to the stderr stream."
+
+  ;; <port>
+  (port
+   #:init-keyword #:port
+   #:init-value   #f
+   #:accessor     port))
 
 (define-method (initialize (self <stderr-log>) args)
   (next-method)
