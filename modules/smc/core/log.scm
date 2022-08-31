@@ -36,9 +36,9 @@
   #:export (<precise-logger>
             <syslog-handler>
             <null-log-handler>
-            <port-log/us>
+            <precise-port-log>
             precise-logger?
-            port-log/us?
+            precise-port-log?
             syslog-handler?
             smc-log-init!
             smc-log
@@ -58,7 +58,7 @@
 ;;; Constants.
 
 (define-with-docs %default-port-log-file
-  "The full path to the default log file used with <port-log/us>."
+  "The full path to the default log file used with <precise-port-log>."
   "/var/log/smc.log")
 
 (define-with-docs %default-guile-smc-syslog-tag
@@ -154,7 +154,7 @@
 
 ;;; The precise logger API is inspired by (logging logger) API.
 
-(define-class-with-docs <port-log/us> (<log-handler>)
+(define-class-with-docs <precise-port-log> (<log-handler>)
   "Microsecond version of <port-log> from (logging port-log)."
 
   ;; <port>
@@ -163,8 +163,8 @@
    #:init-value   #f
    #:accessor     port))
 
-(define (port-log/us? x)
-  (is-a? x <port-log/us>))
+(define (precise-port-log? x)
+  (is-a? x <precise-port-log>))
 
 (define (%precise-log-formatter lvl time str)
   (with-output-to-string
@@ -178,17 +178,17 @@
       (display str)
       (newline))))
 
-(define-method (initialize (self <port-log/us>) args)
+(define-method (initialize (self <precise-port-log>) args)
   (next-method)
   (slot-set! self 'formatter %precise-log-formatter))
 
-(define-method (emit-log (self <port-log/us>) str)
+(define-method (emit-log (self <precise-port-log>) str)
   (display str (port self)))
 
-(define-method (flush-log (self <port-log/us>))
+(define-method (flush-log (self <precise-port-log>))
   (force-output (port self)))
 
-(define-method (close-log! (self <port-log/us>))
+(define-method (close-log! (self <precise-port-log>))
   (close-port (port self))
   (set! (port self) (%make-void-port "w")))
 
@@ -216,7 +216,7 @@
     (let* ((file (or (assoc-ref options 'file)
                      %default-port-log-file))
            (port (open-output-file file)))
-      (log-add-handler! (make <port-log/us> #:port port))))
+      (log-add-handler! (make <precise-port-log> #:port port))))
    ((string=? driver "null")
     (log-add-handler! (make <null-log-handler>)))
    (else

@@ -23,7 +23,7 @@
 
 (test-equal "<port-log/us>: initialize"
   %precise-log-formatter
-  (let ((h (make <port-log/us>)))
+  (let ((h (make <precise-port-log>)))
     (slot-ref h 'formatter)))
 
 
