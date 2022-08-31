@@ -54,6 +54,8 @@ Options:
   --generate, -g    Generate a context stub from a given PlantUML file.
   --module, -m <module>
                     Place the output code into a specified module
+  --load-path, -L <load-path>
+                    Add an extra load path.
   --log-driver <driver>
                     Set the log driver.
                     Supported values:
