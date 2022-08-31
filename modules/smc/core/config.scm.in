@@ -23,11 +23,12 @@
 
 ;;; Code:
 
-(define-module (smc core config))
+(define-module (smc core config)
+  #:export (%logger-binary))
 
 
 
-(define-public %logger-binary
+(define %logger-binary
   "@LOGGER_BINARY@")
 
 
