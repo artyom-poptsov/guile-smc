@@ -85,10 +85,13 @@
       (command-match command (cdr command-list))))
 
 (define (cli-options->alist opt-string)
-  "Convert a CLI string with options to an alist.  Return the alist."
-  (map (lambda (opt)
-         (let ((lst (string-split opt #\=)))
-           (cons (string->symbol (car lst)) (cadr lst))))
-       (string-split opt-string #\,)))
+  "Convert a CLI string with options to an alist.  Return the alist when options
+are present, or an empty list if the string is empty.."
+  (if (string-null? opt-string)
+      '()
+      (map (lambda (opt)
+             (let ((lst (string-split opt #\=)))
+               (cons (string->symbol (car lst)) (cadr lst))))
+           (string-split opt-string #\,))))
 
 ;;; common.scm ends here.
