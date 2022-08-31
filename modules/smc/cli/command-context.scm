@@ -40,7 +40,7 @@
   #:export (command-context))
 
 (define (print-help)
-  (display "\
+  (display (string-append "\
 Usage: smc context [options] [input-file]
 
 Analyze or generate a context stub based on a given PlantUML file.  If
@@ -52,6 +52,11 @@ Options:
   --standalone, -s
                     Generate a standalone compiler context.
   --generate, -g    Generate a context stub from a given PlantUML file.
+  --core-modules-path <path>
+                    Set the path where Guile-SMC core modules are stored.
+
+                    Default value:
+                      " %guile-smc-modules-directory "
   --module, -m <module>
                     Place the output code into a specified module
   --load-path, -L <load-path>
@@ -76,7 +81,7 @@ Options:
                       \"file=/tmp/smc.log\"
   --debug           Enable the debug mode.
 
-"))
+")))
 
 
 
@@ -144,11 +149,11 @@ context."
       (cadr defmod)
       (get-module-exports (cdr defmod))))
 
-(define (generate-smc-context module output-port)
+(define (generate-smc-context core-modules-path module output-port)
   "Generate a Guile-SMC context that can server as intermediate module for the
 derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
-  (let* ((context-code (fsm-get-context-code %guile-smc-modules-directory
+  (let* ((context-code (fsm-get-context-code core-modules-path
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
                                (cond
@@ -173,14 +178,15 @@ specified OUTPUT-PORT."
                      #:use-module (smc core log)
                      #:re-export ,exports))))
 
-(define* (generate-smc-context/standalone module
+(define* (generate-smc-context/standalone core-modules-path
+                                          module
                                           output-port)
   "Generate a Guile-SMC context that contains everything that is needed for
 derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
   (write-header output-port)
   (newline)
-  (let* ((context-code (fsm-get-context-code %guile-smc-modules-directory
+  (let* ((context-code (fsm-get-context-code core-modules-path
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
                                (cond
@@ -220,6 +226,7 @@ specified OUTPUT-PORT."
     (use-modules              (single-char #\U) (value #t))
     (resolve                  (single-char #\r) (value #f))
     (generate                 (single-char #\g) (value #f))
+    (core-modules-path                          (value #t))
     (module                   (single-char #\m) (value #t))
     (log-driver                                 (value #t))
     (log-opt                                    (value #t))
@@ -228,6 +235,9 @@ specified OUTPUT-PORT."
 (define (command-context args)
   (let* ((options          (getopt-long args %option-spec))
          (extra-load-paths (option-ref options 'load-path ""))
+         (core-modules-path (option-ref options
+                                        'core-modules-path
+                                        %guile-smc-modules-directory))
          (extra-modules    (option-ref options 'use-modules #f))
          (module           (option-ref options 'module    #f))
          (resolve?         (option-ref options 'resolve   #f))
@@ -277,8 +287,12 @@ specified OUTPUT-PORT."
                             (current-output-port))))
        (else
         (if standalone?
-            (generate-smc-context/standalone module (current-output-port))
-            (generate-smc-context module (current-output-port))))))))
+            (generate-smc-context/standalone core-modules-path
+                                             module
+                                             (current-output-port))
+            (generate-smc-context core-modules-path
+                                  module
+                                  (current-output-port))))))))
 
 ;;; command-context.scm ends here.
 
