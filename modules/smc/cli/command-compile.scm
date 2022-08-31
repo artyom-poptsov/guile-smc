@@ -54,6 +54,24 @@ Options:
   --print-transition-table, -p
                     Print the FSM transition table to the standard
                     output.
+  --log-driver <driver>
+                    Set the log driver.
+                    Supported values:
+                    - \"syslog\" -- use syslog as the logging driver.
+                    - \"file\" -- log to a specified file. Output files are
+                      rotated as needed.
+                      Options:
+                      \"file\" -- the full path to the log file.
+                    - \"none\" -- disable logging (discard all the messages.)
+
+                    Default value is \"syslog\"
+  --log-opt <options>
+                    Set the logging options.  The set of options depends on
+                    the logging driver.
+                    Format:
+                      \"key1=value1,key2=value2\"
+                    Example:
+                      \"file=/tmp/smc.log\"
   --load-path, -L <paths>
                     Add a paths separated by a colon to load paths.
   --modules, -U <extra-modules>
@@ -80,6 +98,8 @@ Options:
 (define %option-spec
   '((help                     (single-char #\h) (value #f))
     (print-transition-table   (single-char #\p) (value #f))
+    (log-driver                                 (value #t))
+    (log-opt                                    (value #t))
     (load-path                (single-char #\L) (value #t))
     (modules                  (single-char #\U) (value #t))
     (fsm-name                 (single-char #\n) (value #t))
@@ -91,6 +111,9 @@ Options:
 (define (command-compile args)
   (let* ((options          (getopt-long args %option-spec))
          (extra-load-paths (option-ref options 'load-path  ""))
+         (log-driver       (option-ref options 'log-driver "syslog"))
+         (log-opt          (cli-options->alist
+                            (option-ref options 'log-opt "")))
          (module           (option-ref options 'fsm-module #f))
          (extra-modules    (option-ref options 'modules    #f))
          (target           (option-ref options 'target     "guile"))
@@ -110,7 +133,10 @@ Options:
       (print-compile-help)
       (exit 0))
 
-    (log-use-stderr! debug-mode?)
+    (when debug-mode?
+      (log-use-stderr! debug-mode?))
+
+    (smc-log-init! log-driver log-opt)
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
