@@ -38,6 +38,7 @@
             <null-log>
             <precise-port-log>
             <stderr-log>
+            stderr-log?
             precise-logger?
             precise-port-log?
             syslog-handler?
@@ -205,6 +206,10 @@
    #:init-value   #f
    #:accessor     port))
 
+(define (stderr-log? x)
+  "Check if X is an <stderr-log> instance."
+  (is-a? x <stderr-log>))
+
 (define-method (initialize (self <stderr-log>) args)
   (next-method)
   (slot-set! self 'port (current-error-port))
@@ -257,8 +262,7 @@
 
 (define-method-with-docs (log-use-stderr! (value <boolean>))
   "Enable or disable logging to stderr."
-  #f)
-  ;; (syslog-handler-use-stderr! %syslog value))
+  (log-add-handler! (make <stderr-log>)))
 
 (define (smc-log level fmt . args)
   (let ((message (apply format #f fmt args)))
