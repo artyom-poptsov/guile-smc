@@ -54,6 +54,24 @@ Options:
   --generate, -g    Generate a context stub from a given PlantUML file.
   --module, -m <module>
                     Place the output code into a specified module
+  --log-driver <driver>
+                    Set the log driver.
+                    Supported values:
+                    - \"syslog\" -- use syslog as the logging driver.
+                    - \"file\" -- log to a specified file. Output files are
+                      rotated as needed.
+                      Options:
+                      \"file\" -- the full path to the log file.
+                    - \"none\" -- disable logging (discard all the messages.)
+
+                    Default value is \"syslog\"
+  --log-opt <options>
+                    Set the logging options.  The set of options depends on
+                    the logging driver.
+                    Format:
+                      \"key1=value1,key2=value2\"
+                    Example:
+                      \"file=/tmp/smc.log\"
   --debug           Enable the debug mode.
 
 "))
@@ -201,6 +219,8 @@ specified OUTPUT-PORT."
     (resolve                  (single-char #\r) (value #f))
     (generate                 (single-char #\g) (value #f))
     (module                   (single-char #\m) (value #t))
+    (log-driver                                 (value #t))
+    (log-opt                                    (value #t))
     (debug                                      (value #f))))
 
 (define (command-context args)
@@ -211,6 +231,9 @@ specified OUTPUT-PORT."
          (resolve?         (option-ref options 'resolve   #f))
          (generate?        (option-ref options 'generate  #f))
          (standalone?      (option-ref options 'standalone #f))
+         (log-driver       (option-ref options 'log-driver "syslog"))
+         (log-opt          (cli-options->alist
+                            (option-ref options 'log-opt "")))
          (debug-mode?      (option-ref options 'debug     #f))
          (help-needed?     (option-ref options 'help      #f))
          (args             (option-ref options '()        #f)))
@@ -219,7 +242,10 @@ specified OUTPUT-PORT."
       (print-help)
       (exit 0))
 
-    (log-use-stderr! debug-mode?)
+    (when debug-mode?
+      (log-use-stderr! debug-mode?))
+
+    (smc-log-init! log-driver log-opt)
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
