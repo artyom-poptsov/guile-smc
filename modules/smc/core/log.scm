@@ -158,7 +158,7 @@
   "Microsecond version of <port-log> from (logging port-log)."
 
   ;; <port>
-  (portp
+  (port
    #:init-keyword #:port
    #:init-value   #f
    #:accessor     port))
