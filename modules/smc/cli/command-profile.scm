@@ -57,7 +57,7 @@ Options:
                       rotated as needed.
                       Options:
                       \"file\" -- the full path to the log file.
-                    - \"none\" -- disable logging (discard all the messages.)
+                    - \"null\" -- disable logging (discard all the messages.)
 
                     Default value is \"syslog\"
   --log-opt <options>
