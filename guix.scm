@@ -45,6 +45,7 @@
              (gnu packages guile-xyz)
              (gnu packages pkg-config)
              (gnu packages texinfo)
+             (gnu packages tex)
              (gnu packages man))
 
 
@@ -93,7 +94,8 @@
            pkg-config
            help2man
            texinfo
-           which))
+           which
+           texlive))
     (inputs
      (list bash-minimal
            guile-3.0
