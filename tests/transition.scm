@@ -1,14 +1,18 @@
+(add-to-load-path (getenv "abs_top_srcdir"))
+
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (ice-9 receive)
              (ice-9 regex)
              (oop goops)
+             (tests common)
              (smc context char-context)
              (smc core transition))
 
 
 (define %test-name "transition")
 
+(configure-test-logging! %test-name)
 (test-begin %test-name)
 
 

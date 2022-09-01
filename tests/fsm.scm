@@ -5,13 +5,17 @@
              (ice-9 receive)
              (ice-9 regex)
              (oop goops)
+             (tests common)
              (smc context char-context)
              (tests test-context)
              (smc fsm)
              (smc core state))
 
 
+(define %test-suite-name "fsm")
+
 (test-begin "fsm")
+(configure-test-logging! %test-suite-name)
 
 
 
@@ -162,6 +166,6 @@
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
-(test-end "fsm")
+(test-end %test-suite-name)
 
 (exit exit-status)

@@ -9,10 +9,13 @@
              (smc puml-context)
              (smc core state)
              (smc core set)
+             (tests common)
              (tests test-context))
 
 
 (define %test-name "puml-context")
+
+(configure-test-logging! %test-name)
 (test-begin %test-name)
 
 

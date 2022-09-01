@@ -1,12 +1,16 @@
+(add-to-load-path (getenv "abs_top_srcdir"))
+
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (oop goops)
+             (tests common)
              (smc context context)
              (smc context char-context))
 
 
 (define %test-suite-name "context")
 
+(configure-test-logging! %test-suite-name)
 (test-begin %test-suite-name)
 
 

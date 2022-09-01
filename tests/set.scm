@@ -2,10 +2,13 @@
 
 (use-modules (srfi srfi-64)
              (oop goops)
+             (tests common)
              (smc core set))
 
 
 (define %test-name "set")
+
+(configure-test-logging! %test-name)
 (test-begin %test-name)
 
 

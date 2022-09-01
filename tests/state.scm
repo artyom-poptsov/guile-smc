@@ -9,10 +9,12 @@
              (smc fsm)
              (smc core transition)
              (smc core state)
+             (tests common)
              (tests test-context))
 
 
 (test-begin "state")
+(configure-test-logging! "state")
 
 
 ;;; Accessors tests.

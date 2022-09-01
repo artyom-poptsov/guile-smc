@@ -28,12 +28,14 @@
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
              (oop goops)
+             (tests common)
              (smc cli command-compile)
              (tests test-context))
 
 
 (define %test-suite-name "cli")
 
+(configure-test-logging! %test-suite-name)
 (test-begin %test-suite-name)
 
 ;; compile

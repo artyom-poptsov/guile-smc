@@ -6,11 +6,13 @@
              (smc fsm)
              (smc compiler)
              (smc context char-context)
+             (tests common)
              (tests test-context))
 
 
 (define %test-suite-name "compiler")
 
+(configure-test-logging! %test-suite-name)
 (test-begin %test-suite-name)
 
 
