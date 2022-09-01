@@ -51,7 +51,7 @@
     (lambda ()
       (with-output-to-string
         (lambda ()
-          (command-compile '("smc")))))))
+          (command-compile '("smc" "--log-driver" "null")))))))
 
 (test-assert "compile-validate"
   (with-input-from-string
@@ -65,7 +65,7 @@
     (lambda ()
       (with-output-to-string
         (lambda ()
-          (command-compile '("smc" "--validate")))))))
+          (command-compile '("smc" "--log-driver" "null" "--validate")))))))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
