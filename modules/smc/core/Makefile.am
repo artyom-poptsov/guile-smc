@@ -27,7 +27,7 @@ SOURCES = \
 	state.scm	\
 	set.scm
 
-EXTRA_DIST = \
+EXTRA_DIST += \
 	config.scm.in
 
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/core/
