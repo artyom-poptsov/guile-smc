@@ -81,6 +81,24 @@ Options:
   --print-transition-table, -p
                     Print the FSM transition table to the standard
                     output.
+  --log-driver <driver>
+                    Set the log driver.
+                    Supported values:
+                    - "syslog" -- use syslog as the logging driver.
+                    - "file" -- log to a specified file. Output files are
+                      rotated as needed.
+                      Options:
+                      "file" -- the full path to the log file.
+                    - "none" -- disable logging (discard all the messages.)
+
+                    Default value is "syslog"
+  --log-opt <options>
+                    Set the logging options.  The set of options depends on
+                    the logging driver.
+                    Format:
+                      "key1=value1,key2=value2"
+                    Example:
+                      "file=/tmp/smc.log"
   --load-path, -L <paths>
                     Add a paths separated by a colon to load paths.
   --modules, -U <extra-modules>
@@ -296,7 +314,30 @@ Options:
   --validate        Validate the output FSM and print the validation result.
                     The exit code is 0 if the validation is passed,
                     and a non-zero value otherwise.
-  --log-file <file> Log file to use.  Pass "-" as the file to use the standard
+  --log-driver <driver>
+                    Set the log driver.
+                    Supported values:
+                    - "syslog" -- use syslog as the logging driver.
+                    - "file" -- log to a specified file. Output files are
+                      rotated as needed.
+                      Options:
+                      "file" -- the full path to the log file.
+                    - "none" -- disable logging (discard all the messages.)
+
+                    Default value is "syslog"
+  --log-opt <options>
+                    Set the logging options.  The set of options depends on
+                    the logging driver.
+                    Format:
+                      "key1=value1,key2=value2"
+                    Example:
+                      "file=/tmp/smc.log"
+  --log-file <file>
+                    *This option is deprecated and will be removed in the
+                    Guile-SMC 0.6.0.  Use "--log-driver" and "--log-opt"
+                    instead.*
+
+                    Log file to use.  Pass "-" as the file to use the standard
                     error stream (stderr.)
                     'smc run' logs to syslog by default.
   --debug           Enable the debug mode.
