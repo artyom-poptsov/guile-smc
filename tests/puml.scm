@@ -8,10 +8,13 @@
              (smc fsm)
              (smc puml)
              (smc core state)
+             (tests common)
              (tests test-context))
 
 
 (test-begin "puml")
+
+(configure-test-logging! "puml")
 
 
 ;; read-start-tag errors
