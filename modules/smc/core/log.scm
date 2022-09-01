@@ -52,6 +52,7 @@
             smc-log
 
             log-add-handler!
+            log-remove-handler!
             log-clear-handlers!
             log-error
             log-warning
@@ -244,6 +245,14 @@
 (define-method (log-add-handler! (handler <log-handler>))
   (add-handler! %logger handler))
 
+(define-method (log-remove-handler! type)
+  "Remove a log handler of the specified TYPE."
+  (slot-set! %logger
+             'log-handlers
+             (filter (lambda (handler)
+                       (not (is-a? handler type)))
+                     (slot-ref %logger 'log-handlers))))
+
 (define-method (log-clear-handlers!)
   (slot-set! %logger 'log-handlers '()))
 
@@ -270,7 +279,9 @@
 
 (define-method-with-docs (log-use-stderr! (value <boolean>))
   "Enable or disable logging to stderr."
-  (log-add-handler! (make <stderr-log>)))
+  (if value
+      (log-add-handler! (make <stderr-log>))
+      (log-remove-handler! <stderr-log>)))
 
 (define (smc-log level fmt . args)
   (let ((message (apply format #f fmt args)))
