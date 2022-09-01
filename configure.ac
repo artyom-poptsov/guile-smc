@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License
 along with Guile-SMC.  If not, see <http://www.gnu.org/licenses/>.
 ]])
 
-AC_INIT([Guile-SMC], [0.5.0], [poptsov.artyom@gmail.com],
+AC_INIT([Guile-SMC], [0.5.1], [poptsov.artyom@gmail.com],
                      [guile-smc],
                      [https://github.com/artyom-poptsov/guile-smc])
 

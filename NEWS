@@ -7,6 +7,27 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
+* Version 0.5.1 (2022-09-02)
+** Fix =log= core binding shadowing by =(smc core log)=
+** Allow to set the log driver in Guile-SMC CLI.
+See the =--help= for each =smc= action for the description of the new command
+line options.
+
+Implemented log drivers are: =syslog=, =file= and =null=.
+** =stderr= logging now works with any log driver
+Updated =(smc core log)= API now allows to use =stderr= logging with any other
+driver.  That is, Guile-SMC will log messages to the =stderr= even for =none=
+driver is set after =log-use-stderr!= is called with =#t=.
+
+The =stderr= logging can be disabled by calling =log-use-stderr!= with =#f= as
+the argument.
+** PNG parser example now uses =null= log driver
+That should make building in isolated/restricted environments (like in Guix)
+easier.
+** Guile-SMC tests now uses file log driver
+Each test suite now logs to a file named =<test-suite-name>-smc.log= in the
+=tests= directory.
+** Update the Texinfo documentation
 * Version 0.5.0 (2022-08-23)
 ** Compiler changes
 *** =guile-standalone=: Add missing dependency for the target code
