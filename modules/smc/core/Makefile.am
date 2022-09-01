@@ -27,6 +27,9 @@ SOURCES = \
 	state.scm	\
 	set.scm
 
+EXTRA_DIST = \
+	config.scm.in
+
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/core/
 godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/core/
 
