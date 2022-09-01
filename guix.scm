@@ -39,6 +39,7 @@
              (guix build-system gnu)
              (gnu packages autotools)
              (gnu packages guile)
+             (gnu packages base)
              (gnu packages bash)
              (gnu packages admin)
              (gnu packages guile-xyz)
@@ -68,21 +69,6 @@
        #:phases
        (modify-phases %standard-phases
          (delete 'strip)
-         (add-after 'configure 'patch
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (substitute* "modules/smc/core/log.scm"
-               (("  #:use-module \\(logging logger\\)")
-                (string-append
-                 "  #:use-module (logging logger)\n"
-                 "  #:use-module (logging rotating-log)"))
-               (("\\(make <precise-logger>\\)")
-                "(make <logger>)")
-               (("\\(add-handler! %logger %syslog\\)")
-                (string-append
-                 "(add-handler! %logger\n"
-                 "              (make <rotating-log>\n"
-                 "                    #:file-name \"/tmp/smc.log\"))\n")))
-             #t))
          (add-after 'install 'wrap-program
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let* ((out       (assoc-ref outputs "out"))
@@ -106,7 +92,8 @@
            automake
            pkg-config
            help2man
-           texinfo))
+           texinfo
+           which))
     (inputs
      (list bash-minimal
            guile-3.0
