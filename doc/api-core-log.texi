@@ -8,12 +8,66 @@
 
 @code{(smc core log)} module contains Guile-SMC logging facilities.
 
-@deftp {Class} <syslog>
+@subsection The Precise Logger
+
+@deftp {Class} <precise-logger>
+Guile-SMC precise logger that prints log with microsecond accuracy.
+@end deftp
+
+@deffn {Scheme Procedure} precise-logger? x
+Check if @var{x} is a @code{<precise-logger>} instance.
+@end deffn
+
+@subsection Log Drivers
+
+Guile-SMC allows to set different log drivers (or handlers).  It uses
+@code{<system-log>} by default.
+
+@subsubsection System Log
+@deftp {Class} <system-log>
 This is a log handler which writes logs to the syslog.
 @end deftp
 
-@deffn {Scheme Procedure} syslog? x
-Check if @var{x} is a @code{<syslog>} instance.
+@deffn {Scheme Procedure} system-log? x
+Check if @var{x} is a @code{<system-log>} instance.
+@end deffn
+
+@subsubsection Precise Port Log
+
+@deftp {Class} <precise-port-log>
+Microsecond version of @code{<port-log>} from @code{(logging port-log)}.
+@end deftp
+
+@subsubsection Standard Error Log
+
+@deftp {Class} <stderr-log>
+Log driver that logs to the standard error port.
+@end deftp
+
+@subsubsection Null Log
+
+@deftp {Class} <null-log>
+Log driver that logs to the standard error port.
+@end deftp
+
+@deffn {Scheme Procedure} null-log? x
+Check if @var{x} is a @code{<null-log>} instance.
+@end deffn
+
+@subsection Logging Initialization and Configuration
+
+@deffn {Scheme Procedure} smc-log-init! (log-driver <string>) (log-options <list>)
+Initialize Guile-SMC logging to the specified @var{log-driver} with
+@var{log-options} list.
+
+Known log drivers:
+@itemize
+@item ``syslog'' (@code{<system-log>})
+@item ``file''   (@code{<precise-port-log>})
+@item ``null''   (@code{<null-log>})
+@end itemize
+
+Return value is undefined.
 @end deffn
 
 @deffn {Scheme Procedure} log-use-stderr! (value <boolean>)
@@ -21,34 +75,20 @@ Change whether the logger must print messages to the stderr as well as to
 syslog, or not.
 @end deffn
 
-@deffn  {Scheme Procedure} log level fmt . args
-@deffnx {Scheme Procedure} log-error fmt . args
-@deffnx {Scheme Procedure} log-warning fmt . args
-@deffnx {Scheme Procedure} log-info fmt . args
-@deffnx {Scheme Procedure} log-debug fmt . args
-Log a formatted message of a specified logging @var{level} to syslog.
-@end deffn
-
-@subsection Precise logging
-
-@deftp {Class} <precise-logger>
-Guile-SMC precise logger that prints log with microsecond accuracy.
-@end deftp
-
-@deftp {Class} <port-log/us>
-Microsecond version of @code{<port-log>} from @code{(logging port-log)}.
-@end deftp
+@subsection Helper Procedures
 
 @deffn {Scheme Procedure} %precise-log-formatter lvl time str
 The precise log formatter for @code{<precise-logger>}.
 @end deffn
 
-@deffn {Scheme Procedure} precise-logger? x
-Check if @var{x} is a @code{<precise-logger>} instance.
-@end deffn
+@subsection Logging Procedures
 
-@deffn {Scheme Procedure} port-log/us? x
-Check if @var{x} is a @code{<port-log/us>} instance.
+@deffn  {Scheme Procedure} smc-log level fmt . args
+@deffnx {Scheme Procedure} log-error fmt . args
+@deffnx {Scheme Procedure} log-warning fmt . args
+@deffnx {Scheme Procedure} log-info fmt . args
+@deffnx {Scheme Procedure} log-debug fmt . args
+Log a formatted message of a specified logging @var{level} to syslog.
 @end deffn
 
 @c Local Variables:
