@@ -197,6 +197,7 @@ OUTPUT-DIRECTORY."
                                           "/")))
          (files      (list "/fsm.scm"
                            "/core/common.scm"
+                           "/core/config.scm"
                            "/core/log.scm"
                            "/core/state.scm"
                            "/core/stack.scm"
