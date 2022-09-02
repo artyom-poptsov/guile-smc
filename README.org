@@ -445,5 +445,3 @@ Also see other examples the =examples= directory.
   the =smc= compiler as part of state machine benchmark suite.
 - It is possible to add compilation to other languages aside from Scheme, but
   it will be quite hard to implement indeed.
-- Add standalone-mode for the FSM compiler that will produce state machines
-  independent from Guile-SMC.
