@@ -435,7 +435,8 @@ PlantUML format -- see =examples/pumlpuml.scm=.
 Also see other examples the =examples= directory.
 
 *** Projects that use Guile-SMC
-- Guile-INI: https://github.com/artyom-poptsov/guile-ini
+- [[https://github.com/artyom-poptsov/guile-ini][Guile-INI]]
+- [[https://github.com/artyom-poptsov/guile-ics][Guile-ICS]]
 
 ** Ideas to implement
 - Write a PlantUML generator that take a =<fsm>= instance and produces a
