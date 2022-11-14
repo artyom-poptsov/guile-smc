@@ -437,6 +437,7 @@ Also see other examples the =examples= directory.
 *** Projects that use Guile-SMC
 - [[https://github.com/artyom-poptsov/guile-ini][Guile-INI]]
 - [[https://github.com/artyom-poptsov/guile-ics][Guile-ICS]]
+- [[https://github.com/artyom-poptsov/guile-png][Guile-PNG]]
 
 ** Ideas to implement
 - Write a PlantUML generator that take a =<fsm>= instance and produces a
