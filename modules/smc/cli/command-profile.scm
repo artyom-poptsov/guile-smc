@@ -49,6 +49,10 @@ Profile a state machine using a logged execution trace.
 
 Options:
   --help, -h        Print this message and exit.
+  --format, -f <output-format>
+                    Output format.  Supported values:
+                    - \"human-readable\" (default)
+                    - \"json\"
   --log-driver <driver>
                     Set the log driver.
                     Supported values:
@@ -72,6 +76,7 @@ Options:
 
 (define %option-spec
   '((help                     (single-char #\h) (value #f))
+    (format                   (single-char #\f) (value #t))
     (log-driver                                 (value #t))
     (log-opt                                    (value #t))
     (debug                                      (value #f))))
@@ -102,9 +107,47 @@ Options:
 
 
 
+(define (print-human-readable trace total-time)
+  (format #t "Total transitions: ~a~%" (length trace))
+  (format #t "Total time:        ~a us~%" total-time)
+  (display "Stats:\n")
+  (for-each (lambda (kv)
+              (unless (string=? (car kv) "*")
+                (format #t
+                        "  ~a: ~a us (~2,4f %)~%"
+                        (car kv)
+                        (cdr kv)
+                        (* (/ (cdr kv) total-time) 100))))
+            (sort (hash-map->list cons (trace-profile-time trace))
+                  (lambda (kv1 kv2)
+                    (> (cdr kv1) (cdr kv2))))))
+
+(define (print-json trace total-time)
+  (display "{")
+  (format #t "\"Total transitions\": ~a," (length trace))
+  (format #t "\"Total time (us)\":~a," total-time)
+  (display "\"Stats\": {")
+  (let* ((data (sort (hash-map->list cons (trace-profile-time trace))
+                     (lambda (kv1 kv2)
+                       (> (cdr kv1) (cdr kv2)))))
+         (last-rec (car (reverse data))))
+    (for-each (lambda (kv)
+                (unless (string=? (car kv) "*")
+                  (format #t
+                          "\"~a\": {\"Time (us)\": ~a, \"Percent\": ~2,4f}"
+                          (car kv)
+                          (cdr kv)
+                          (* (/ (cdr kv) total-time) 100))
+                  (if (equal? kv last-rec)
+                      (display " ")
+                      (display ", "))))
+              data))
+  (display "}}\n"))
+
 (define (command-profile args)
   (let* ((options          (getopt-long args %option-spec))
          (debug-mode?      (option-ref options 'debug     #f))
+         (output-format    (option-ref options 'format    "human-readable"))
          (log-driver       (option-ref options 'log-driver "syslog"))
          (log-opt          (cli-options->alist
                             (option-ref options 'log-opt "")))
@@ -127,18 +170,12 @@ Options:
            (trace   (reverse (trace-context-result context)))
            (total-time (- (log-entry-timestamp-usec (car (trace-context-result context)))
                           (log-entry-timestamp-usec (car trace)))))
-      (format #t "Total transitions: ~a~%" (length trace))
-      (format #t "Total time:        ~a us~%" total-time)
-      (display "Stats:\n")
-      (for-each (lambda (kv)
-                  (unless (string=? (car kv) "*")
-                    (format #t
-                            "  ~a: ~a us (~2,4f %)~%"
-                            (car kv)
-                            (cdr kv)
-                            (* (/ (cdr kv) total-time) 100))))
-                (sort (hash-map->list cons (trace-profile-time trace))
-                      (lambda (kv1 kv2)
-                        (> (cdr kv1) (cdr kv2))))))))
+      (cond
+       ((string=? output-format "human-readable")
+        (print-human-readable trace total-time))
+       ((string=? output-format "json")
+        (print-json trace total-time))
+       (#t
+        (error "Unknown output format" output-format))))))
 
 ;;; command-profile.scm ends here.
