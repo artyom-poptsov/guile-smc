@@ -105,12 +105,12 @@
 
 ;; Make a procedure that checks if a CH1 equals to CH2.
 (define-syntax-rule (make-char-guard name ch)
-  (define-public (name ctx byte)
+  (define-method (name (ctx <binary-context>) (byte <number>))
     (char=? (integer->char byte) ch)))
 
 ;; Make a procedure that checks if a CH is in a CHARSET.
 (define-syntax-rule (make-charset-guard name charset)
-  (define-public (name ctx byte)
+  (define-method (name (ctx <binary-context>) (byte <number>))
     (char-set-contains? charset (integer->char byte))))
 
 ;;; The procedures below are predicates for symbols of the ASCII table, in the
