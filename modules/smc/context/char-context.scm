@@ -144,13 +144,17 @@
 
 ;; Make a procedure that checks if a CH1 equals to CH2.
 (define-syntax-rule (make-char-guard name ch1)
-  (define-public (name ctx ch2)
-    (char=? ch1 ch2)))
+  (begin
+    (define-method (name (ctx <char-context>) (ch2 <char>))
+      (char=? ch1 ch2))
+    (export name)))
 
 ;; Make a procedure that checks if a CH is in a CHARSET.
 (define-syntax-rule (make-charset-guard name charset)
-  (define-public (name ctx ch)
-    (char-set-contains? charset ch)))
+  (begin
+    (define-method (name (ctx <char-context>) (ch <char>))
+      (char-set-contains? charset ch))
+    (export name)))
 
 ;;; The procedures below are predicates for symbols of the ASCII table, in the
 ;;; same order.
