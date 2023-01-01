@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -21,7 +21,8 @@ include $(top_srcdir)/build-aux/am/guile.am
 
 SOURCES = \
 	context.scm		\
-	char-context.scm
+	char-context.scm	\
+	binary.scm
 
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/context/
 godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/context/
