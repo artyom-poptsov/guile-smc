@@ -29,6 +29,7 @@
   #:use-module (ice-9 binary-ports)
   #:use-module (oop goops)
   #:use-module (smc context context)
+  #:use-module (smc core log)
   #:re-export (;; From (smc context context)
                <context>
                context?
@@ -46,7 +47,13 @@
                action:update-stanza)
   #:export (<binary-context>
             binary-context-port
-            binary-context-counter))
+            binary-context-counter
+
+            ;; Logging procedures
+            context-log-error
+            context-log-warning
+            context-log-info
+            context-log-debug))
 
 
 (define-class <binary-context> (<context>)
@@ -271,5 +278,32 @@
          (binary-context-counter ctx)
          byte
          ctx))
+
+
+
+(define (%current-position-prefix ctx)
+  (format #f "~a:~a: "
+          (binary-context-port ctx)
+          (binary-context-counter ctx)))
+
+(define (context-log-error ctx fmt . rest)
+  (apply log-error
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
+
+(define (context-log-warning ctx fmt . rest)
+  (apply log-warning
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
+
+(define (context-log-info ctx fmt . rest)
+  (apply log-info
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
+
+(define (context-log-debug ctx fmt . rest)
+  (apply log-debug
+         (string-append (%current-position-prefix ctx) fmt)
+         rest))
 
 ;;; binary.scm ends here.
