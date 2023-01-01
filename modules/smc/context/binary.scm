@@ -49,6 +49,13 @@
             binary-context-port
             binary-context-counter
 
+            event-source
+
+            ;; Actions.
+            action:syntax-error
+
+            ;; All guards that are exported with 'define-public' below.
+
             ;; Logging procedures
             context-log-error
             context-log-warning
