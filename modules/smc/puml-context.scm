@@ -42,6 +42,7 @@
             puml-context-resolved-procedures
             puml-context-unresolved-procedures
             puml-context-print-resolver-status
+            event-source
             %puml-error
             puml-error
             stanza->list-of-symbols
@@ -134,6 +135,10 @@
                         "Could not resolve procedure ~a in ~a"
                         event-source-name
                         puml-context)))))
+
+
+
+(define event-source char-context-event-source)
 
 
 

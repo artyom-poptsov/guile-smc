@@ -59,7 +59,7 @@
             char-context-col
             char-context-update-counters!
 
-            event-source
+            char-context-event-source
 
             ;; Actions.
             action:syntax-error
@@ -125,7 +125,7 @@
 ;;; Event source.
 
 ;; Get the next character from a CONTEXT port.
-(define-method (event-source (context <char-context>))
+(define-method (char-context-event-source (context <char-context>))
   (let ((ch (get-char (char-context-port context))))
     (char-context-update-counters! context ch)
     ch))

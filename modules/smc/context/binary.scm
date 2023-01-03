@@ -53,7 +53,7 @@
             binary-context-port
             binary-context-counter
 
-            event-source
+            binary-context-event-source
 
             ;; Actions.
             action:syntax-error
@@ -81,7 +81,7 @@
 ;;; Event source.
 
 ;; Get the next character from a CONTEXT port.
-(define-method (event-source (context <binary-context>))
+(define-method (binary-context-event-source (context <binary-context>))
   (let ((byte (get-u8 (binary-context-port context))))
     (binary-context-update-counters! context byte)
     byte))
