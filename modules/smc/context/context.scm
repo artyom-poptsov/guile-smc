@@ -39,20 +39,8 @@
             context?
             context-debug-mode?
             context-debug-mode-set!
-            context-stanza
-            context-stanza-set!
-            context-stanza-add!
-            context-stanza-clear!
-            context-buffer
-            context-buffer-set!
-            context-buffer-add!
-            context-buffer-clear!
-            context-clear!
             guard:#t
-            action:no-op
-            action:store
-            action:clear-buffer
-            action:update-stanza))
+            action:no-op))
 
 
 
@@ -64,23 +52,7 @@
    #:init-value #f
    #:init-keyword #:debug-mode?
    #:getter       context-debug-mode?
-   #:setter       context-debug-mode-set!)
-
-  ;; The buffer holds read symbols.
-  ;;
-  ;; <list>
-  (buffer
-   #:init-value '()
-   #:getter     context-buffer
-   #:setter     context-buffer-set!)
-
-  ;; The stanza holds a logical unit of parsing (e.g. a key/value pair)
-  ;;
-  ;;<list>
-  (stanza
-   #:init-value '()
-   #:getter     context-stanza
-   #:setter     context-stanza-set!))
+   #:setter       context-debug-mode-set!))
 
 (define-method (context? x)
   "Check if an X is a <context> instance."
@@ -88,53 +60,8 @@
 
 
 
-(define-method (context-buffer-clear! (ctx <context>))
-  (context-buffer-set! ctx '()))
-
-(define-method (context-buffer-add! (ctx <context>) value)
-  (context-buffer-set! ctx
-                       (cons value (context-buffer ctx))))
-
-(define-method (context-stanza-clear! (ctx <context>))
-  (context-stanza-set! ctx '()))
-
-(define-method (context-stanza-add! (ctx <context>) value)
-  (context-stanza-set! ctx
-                       (cons value (context-stanza ctx))))
-
-(define-method (context-clear! (ctx <context>))
-  (context-buffer-clear! ctx)
-  (context-stanza-clear! ctx))
-
-
-
 (define (action:no-op ctx event)
   ctx)
-
-(define (action:store ctx event)
-  (when (context-debug-mode? ctx)
-    (log-debug "action:store: event: ~a; buffer: ~a"
-               event (context-buffer ctx)))
-  (context-buffer-add! ctx event)
-  ctx)
-
-(define (action:clear-buffer ctx event)
-  "Clear the context CTX buffer."
-  (context-buffer-clear! ctx)
-  ctx)
-
-(define (action:update-stanza ctx event)
-  (let ((buf (reverse (context-buffer ctx))))
-    (unless (null? buf)
-      (when (context-debug-mode? ctx)
-        (let ((stanza (reverse (context-stanza ctx))))
-          (log-debug "action:update-stanza: event: ~a; buffer: ~a; stanza: ~a"
-                     event
-                     buf
-                     stanza)))
-      (context-stanza-add! ctx buf)
-      (context-buffer-clear! ctx))
-    ctx))
 
 (define (guard:#t ctx event)
   "This guard is always returns #t."

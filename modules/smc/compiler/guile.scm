@@ -202,6 +202,7 @@ OUTPUT-DIRECTORY."
                            "/core/state.scm"
                            "/core/stack.scm"
                            "/core/transition.scm"
+                           "/context/port.scm"
                            "/context/char-context.scm"
                            "/context/binary.scm"
                            "/context/context.scm"))

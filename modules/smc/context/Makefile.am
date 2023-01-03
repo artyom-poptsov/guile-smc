@@ -21,8 +21,13 @@ include $(top_srcdir)/build-aux/am/guile.am
 
 SOURCES = \
 	context.scm		\
+	port.scm		\
 	char-context.scm	\
 	binary.scm
+
+char-context.go: port.go
+
+binary.go: port.go
 
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/context/
 godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/context/

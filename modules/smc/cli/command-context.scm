@@ -174,6 +174,7 @@ specified OUTPUT-PORT."
                                     (string-append "(quote " module ")"))
                      #:use-module (smc core common)
                      #:use-module (smc context context)
+                     #:use-module (smc context port)
                      #:use-module (smc context char-context)
                      #:use-module (smc context binary)
                      #:use-module (smc core config)

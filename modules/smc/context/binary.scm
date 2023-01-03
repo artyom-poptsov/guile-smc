@@ -29,8 +29,10 @@
   #:use-module (ice-9 binary-ports)
   #:use-module (oop goops)
   #:use-module (smc context context)
+  #:use-module (smc context port)
   #:use-module (smc core log)
   #:re-export (;; From (smc context context)
+               ;; and (smc context port)
                <context>
                context?
                context-debug-mode?
@@ -63,33 +65,15 @@
             binary-context-log-debug))
 
 
-(define-class <binary-context> (<context>)
-  ;; A port from which data is read.
-  ;;
-  ;; <port>
-  (port
-   #:init-thunk   (lambda () (current-input-port))
-   #:init-keyword #:port
-   #:getter       binary-context-port)
-
-  ;; Total number of bytes consumed.
-  ;;
-  ;; <number>
-  (counter
-   #:init-value 0
-   #:getter     binary-context-counter
-   #:setter     binary-context-counter-set!))
+(define-class <binary-context> (<port-context>))
 
 
-
-(define-method (%counter++! (ctx <binary-context>))
-  (binary-context-counter-set! ctx (+ (binary-context-counter ctx) 1)))
 
 ;; Update counters in a character context CTX based on an incoming character
 ;; CH.  These counters are thrown when a syntax error occurred.
 (define-method (binary-context-update-counters! (ctx <binary-context>) byte)
   (unless (eof-object? byte)
-    (%counter++! ctx)))
+    (context-counter++! ctx)))
 
 
 ;;; Event source.

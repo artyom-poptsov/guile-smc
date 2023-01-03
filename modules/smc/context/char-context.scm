@@ -29,8 +29,10 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (oop goops)
   #:use-module (smc context context)
+  #:use-module (smc context port)
   #:use-module (smc core log)
   #:re-export (;; From (smc context context)
+               ;; and (smc context port)
                <context>
                context?
                context-debug-mode?
@@ -70,23 +72,7 @@
             make-char-guard
             make-charset-guard))
 
-(define-class <char-context> (<context>)
-  ;; A port from which data is read.
-  ;;
-  ;; <port>
-  (port
-   #:init-value   (current-input-port)
-   #:init-keyword #:port
-   #:getter       char-context-port)
-
-  ;; Total number of characters consumed.
-  ;;
-  ;; <number>
-  (counter
-   #:init-value 0
-   #:getter     char-context-counter
-   #:setter     char-context-counter-set!)
-
+(define-class <char-context> (<port-context>)
   ;; Current text column number.
   ;;
   ;; <number>
@@ -105,8 +91,10 @@
 
 
 
-(define-method (%counter++! (ctx <char-context>))
-  (char-context-counter-set! ctx (+ (char-context-counter ctx) 1)))
+(define char-context-port context-port)
+(define char-context-counter context-counter)
+
+
 
 ;; Increment the current text column.
 (define-method (%col++! (ctx <char-context>))
@@ -125,7 +113,7 @@
 ;; CH.  These counters are thrown when a syntax error occurred.
 (define-method (char-context-update-counters! (ctx <char-context>) ch)
   (unless (eof-object? ch)
-    (%counter++! ctx)
+    (context-counter++! ctx)
     (%col++! ctx)
     (when (char=? ch #\newline)
       (%row++! ctx))))
