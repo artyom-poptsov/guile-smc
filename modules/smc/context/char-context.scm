@@ -37,6 +37,7 @@
                context?
                context-debug-mode?
                context-debug-mode-set!
+               <port-context>
                context-stanza
                context-stanza-set!
                context-stanza-add!
