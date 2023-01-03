@@ -39,9 +39,11 @@
                context-debug-mode-set!
                context-stanza
                context-stanza-set!
+               context-stanza-add!
                context-stanza-clear!
                context-buffer
                context-buffer-set!
+               context-buffer-add!
                context-buffer-clear!
                guard:#t
                action:no-op
