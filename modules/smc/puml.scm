@@ -81,14 +81,14 @@
 (define* (puml->fsm port
                     #:key
                     (module (current-module))
-                    (default-event-source 'event-source)
+                    (default-event-source 'char-context-event-source)
                     (keep-going? #f)
                     (debug-mode? #f))
   (log-use-stderr! debug-mode?)
   (let* ((reader-fsm
           (make <puml-fsm>
             #:debug-mode? debug-mode?
-            #:event-source     event-source))
+            #:event-source     char-context-event-source))
          (context (fsm-run! reader-fsm
                             (make <puml-context>
                               #:port             port
