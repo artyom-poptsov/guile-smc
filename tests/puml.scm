@@ -16,6 +16,8 @@
 
 (configure-test-logging! "puml")
 
+(define event-source char-context-event-source)
+
 
 ;; read-start-tag errors
 
