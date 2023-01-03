@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(define-module (scm context binary)
+(define-module (smc context binary)
   #:use-module (ice-9 binary-ports)
   #:use-module (oop goops)
   #:use-module (smc context context)
