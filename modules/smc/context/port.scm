@@ -62,21 +62,21 @@
 
 
 
-(define-method (context-buffer-clear! (ctx <context>))
+(define-method (context-buffer-clear! (ctx <port-context>))
   (context-buffer-set! ctx '()))
 
-(define-method (context-buffer-add! (ctx <context>) value)
+(define-method (context-buffer-add! (ctx <port-context>) value)
   (context-buffer-set! ctx
                        (cons value (context-buffer ctx))))
 
-(define-method (context-stanza-clear! (ctx <context>))
+(define-method (context-stanza-clear! (ctx <port-context>))
   (context-stanza-set! ctx '()))
 
-(define-method (context-stanza-add! (ctx <context>) value)
+(define-method (context-stanza-add! (ctx <port-context>) value)
   (context-stanza-set! ctx
                        (cons value (context-stanza ctx))))
 
-(define-method (context-clear! (ctx <context>))
+(define-method (context-clear! (ctx <port-context>))
   (context-buffer-clear! ctx)
   (context-stanza-clear! ctx))
 
