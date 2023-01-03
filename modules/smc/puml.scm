@@ -81,7 +81,7 @@
 (define* (puml->fsm port
                     #:key
                     (module (current-module))
-                    (default-event-source 'char-context-event-source)
+                    (default-event-source 'event-source)
                     (keep-going? #f)
                     (debug-mode? #f))
   (log-use-stderr! debug-mode?)
