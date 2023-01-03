@@ -19,7 +19,7 @@
 
 (test-assert "fsm-compile"
   (let ((fsm (make <fsm>
-               #:event-source event-source
+               #:event-source char-context-event-source
                #:transition-table `(((name . state-1)
                                      (transitions
                                       (,guard:#t ,action:no-op state-2)
