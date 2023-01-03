@@ -175,6 +175,7 @@ specified OUTPUT-PORT."
                      #:use-module (smc core common)
                      #:use-module (smc context context)
                      #:use-module (smc context char-context)
+                     #:use-module (smc context binary)
                      #:use-module (smc core config)
                      #:use-module (smc core log)
                      #:re-export ,exports))))
