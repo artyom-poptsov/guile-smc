@@ -57,10 +57,10 @@
             ;; All guards that are exported with 'define-public' below.
 
             ;; Logging procedures
-            context-log-error
-            context-log-warning
-            context-log-info
-            context-log-debug))
+            binary-context-log-error
+            binary-context-log-warning
+            binary-context-log-info
+            binary-context-log-debug))
 
 
 (define-class <binary-context> (<context>)
@@ -293,22 +293,22 @@
           (binary-context-port ctx)
           (binary-context-counter ctx)))
 
-(define (context-log-error ctx fmt . rest)
+(define (binary-context-log-error ctx fmt . rest)
   (apply log-error
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-(define (context-log-warning ctx fmt . rest)
+(define (binary-context-log-warning ctx fmt . rest)
   (apply log-warning
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-(define (context-log-info ctx fmt . rest)
+(define (binary-context-log-info ctx fmt . rest)
   (apply log-info
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-(define (context-log-debug ctx fmt . rest)
+(define (binary-context-log-debug ctx fmt . rest)
   (apply log-debug
          (string-append (%current-position-prefix ctx) fmt)
          rest))
