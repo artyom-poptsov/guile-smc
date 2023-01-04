@@ -34,6 +34,7 @@
 
 (define-module (smc context context)
   #:use-module (oop goops)
+  #:use-module (smc core common)
   #:use-module (smc core log)
   #:export (<context>
             context?
@@ -57,6 +58,16 @@
 (define-method (context? x)
   "Check if an X is a <context> instance."
   (is-a? x <context>))
+
+
+
+(define-method (display (context <context>) (port <port>))
+  (format port
+          "#<context ~a>"
+          (object-address/hex-string context)))
+
+(define-method (write (context <context>) (port <port>))
+  (display context port))
 
 
 
