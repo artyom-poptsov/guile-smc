@@ -58,31 +58,38 @@
 
 
 (define-method (context-counter++! (ctx <port-context>))
+  "Update the context CTX data counter."
   (context-counter-set! ctx (+ (context-counter ctx) 1)))
 
 
 
 (define-method (context-buffer-clear! (ctx <port-context>))
+  "Clear the context CTX buffer."
   (context-buffer-set! ctx '()))
 
 (define-method (context-buffer-add! (ctx <port-context>) value)
+  "Add a new VALUE to the context CTX buffer."
   (context-buffer-set! ctx
                        (cons value (context-buffer ctx))))
 
 (define-method (context-stanza-clear! (ctx <port-context>))
+  "Clear the context CTX stanza."
   (context-stanza-set! ctx '()))
 
 (define-method (context-stanza-add! (ctx <port-context>) value)
+  "Add a new VALUE to the context CTX stanza."
   (context-stanza-set! ctx
                        (cons value (context-stanza ctx))))
 
 (define-method (context-clear! (ctx <port-context>))
+  "Clear both the context CTX buffer and stanza."
   (context-buffer-clear! ctx)
   (context-stanza-clear! ctx))
 
 
 
 (define (action:store ctx event)
+  "Store a new EVENT in a context CTX buffer."
   (when (context-debug-mode? ctx)
     (log-debug "action:store: event: ~a; buffer: ~a"
                event (context-buffer ctx)))
@@ -95,6 +102,7 @@
   ctx)
 
 (define (action:update-stanza ctx event)
+  "Copy the context CTX buffer to the stanza, clear the buffer."
   (let ((buf (reverse (context-buffer ctx))))
     (unless (null? buf)
       (when (context-debug-mode? ctx)
