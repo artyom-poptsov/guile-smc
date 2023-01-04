@@ -72,6 +72,7 @@
 
 
 (define (action:no-op ctx event)
+  "The action that does nothing special, just returns the context CTX as it is."
   ctx)
 
 (define (guard:#t ctx event)
