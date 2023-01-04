@@ -70,6 +70,7 @@
 (define-class <binary-context> (<port-context>))
 
 
+(define binary-context-port context-port)
 
 ;; Update counters in a character context CTX based on an incoming character
 ;; CH.  These counters are thrown when a syntax error occurred.
