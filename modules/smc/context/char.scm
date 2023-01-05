@@ -99,22 +99,23 @@
 
 
 
-;; Increment the current text column.
 (define-method (%col++! (ctx <char-context>))
+  "Increment the current text column."
   (char-context-col-set! ctx (+ (char-context-col ctx) 1)))
 
-;; Reset the current text column.
 (define-method (%col-reset! (ctx <char-context>))
+  "Reset the current text column."
   (char-context-col-set! ctx 0))
 
-;; Increment the current row number. Resets the current column number to zero.
 (define-method (%row++! (ctx <char-context>))
+  "Increment the current row number. Resets the current column number to
+zero."
   (char-context-row-set! ctx (+ (char-context-row ctx) 1))
   (%col-reset! ctx))
 
-;; Update counters in a character context CTX based on an incoming character
-;; CH.  These counters are thrown when a syntax error occurred.
 (define-method (char-context-update-counters! (ctx <char-context>) ch)
+  "Update counters in a character context CTX based on an incoming character CH.
+These counters are thrown when a syntax error occurred."
   (unless (eof-object? ch)
     (context-counter++! ctx)
     (%col++! ctx)
@@ -124,8 +125,8 @@
 
 ;;; Event source.
 
-;; Get the next character from a CONTEXT port.
 (define-method (char-context-event-source (context <char-context>))
+  "Get the next character from a CONTEXT port."
   (let ((ch (get-char (char-context-port context))))
     (char-context-update-counters! context ch)
     ch))
@@ -324,6 +325,8 @@
 
 
 (define (%current-position-prefix ctx)
+  "Make a char context CTX prefix for a log message.  Return the prefix as a
+string."
   (format #f "~a:~a:~a: "
           (char-context-port ctx)
           (char-context-row ctx)
