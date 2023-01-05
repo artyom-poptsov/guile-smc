@@ -52,6 +52,7 @@
   #:export (<binary-context>
             binary-context-port
             binary-context-counter
+            binary-context-update-counters!
 
             binary-context-event-source
 
@@ -71,6 +72,7 @@
 
 
 (define binary-context-port context-port)
+(define binary-context-counter context-counter)
 
 ;; Update counters in a character context CTX based on an incoming character
 ;; CH.  These counters are thrown when a syntax error occurred.

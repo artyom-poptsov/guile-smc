@@ -2,11 +2,13 @@
 
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
+             (ice-9 binary-ports)
              (oop goops)
              (tests common)
              (smc context context)
              (smc context port)
-             (smc context char))
+             (smc context char)
+             (smc context binary))
 
 
 (define %test-suite-name "context")
@@ -51,6 +53,9 @@
   (and (context? (make <context>))
        (not (context? "not a context"))))
 
+
+;;; Port context.
+
 (test-assert "<context>: buffer and stanza initially must be empty lists"
   (let ((ctx (make <port-context>)))
     (and (list? (context-buffer ctx))
@@ -88,6 +93,21 @@
     (and (equal? (context-stanza ctx)
                  '(("hello" "world")))
          (null? (context-buffer ctx)))))
+
+
+;;; Binary context.
+
+(test-equal "binary-context-update-counters!: Regular byte"
+  1
+  (let ((ctx (make <binary-context>)))
+    (binary-context-update-counters! ctx 0)
+    (binary-context-counter ctx)))
+
+(test-equal "binary-context-update-counters!: EOF"
+  0
+  (let ((ctx (make <binary-context>)))
+    (binary-context-update-counters! ctx (eof-object))
+    (binary-context-counter ctx)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
