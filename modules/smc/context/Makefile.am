@@ -22,7 +22,7 @@ include $(top_srcdir)/build-aux/am/guile.am
 SOURCES = \
 	context.scm		\
 	port.scm		\
-	char-context.scm	\
+	char.scm		\
 	binary.scm
 
 char-context.go: port.go
