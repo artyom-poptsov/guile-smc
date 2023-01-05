@@ -56,7 +56,7 @@
             binary-context-event-source
 
             ;; Actions.
-            action:syntax-error
+            binary-context-syntax-error
 
             ;; All guards that are exported with 'define-public' below.
 
@@ -266,7 +266,7 @@
 
 
 
-(define (action:syntax-error ctx byte)
+(define (binary-context-syntax-error ctx byte)
   (error "Syntax error"
          (binary-context-port ctx)
          (binary-context-counter ctx)
