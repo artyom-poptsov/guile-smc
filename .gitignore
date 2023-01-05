@@ -24,3 +24,6 @@ tags
 
 # Ignore Guile-SMC build directories and distributions.
 guile-smc-*
+
+# Ignore Guile-SMC logs.
+smc.log.*
