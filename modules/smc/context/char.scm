@@ -1,4 +1,4 @@
-;;; char-context.scm -- Guile-SMC finite state machine character context.
+;;; char.scm -- Guile-SMC finite state machine character context.
 
 ;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(define-module (smc context char-context)
+(define-module (smc context char)
   #:use-module (ice-9 textual-ports)
   #:use-module (oop goops)
   #:use-module (smc context context)
@@ -349,4 +349,4 @@
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-;;; char-context.scm ends here.
+;;; char.scm ends here.

@@ -6,7 +6,7 @@
              (tests common)
              (smc context context)
              (smc context port)
-             (smc context char-context))
+             (smc context char))
 
 
 (define %test-suite-name "context")

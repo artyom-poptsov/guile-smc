@@ -203,7 +203,7 @@ OUTPUT-DIRECTORY."
                            "/core/stack.scm"
                            "/core/transition.scm"
                            "/context/port.scm"
-                           "/context/char-context.scm"
+                           "/context/char.scm"
                            "/context/binary.scm"
                            "/context/context.scm"))
          (substitutes (list (cons "\\(smc "

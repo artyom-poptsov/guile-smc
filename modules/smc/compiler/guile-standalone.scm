@@ -190,7 +190,7 @@ code as a list."
       ,@(read-module core-path "log.scm")
       ,@(read-module context-path "context.scm")
       ,@(read-module context-path "port.scm")
-      ,@(read-module context-path "char-context.scm")
+      ,@(read-module context-path "char.scm")
       ,@(read-module context-path "binary.scm"))))
 
 (define (fsm-get-class-code fsm-name)

@@ -5,7 +5,7 @@
              (oop goops)
              (smc fsm)
              (smc compiler)
-             (smc context char-context)
+             (smc context char)
              (tests common)
              (tests test-context))
 
