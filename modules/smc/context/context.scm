@@ -35,7 +35,6 @@
 (define-module (smc context context)
   #:use-module (oop goops)
   #:use-module (smc core common)
-  #:use-module (smc core log)
   #:export (<context>
             context?
             context-debug-mode?
