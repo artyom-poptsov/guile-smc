@@ -49,34 +49,34 @@
                action:no-op
                action:store
                action:update-stanza)
-  #:export (<binary-context>
-            binary-context-port
-            binary-context-counter
-            binary-context-update-counters!
+  #:export (<u8-context>
+            u8-context-port
+            u8-context-counter
+            u8-context-update-counters!
 
-            binary-context-event-source
+            u8-context-event-source
 
             ;; Actions.
-            binary-context-syntax-error
+            u8-context-syntax-error
 
             ;; All guards that are exported with 'define-public' below.
 
             ;; Logging procedures
-            binary-context-log-error
-            binary-context-log-warning
-            binary-context-log-info
-            binary-context-log-debug))
+            u8-context-log-error
+            u8-context-log-warning
+            u8-context-log-info
+            u8-context-log-debug))
 
 
-(define-class <binary-context> (<port-context>))
+(define-class <u8-context> (<port-context>))
 
 
-(define binary-context-port context-port)
-(define binary-context-counter context-counter)
+(define u8-context-port context-port)
+(define u8-context-counter context-counter)
 
 ;; Update counters in a character context CTX based on an incoming character
 ;; CH.  These counters are thrown when a syntax error occurred.
-(define-method (binary-context-update-counters! (ctx <binary-context>) byte)
+(define-method (u8-context-update-counters! (ctx <u8-context>) byte)
   (unless (eof-object? byte)
     (context-counter++! ctx)))
 
@@ -84,9 +84,9 @@
 ;;; Event source.
 
 ;; Get the next character from a CONTEXT port.
-(define-method (binary-context-event-source (context <binary-context>))
-  (let ((byte (get-u8 (binary-context-port context))))
-    (binary-context-update-counters! context byte)
+(define-method (u8-context-event-source (context <u8-context>))
+  (let ((byte (get-u8 (u8-context-port context))))
+    (u8-context-update-counters! context byte)
     byte))
 
 
@@ -268,10 +268,10 @@
 
 
 
-(define (binary-context-syntax-error ctx byte)
+(define (u8-context-syntax-error ctx byte)
   (error "Syntax error"
-         (binary-context-port ctx)
-         (binary-context-counter ctx)
+         (u8-context-port ctx)
+         (u8-context-counter ctx)
          byte
          ctx))
 
@@ -279,25 +279,25 @@
 
 (define (%current-position-prefix ctx)
   (format #f "~a:~a: "
-          (binary-context-port ctx)
-          (binary-context-counter ctx)))
+          (u8-context-port ctx)
+          (u8-context-counter ctx)))
 
-(define (binary-context-log-error ctx fmt . rest)
+(define (u8-context-log-error ctx fmt . rest)
   (apply log-error
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-(define (binary-context-log-warning ctx fmt . rest)
+(define (u8-context-log-warning ctx fmt . rest)
   (apply log-warning
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-(define (binary-context-log-info ctx fmt . rest)
+(define (u8-context-log-info ctx fmt . rest)
   (apply log-info
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-(define (binary-context-log-debug ctx fmt . rest)
+(define (u8-context-log-debug ctx fmt . rest)
   (apply log-debug
          (string-append (%current-position-prefix ctx) fmt)
          rest))

@@ -97,17 +97,17 @@
 
 ;;; Binary context.
 
-(test-equal "binary-context-update-counters!: Regular byte"
+(test-equal "u8-context-update-counters!: Regular byte"
   1
-  (let ((ctx (make <binary-context>)))
-    (binary-context-update-counters! ctx 0)
-    (binary-context-counter ctx)))
+  (let ((ctx (make <u8-context>)))
+    (u8-context-update-counters! ctx 0)
+    (u8-context-counter ctx)))
 
-(test-equal "binary-context-update-counters!: EOF"
+(test-equal "u8-context-update-counters!: EOF"
   0
-  (let ((ctx (make <binary-context>)))
-    (binary-context-update-counters! ctx (eof-object))
-    (binary-context-counter ctx)))
+  (let ((ctx (make <u8-context>)))
+    (u8-context-update-counters! ctx (eof-object))
+    (u8-context-counter ctx)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
