@@ -1,4 +1,4 @@
-;;; binary.scm -- Guile-SMC finite state machine binary context.
+;;; u8.scm -- Guile-SMC finite state machine u8 context.
 
 ;; Copyright (C) 2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
@@ -302,4 +302,4 @@
          (string-append (%current-position-prefix ctx) fmt)
          rest))
 
-;;; binary.scm ends here.
+;;; u8.scm ends here.
