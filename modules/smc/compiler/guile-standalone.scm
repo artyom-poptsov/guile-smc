@@ -191,7 +191,7 @@ code as a list."
       ,@(read-module context-path "context.scm")
       ,@(read-module context-path "port.scm")
       ,@(read-module context-path "char.scm")
-      ,@(read-module context-path "binary.scm"))))
+      ,@(read-module context-path "u8.scm"))))
 
 (define (fsm-get-class-code fsm-name)
   (let ((cname (string->symbol (format #f "<~a>" fsm-name))))
