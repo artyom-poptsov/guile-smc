@@ -23,7 +23,7 @@ SOURCES = \
 	context.scm		\
 	port.scm		\
 	char.scm		\
-	binary.scm
+	u8.scm
 
 char-context.go: port.go
 

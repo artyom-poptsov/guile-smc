@@ -8,7 +8,7 @@
              (smc context context)
              (smc context port)
              (smc context char)
-             (smc context binary))
+             (smc context u8))
 
 
 (define %test-suite-name "context")
