@@ -32,6 +32,7 @@
   #:use-module (smc core set)
   #:use-module (smc core state)
   #:use-module (smc context char)
+  #:use-module (smc context oop char)
   #:use-module (smc fsm)
   #:export (<puml-context>
             puml-context-fsm
