@@ -62,6 +62,8 @@ AC_CONFIG_FILES([
         modules/smc/core/Makefile
         modules/smc/compiler/Makefile
         modules/smc/context/Makefile
+        modules/smc/context/functional/Makefile
+        modules/smc/context/oop/Makefile
         modules/smc/cli/Makefile
         utils/Makefile
         doc/Makefile
