@@ -16,32 +16,32 @@
 
 ;;; Guards.
 
-(test-assert "guard:newline?"
-  (guard:newline? 'context #\newline))
+(test-assert "char:newline?"
+  (char:newline? 'context #\newline))
 
-(test-assert "guard:space?"
-  (guard:space? 'context #\space))
+(test-assert "char:space?"
+  (char:space? 'context #\space))
 
-(test-assert "guard:letter?"
-  (guard:letter? 'context #\a))
+(test-assert "char:letter?"
+  (char:letter? 'context #\a))
 
-(test-assert "guard:single-quote?"
-  (guard:single-quote? 'context #\'))
+(test-assert "char:single-quote?"
+  (char:single-quote? 'context #\'))
 
-(test-assert "guard:colon?"
-  (guard:colon? 'context #\:))
+(test-assert "char:colon?"
+  (char:colon? 'context #\:))
 
-(test-assert "guard:left-square-bracket?"
-  (guard:left-square-bracket? 'context #\[))
+(test-assert "char:left-square-bracket?"
+  (char:left-square-bracket? 'context #\[))
 
-(test-assert "guard:right-square-bracket?"
-  (guard:right-square-bracket? 'context #\]))
+(test-assert "char:right-square-bracket?"
+  (char:right-square-bracket? 'context #\]))
 
-(test-assert "guard:at-symbol?"
-  (guard:at-symbol? 'context #\@))
+(test-assert "char:at-symbol?"
+  (char:at-symbol? 'context #\@))
 
 (test-assert "guard-digit?"
-  (guard:digit? 'context #\1))
+  (char:digit? 'context #\1))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
