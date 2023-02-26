@@ -88,7 +88,7 @@
 (define-immutable-record-type <char-context>
   (%make-char-context port
                       debug-mode?
-                      counterg
+                      counter
                       row-number
                       col-number
                       buffer
