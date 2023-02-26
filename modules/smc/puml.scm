@@ -33,7 +33,8 @@
   #:use-module (smc core common)
   #:use-module (smc core log)
   #:use-module (smc core set)
-  #:use-module (smc context char-context)
+  #:use-module (smc context char)
+  #:use-module (smc context oop char)
   #:use-module (smc puml-context)
   #:use-module (smc puml-fsm)
   #:re-export (puml-context-fsm
