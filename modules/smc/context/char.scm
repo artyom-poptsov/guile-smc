@@ -40,14 +40,14 @@
 ;; Make a procedure that checks if a CH1 equals to CH2.
 (define-syntax-rule (make-char-guard name ch1)
   (begin
-    (define-method (name (ctx <top>) (ch2 <char>))
+    (define (name ctx ch2)
       (char=? ch1 ch2))
     (export name)))
 
 ;; Make a procedure that checks if a CH is in a CHARSET.
 (define-syntax-rule (make-charset-guard name charset)
   (begin
-    (define-method (name (ctx <top>) (ch <char>))
+    (define (name ctx ch)
       (char-set-contains? charset ch))
     (export name)))
 
