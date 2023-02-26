@@ -5,6 +5,7 @@
              (ice-9 receive)
              (oop goops)
              (smc context char)
+             (smc context oop char)
              (smc fsm)
              (smc puml)
              (smc core state)
