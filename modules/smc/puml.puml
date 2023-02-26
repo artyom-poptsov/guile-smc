@@ -5,113 +5,113 @@ title PlantUML <https://plantuml.com> Reader Finite-State Machine.\nThis FSM is 
 [*] -> read_start_tag
 
 read_start_tag: Read the start @startuml tag and check it for errors
-read_start_tag --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
-read_start_tag --> read: guard:space? -> action:check-start-tag
-read_start_tag --> read: guard:newline? -> action:check-start-tag
+read_start_tag --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_start_tag --> read: char:space? -> action:check-start-tag
+read_start_tag --> read: char:newline? -> action:check-start-tag
 read_start_tag -> read_start_tag: guard:#t -> action:store
 
 read: Read the PlantUML transition table.
-read -> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
-read --> read_end_tag: guard:at-symbol? -> action:store
-read --> read_skip_comment: guard:single-quote?
-read --> read_state: guard:left-square-bracket?
-read --> read_word: guard:letter? -> action:store
+read -> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read --> read_end_tag: char:at-symbol? -> action:store
+read --> read_skip_comment: char:single-quote?
+read --> read_state: char:left-square-bracket?
+read --> read_word: char:letter? -> action:store
 read -> read
 
 read_end_tag: Read and check the @enduml tag.
 read_end_tag:
 read_end_tag: exit-action: action:check-end-tag
-read_end_tag --> [*]: guard:eof-object?
-read_end_tag --> [*]: guard:newline?
-read_end_tag --> [*]: guard:space?
+read_end_tag --> [*]: char:eof-object?
+read_end_tag --> [*]: char:newline?
+read_end_tag --> [*]: char:space?
 read_end_tag ->  read_end_tag: guard:#t -> action:store
 
 read_skip_comment: Skip commentaries that are written between stanzas.
-read_skip_comment --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
-read_skip_comment --> read: guard:newline?
+read_skip_comment --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_skip_comment --> read: char:newline?
 read_skip_comment ->  read_skip_comment
 
 read_word: Read a word.
-read_word --> [*]: guard:eof-object?  -> action:unexpected-end-of-file-error
+read_word --> [*]: char:eof-object?  -> action:unexpected-end-of-file-error
 read_word --> read_title: guard:title? -> action:clear-buffer
-read_word --> read_state_description: guard:colon? -> action:update-stanza
-read_word --> search_state_transition: guard:space? -> action:update-stanza
+read_word --> read_state_description: char:colon? -> action:update-stanza
+read_word --> search_state_transition: char:space? -> action:update-stanza
 read_word -> read_word: guard:#t -> action:store
 
 read_title: Read a diagram title.
-read_title --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
-read_title --> read: guard:newline? -> action:add-description
+read_title --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_title --> read: char:newline? -> action:add-description
 read_title -> read_title: guard:#t -> action:store
 
 read_state: Read a PlantUML stanza.
-read_state --> [*]: guard:eof-object?
-read_state --> [*]: guard:newline? -> action:syntax-error
-read_state --> search_state_transition: guard:right-square-bracket? -> action:update-stanza
-read_state --> search_state_transition: guard:space? -> action:update-stanza
-read_state --> read_state_description: guard:colon? -> action:update-stanza
+read_state --> [*]: char:eof-object?
+read_state --> [*]: char:newline? -> action:syntax-error
+read_state --> search_state_transition: char:right-square-bracket? -> action:update-stanza
+read_state --> search_state_transition: char:space? -> action:update-stanza
+read_state --> read_state_description: char:colon? -> action:update-stanza
 read_state -> read_state: guard:#t -> action:store
 
 search_state_transition: Check if a state has a transition.
-search_state_transition --> [*]: guard:eof-object?
-search_state_transition --> read_state_description: guard:colon?
-search_state_transition --> read_state_right_arrow: guard:hyphen-minus?
-search_state_transition --> read_state_left_arrow: guard:less-than-sign?
+search_state_transition --> [*]: char:eof-object?
+search_state_transition --> read_state_description: char:colon?
+search_state_transition --> read_state_right_arrow: char:hyphen-minus?
+search_state_transition --> read_state_left_arrow: char:less-than-sign?
 search_state_transition ->  search_state_transition
 
 read_state_description: Read a state description if it is present.
-read_state_description --> [*]: guard:eof-object?
-read_state_description --> read: guard:newline? -> action:process-state-description
+read_state_description --> [*]: char:eof-object?
+read_state_description --> read: char:newline? -> action:process-state-description
 read_state_description ->  read_state_description: guard:#t -> action:store
 
 read_state_right_arrow: Read a right arrow that indicates a transition.
-read_state_right_arrow --> [*]: guard:eof-object?
-read_state_right_arrow --> search_state_transition_to: guard:space?
+read_state_right_arrow --> [*]: char:eof-object?
+read_state_right_arrow --> search_state_transition_to: char:space?
 read_state_right_arrow -> read_state_right_arrow
 
 search_state_transition_to: Search for a state that the current state transitions to.
-search_state_transition_to --> [*]: guard:eof-object?
-search_state_transition_to --> read_state_transition_to: guard:letter? -> action:store
-search_state_transition_to --> read_state_transition_to: guard:left-square-bracket?
+search_state_transition_to --> [*]: char:eof-object?
+search_state_transition_to --> read_state_transition_to: char:letter? -> action:store
+search_state_transition_to --> read_state_transition_to: char:left-square-bracket?
 search_state_transition_to -> search_state_transition_to
 
 read_state_transition_to: Read a state that the current state transitions to.
-read_state_transition_to --> [*]: guard:eof-object?
-read_state_transition_to --> read_state_transition_to: guard:right-square-bracket?
-read_state_transition_to --> search_state_transition_guard: guard:colon? -> action:update-stanza
-read_state_transition_to --> read: guard:newline? -> action:add-state-transition
+read_state_transition_to --> [*]: char:eof-object?
+read_state_transition_to --> read_state_transition_to: char:right-square-bracket?
+read_state_transition_to --> search_state_transition_guard: char:colon? -> action:update-stanza
+read_state_transition_to --> read: char:newline? -> action:add-state-transition
 read_state_transition_to -> read_state_transition_to: guard:#t -> action:store
 
 search_state_transition_guard: Check if the transition has a guard.
-search_state_transition_guard --> [*]: guard:eof-object?
-search_state_transition_guard --> read_state_transition_guard: guard:letter? -> action:store
+search_state_transition_guard --> [*]: char:eof-object?
+search_state_transition_guard --> read_state_transition_guard: char:letter? -> action:store
 search_state_transition_guard -> search_state_transition_guard
 
 read_state_transition_guard: Read a state transition guard.
-read_state_transition_guard --> [*]: guard:eof-object?
-read_state_transition_guard --> search_state_action_arrow: guard:space? -> action:update-stanza
-read_state_transition_guard --> read: guard:newline? -> action:add-state-transition
+read_state_transition_guard --> [*]: char:eof-object?
+read_state_transition_guard --> search_state_action_arrow: char:space? -> action:update-stanza
+read_state_transition_guard --> read: char:newline? -> action:add-state-transition
 read_state_transition_guard -> read_state_transition_guard: guard:#t -> action:store
 
 search_state_action_arrow: Check if a transition has an attached action.
-search_state_action_arrow --> [*]: guard:eof-object?
-search_state_action_arrow --> read: guard:newline?
-search_state_action_arrow --> read_state_action_arrow: guard:hyphen-minus?
+search_state_action_arrow --> [*]: char:eof-object?
+search_state_action_arrow --> read: char:newline?
+search_state_action_arrow --> read_state_action_arrow: char:hyphen-minus?
 search_state_action_arrow -> search_state_action_arrow
 
 read_state_action_arrow: Read and skip the action arrow.
-read_state_action_arrow --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
-read_state_action_arrow --> [*]: guard:newline?
-read_state_action_arrow --> search_state_transition_action: guard:more-than-sign?
+read_state_action_arrow --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_state_action_arrow --> [*]: char:newline?
+read_state_action_arrow --> search_state_transition_action: char:more-than-sign?
 
 search_state_transition_action: Check if an action is present after the arrow.
 search_state_transition_action: Issue an error if it is not.
-search_state_transition_action --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
-search_state_transition_action --> read_state_transition_action: guard:letter? -> action:store
-search_state_transition_action --> [*]: guard:newline?
+search_state_transition_action --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+search_state_transition_action --> read_state_transition_action: char:letter? -> action:store
+search_state_transition_action --> [*]: char:newline?
 search_state_transition_action -> search_state_transition_action
 
 read_state_transition_action: Read the state transition action.
-read_state_transition_action --> [*]: guard:eof-object? -> action:unexpected-end-of-file-error
-read_state_transition_action --> read: guard:newline? -> action:add-state-transition
+read_state_transition_action --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_state_transition_action --> read: char:newline? -> action:add-state-transition
 read_state_transition_action -> read_state_transition_action: guard:#t -> action:store
 @enduml

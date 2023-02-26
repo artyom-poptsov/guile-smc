@@ -8,31 +8,32 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6201
+;;;   step-counter:              6147
 ;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:
-;;;   #<directory (smc context char-context)>
-;;;     #<<generic> event-source (1)>
+;;;   #<directory (smc context char)>
 ;;;     #<procedure #{guard:#t}# (ctx event)>
-;;;     #<procedure action:clear-buffer (ctx event)>
 ;;;     #<procedure action:no-op (ctx event)>
+;;;     #<procedure char:at-symbol? (ctx ch2)>
+;;;     #<procedure char:colon? (ctx ch2)>
+;;;     #<procedure char:eof-object? (ctx ch)>
+;;;     #<procedure char:hyphen-minus? (ctx ch2)>
+;;;     #<procedure char:left-square-bracket? (ctx ch2)>
+;;;     #<procedure char:less-than-sign? (ctx ch2)>
+;;;     #<procedure char:letter? (ctx ch)>
+;;;     #<procedure char:more-than-sign? (ctx ch2)>
+;;;     #<procedure char:newline? (ctx ch2)>
+;;;     #<procedure char:right-square-bracket? (ctx ch2)>
+;;;     #<procedure char:single-quote? (ctx ch2)>
+;;;     #<procedure char:space? (ctx ch2)>
+;;;   #<directory (smc context oop char)>
+;;;     #<procedure action:clear-buffer (ctx event)>
 ;;;     #<procedure action:store (ctx event)>
 ;;;     #<procedure action:syntax-error (ctx ch)>
 ;;;     #<procedure action:update-stanza (ctx event)>
-;;;     #<procedure guard:at-symbol? (ctx ch2)>
-;;;     #<procedure guard:colon? (ctx ch2)>
-;;;     #<procedure guard:eof-object? (ctx ch)>
-;;;     #<procedure guard:hyphen-minus? (ctx ch2)>
-;;;     #<procedure guard:left-square-bracket? (ctx ch2)>
-;;;     #<procedure guard:less-than-sign? (ctx ch2)>
-;;;     #<procedure guard:letter? (ctx ch)>
-;;;     #<procedure guard:more-than-sign? (ctx ch2)>
-;;;     #<procedure guard:newline? (ctx ch2)>
-;;;     #<procedure guard:right-square-bracket? (ctx ch2)>
-;;;     #<procedure guard:single-quote? (ctx ch2)>
-;;;     #<procedure guard:space? (ctx ch2)>
 ;;;   #<directory (smc puml-context)>
+;;;     #<<generic> event-source (1)>
 ;;;     #<procedure action:add-description (ctx ch)>
 ;;;     #<procedure action:add-state-transition (ctx ch)>
 ;;;     #<procedure action:check-end-tag (ctx)>
@@ -51,6 +52,8 @@
   #:use-module
   (smc context char)
   #:use-module
+  (smc context oop char)
+  #:use-module
   (smc puml-context)
   #:re-export
   (fsm-run!)
@@ -66,14 +69,14 @@
        "Check if a state has a transition.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:colon?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:colon?
         ,action:no-op
         read_state_description)
-       (,guard:hyphen-minus?
+       (,char:hyphen-minus?
         ,action:no-op
         read_state_right_arrow)
-       (,guard:less-than-sign?
+       (,char:less-than-sign?
         ,action:no-op
         read_state_left_arrow)
        (,#{guard:#t}#
@@ -85,8 +88,8 @@
        "Check if the transition has a guard.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:letter?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:letter?
         ,action:store
         read_state_transition_guard)
        (,#{guard:#t}#
@@ -98,11 +101,11 @@
        "Read the start @startuml tag and check it for errors")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,guard:space? ,action:check-start-tag read)
-       (,guard:newline? ,action:check-start-tag read)
+       (,char:space? ,action:check-start-tag read)
+       (,char:newline? ,action:check-start-tag read)
        (,#{guard:#t}# ,action:store read_start_tag)))
     ((name . read_state_description)
      (description
@@ -110,8 +113,8 @@
        "Read a state description if it is present.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:newline?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:newline?
         ,action:process-state-description
         read)
        (,#{guard:#t}#
@@ -121,14 +124,14 @@
      (description . "Read a word.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
        (,guard:title? ,action:clear-buffer read_title)
-       (,guard:colon?
+       (,char:colon?
         ,action:update-stanza
         read_state_description)
-       (,guard:space?
+       (,char:space?
         ,action:update-stanza
         search_state_transition)
        (,#{guard:#t}# ,action:store read_word)))
@@ -138,10 +141,10 @@
        "Skip commentaries that are written between stanzas.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,guard:newline? ,action:no-op read)
+       (,char:newline? ,action:no-op read)
        (,#{guard:#t}# ,action:no-op read_skip_comment)))
     ((name . read)
      (description
@@ -149,17 +152,17 @@
        "Read the PlantUML transition table.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,guard:at-symbol? ,action:store read_end_tag)
-       (,guard:single-quote?
+       (,char:at-symbol? ,action:store read_end_tag)
+       (,char:single-quote?
         ,action:no-op
         read_skip_comment)
-       (,guard:left-square-bracket?
+       (,char:left-square-bracket?
         ,action:no-op
         read_state)
-       (,guard:letter? ,action:store read_word)
+       (,char:letter? ,action:store read_word)
        (,#{guard:#t}# ,action:no-op read)))
     ((name . search_state_transition_action)
      (description
@@ -167,13 +170,13 @@
        "Check if an action is present after the arrow.  Issue an error if it is not.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,guard:letter?
+       (,char:letter?
         ,action:store
         read_state_transition_action)
-       (,guard:newline? ,action:no-op #f)
+       (,char:newline? ,action:no-op #f)
        (,#{guard:#t}#
         ,action:no-op
         search_state_transition_action)))
@@ -186,8 +189,8 @@
        "Read a right arrow that indicates a transition.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:space?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:space?
         ,action:no-op
         search_state_transition_to)
        (,#{guard:#t}#
@@ -197,19 +200,19 @@
      (description . "Read and check the @enduml tag.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:newline? ,action:no-op #f)
-       (,guard:space? ,action:no-op #f)
+       (,char:eof-object? ,action:no-op #f)
+       (,char:newline? ,action:no-op #f)
+       (,char:space? ,action:no-op #f)
        (,#{guard:#t}# ,action:store read_end_tag)))
     ((name . read_state_transition_guard)
      (description . "Read a state transition guard.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:space?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:space?
         ,action:update-stanza
         search_state_action_arrow)
-       (,guard:newline?
+       (,char:newline?
         ,action:add-state-transition
         read)
        (,#{guard:#t}#
@@ -219,15 +222,15 @@
      (description . "Read a PlantUML stanza.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:newline? ,action:syntax-error #f)
-       (,guard:right-square-bracket?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:newline? ,action:syntax-error #f)
+       (,char:right-square-bracket?
         ,action:update-stanza
         search_state_transition)
-       (,guard:space?
+       (,char:space?
         ,action:update-stanza
         search_state_transition)
-       (,guard:colon?
+       (,char:colon?
         ,action:update-stanza
         read_state_description)
        (,#{guard:#t}# ,action:store read_state)))
@@ -235,11 +238,11 @@
      (description . "Read and skip the action arrow.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,guard:newline? ,action:no-op #f)
-       (,guard:more-than-sign?
+       (,char:newline? ,action:no-op #f)
+       (,char:more-than-sign?
         ,action:no-op
         search_state_transition_action)))
     ((name . read_state_transition_action)
@@ -248,10 +251,10 @@
        "Read the state transition action.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,guard:newline?
+       (,char:newline?
         ,action:add-state-transition
         read)
        (,#{guard:#t}#
@@ -263,14 +266,14 @@
        "Read a state that the current state transitions to.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:right-square-bracket?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:right-square-bracket?
         ,action:no-op
         read_state_transition_to)
-       (,guard:colon?
+       (,char:colon?
         ,action:update-stanza
         search_state_transition_guard)
-       (,guard:newline?
+       (,char:newline?
         ,action:add-state-transition
         read)
        (,#{guard:#t}#
@@ -280,10 +283,10 @@
      (description . "Read a diagram title.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object?
+       (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,guard:newline? ,action:add-description read)
+       (,char:newline? ,action:add-description read)
        (,#{guard:#t}# ,action:store read_title)))
     ((name . search_state_transition_to)
      (description
@@ -291,11 +294,11 @@
        "Search for a state that the current state transitions to.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:letter?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:letter?
         ,action:store
         read_state_transition_to)
-       (,guard:left-square-bracket?
+       (,char:left-square-bracket?
         ,action:no-op
         read_state_transition_to)
        (,#{guard:#t}#
@@ -307,9 +310,9 @@
        "Check if a transition has an attached action.")
      (event-source unquote event-source)
      (transitions
-       (,guard:eof-object? ,action:no-op #f)
-       (,guard:newline? ,action:no-op read)
-       (,guard:hyphen-minus?
+       (,char:eof-object? ,action:no-op #f)
+       (,char:newline? ,action:no-op read)
+       (,char:hyphen-minus?
         ,action:no-op
         read_state_action_arrow)
        (,#{guard:#t}#

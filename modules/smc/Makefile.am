@@ -49,7 +49,7 @@ puml-fsm.scm: puml.puml
 	    --load-path "$(abs_top_srcdir)/modules" \
 	    --fsm-name "puml-fsm" \
 	    --fsm-module "(smc puml-fsm)" \
-	    --modules "((smc context char-context)(smc puml-context))" > $@
+	    --modules "((smc context char) (smc context oop char) (smc puml-context))" > $@
 
 trace-fsm.scm: trace.puml
 	@echo "  SMC      $<"
