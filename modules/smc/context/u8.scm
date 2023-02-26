@@ -18,80 +18,17 @@
 
 ;;; Commentary:
 
-;; This file contains an implementation of a binary context based on a
-;; generic context. The binary context can be used to handle a stream of
-;; bytes.
+;; This file contains an implementation of a u8 guards.
 
 
 ;;; Code:
 
 (define-module (smc context u8)
-  #:use-module (ice-9 binary-ports)
-  #:use-module (oop goops)
-  #:use-module (smc context context)
-  #:use-module (smc context port)
-  #:use-module (smc core log)
-  #:re-export (;; From (smc context context)
-               ;; and (smc context port)
-               <context>
-               context?
-               context-debug-mode?
-               context-debug-mode-set!
-               context-stanza
-               context-stanza-set!
-               context-stanza-add!
-               context-stanza-clear!
-               context-buffer
-               context-buffer-set!
-               context-buffer-add!
-               context-buffer-clear!
-               guard:#t
-               action:no-op
-               action:store
-               action:update-stanza)
-  #:export (<u8-context>
-            u8-context-port
-            u8-context-counter
-            u8-context-update-counters!
-
-            u8-context-event-source
-
-            ;; Actions.
-            u8-context-syntax-error
-
-            ;; All guards that are exported with 'define-public' below.
-
-            ;; Logging procedures
-            u8-context-log-error
-            u8-context-log-warning
-            u8-context-log-info
-            u8-context-log-debug))
+  #:use-module (smc context common)
+  #:re-export (guard:#t
+               action:no-op))
 
 
-(define-class <u8-context> (<port-context>))
-
-
-(define u8-context-port context-port)
-(define u8-context-counter context-counter)
-
-;; Update counters in a character context CTX based on an incoming character
-;; CH.  These counters are thrown when a syntax error occurred.
-(define-method (u8-context-update-counters! (ctx <u8-context>) byte)
-  (unless (eof-object? byte)
-    (context-counter++! ctx)))
-
-
-;;; Event source.
-
-;; Get the next character from a CONTEXT port.
-(define-method (u8-context-event-source (context <u8-context>))
-  (let ((byte (get-u8 (u8-context-port context))))
-    (u8-context-update-counters! context byte)
-    byte))
-
-
-;;; Guards.
-
 ;; Make a procedure that checks if a CH1 equals to CH2.
 (define-syntax-rule (make-char-guard name ch)
   (define-public (name ctx byte)
@@ -265,41 +202,5 @@
 (make-char-guard u8:newline?                #\newline)
 (define-public (u8:eof-object? ctx ch)
   (eof-object? ch))
-
-
-
-(define (u8-context-syntax-error ctx byte)
-  (error "Syntax error"
-         (u8-context-port ctx)
-         (u8-context-counter ctx)
-         byte
-         ctx))
-
-
-
-(define (%current-position-prefix ctx)
-  (format #f "~a:~a: "
-          (u8-context-port ctx)
-          (u8-context-counter ctx)))
-
-(define (u8-context-log-error ctx fmt . rest)
-  (apply log-error
-         (string-append (%current-position-prefix ctx) fmt)
-         rest))
-
-(define (u8-context-log-warning ctx fmt . rest)
-  (apply log-warning
-         (string-append (%current-position-prefix ctx) fmt)
-         rest))
-
-(define (u8-context-log-info ctx fmt . rest)
-  (apply log-info
-         (string-append (%current-position-prefix ctx) fmt)
-         rest))
-
-(define (u8-context-log-debug ctx fmt . rest)
-  (apply log-debug
-         (string-append (%current-position-prefix ctx) fmt)
-         rest))
 
 ;;; u8.scm ends here.
