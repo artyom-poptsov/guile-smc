@@ -6,6 +6,7 @@
              (smc fsm)
              (smc compiler)
              (smc context char)
+             (smc context oop char)
              (tests common)
              (tests test-context))
 
