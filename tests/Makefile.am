@@ -26,6 +26,7 @@ SCM_TESTS = \
 	context-u8.scm			\
 	context-common.scm		\
 	context-oop-generic.scm	\
+	context-oop-port.scm	\
 	context-functional-port.scm	\
 	context-functional-char.scm	\
 	fsm.scm		\
