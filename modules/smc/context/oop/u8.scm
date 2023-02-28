@@ -48,6 +48,7 @@
                action:store
                action:update-stanza)
   #:export (<u8-context>
+            u8-context?
             u8-context-port
             u8-context-counter
             u8-context-update-counters!
@@ -67,6 +68,12 @@
 
 
 (define-class <u8-context> (<port-context>))
+
+
+
+(define (u8-context? x)
+  "Check if X is an <u8-context> instance."
+  (is-a? x <u8-context>))
 
 
 (define u8-context-port context-port)
