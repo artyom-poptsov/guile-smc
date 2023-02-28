@@ -37,6 +37,8 @@
                context?
                context-debug-mode?
                context-debug-mode-set!
+               context-port
+               context-counter
                context-stanza
                context-stanza-set!
                context-stanza-add!
@@ -49,8 +51,6 @@
                action:update-stanza)
   #:export (<u8-context>
             u8-context?
-            u8-context-port
-            u8-context-counter
             u8-context-update-counters!
 
             u8-context-event-source
@@ -75,10 +75,6 @@
   "Check if X is an <u8-context> instance."
   (is-a? x <u8-context>))
 
-
-(define u8-context-port context-port)
-(define u8-context-counter context-counter)
-
 ;; Update counters in a character context CTX based on an incoming character
 ;; CH.  These counters are thrown when a syntax error occurred.
 (define-method (u8-context-update-counters! (ctx <u8-context>) byte)
@@ -90,7 +86,7 @@
 
 ;; Get the next character from a CONTEXT port.
 (define-method (u8-context-event-source (context <u8-context>))
-  (let ((byte (get-u8 (u8-context-port context))))
+  (let ((byte (get-u8 (context-port context))))
     (u8-context-update-counters! context byte)
     byte))
 
@@ -99,8 +95,8 @@
 
 (define (u8-context-syntax-error ctx byte)
   (error "Syntax error"
-         (u8-context-port ctx)
-         (u8-context-counter ctx)
+         (context-port ctx)
+         (context-counter ctx)
          byte
          ctx))
 
@@ -108,8 +104,8 @@
 
 (define (%current-position-prefix ctx)
   (format #f "~a:~a: "
-          (u8-context-port ctx)
-          (u8-context-counter ctx)))
+          (context-port ctx)
+          (context-counter ctx)))
 
 (define (u8-context-log-error ctx fmt . rest)
   (apply log-error
