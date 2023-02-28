@@ -3,6 +3,7 @@
   #:use-module (smc core log)
   #:use-module (smc context oop generic)
   #:export (<port-context>
+            port-context?
             context-port
             context-counter
             context-counter-set!
@@ -56,6 +57,11 @@
    #:init-value '()
    #:getter     context-stanza
    #:setter     context-stanza-set!))
+
+
+
+(define (port-context? x)
+  (is-a? x <port-context>))
 
 
 
