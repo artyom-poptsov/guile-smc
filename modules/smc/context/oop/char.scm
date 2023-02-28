@@ -38,6 +38,8 @@
                context-debug-mode?
                context-debug-mode-set!
                <port-context>
+               context-port
+               context-counter
                context-stanza
                context-stanza-set!
                context-stanza-add!
@@ -51,8 +53,6 @@
                action:clear-buffer
                action:update-stanza)
   #:export (<char-context>
-            char-context-port
-            char-context-counter
             char-context-row
             char-context-col
             char-context-update-counters!
@@ -90,11 +90,6 @@
 
 
 
-(define char-context-port context-port)
-(define char-context-counter context-counter)
-
-
-
 (define-method (%col++! (ctx <char-context>))
   "Increment the current text column."
   (char-context-col-set! ctx (+ (char-context-col ctx) 1)))
@@ -123,7 +118,7 @@ These counters are thrown when a syntax error occurred."
 
 (define-method (char-context-event-source (context <char-context>))
   "Get the next character from a CONTEXT port."
-  (let ((ch (get-char (char-context-port context))))
+  (let ((ch (get-char (context-port context))))
     (char-context-update-counters! context ch)
     ch))
 
@@ -131,7 +126,7 @@ These counters are thrown when a syntax error occurred."
 
 (define (action:syntax-error ctx ch)
   (error "Syntax error"
-         (char-context-port ctx)
+         (context-port ctx)
          (char-context-row ctx)
          (char-context-col ctx)
          ch
@@ -143,7 +138,7 @@ These counters are thrown when a syntax error occurred."
   "Make a char context CTX prefix for a log message.  Return the prefix as a
 string."
   (format #f "~a:~a:~a: "
-          (char-context-port ctx)
+          (context-port ctx)
           (char-context-row ctx)
           (char-context-col ctx)))
 
