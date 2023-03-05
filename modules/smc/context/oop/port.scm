@@ -8,6 +8,7 @@
             context-counter
             context-counter-set!
             context-counter++!
+            context-counter-update!
             context-stanza
             context-stanza-set!
             context-stanza-add!
@@ -64,6 +65,12 @@
   (is-a? x <port-context>))
 
 
+
+(define-method (context-counter-update! (ctx <port-context>) (delta <number>))
+  (context-counter-set! ctx (+ (context-counter ctx) delta)))
+
+(define-method (context-counter-update! (ctx <port-context>))
+  (context-counter-update! ctx 1))
 
 (define-method (context-counter++! (ctx <port-context>))
   "Update the context CTX data counter."

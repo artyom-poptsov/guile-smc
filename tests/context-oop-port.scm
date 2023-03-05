@@ -38,6 +38,18 @@
   #f
   (context-debug-mode? (make <port-context>)))
 
+(test-equal "context-counter-update!: +1"
+  1
+  (let ((ctx (make <port-context>)))
+    (context-counter-update! ctx)
+    (context-counter ctx)))
+
+(test-equal "context-counter-update!: +2"
+  2
+  (let ((ctx (make <port-context>)))
+    (context-counter-update! ctx 2)
+    (context-counter ctx)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
