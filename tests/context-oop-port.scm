@@ -50,6 +50,12 @@
     (context-counter-update! ctx 2)
     (context-counter ctx)))
 
+(test-equal "update-counter"
+  1
+  (let ((ctx (make <port-context>)))
+    (update-counter ctx 'event)
+    (context-counter ctx)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 

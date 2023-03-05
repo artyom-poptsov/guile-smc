@@ -20,6 +20,7 @@
             context-clear!
 
             ;; Actions.
+            update-counter
             action:store
             action:clear-buffer
             action:update-stanza))
@@ -102,6 +103,10 @@
   (context-stanza-clear! ctx))
 
 
+;;; Actions.
+
+(define (update-counter ctx event)
+  (context-counter-update! ctx))
 
 (define (action:store ctx event)
   "Store a new EVENT in a context CTX buffer."
