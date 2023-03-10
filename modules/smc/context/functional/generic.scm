@@ -17,7 +17,14 @@
             context-result-append
 
             ;; Actions.
-            append-result
+            clear-buffer
+            clear-stanza
+            clear-result
+            push-event-to-buffer
+            push-event-to-stanza
+            push-event-to-result
+            push-buffer-to-stanza
+            push-stanza-to-result
             update-counter
             throw-error))
 
@@ -56,7 +63,7 @@
 
 
 
-(define (context-result-append context event)
+(define (context-result-push context event)
   (context-result-set context (cons event (context-result context))))
 
 (define (context-result/reversed context)
@@ -68,11 +75,49 @@
 
 ;;; Actions.
 
+(define (clear-buffer context event)
+  "Set the CONTEXT buffer to an empty list.  Return the updated context."
+  (context-buffer-set context '()))
+
+(define (clear-stanza context event)
+  "Set the CONTEXT stanza to an empty list.  Return the updated context."
+  (context-stanza-set context '()))
+
+(define (clear-result context event)
+  "Set the CONTEXT result to an empty list.  Return the updated context."
+  (context-result-set context '()))
+
 (define (update-counter context event)
+  "Update the CONTEXT counter.  Return the updated context."
   (context-counter-update context))
 
-(define (append-result ctx event)
-  (context-result-append ctx event))
+(define (push-event-to-buffer context event)
+  "Push an EVENT to the CONTEXT buffer.  Return the updated context."
+  (context-buffer-set context (cons event (context-buffer context))))
+
+(define (push-event-to-stanza context event)
+  "Push an EVENT to the CONTEXT stanza.  Return the updated context."
+  (context-stanza-set context (cons event (context-stanza context))))
+
+(define (push-event-to-result context event)
+  "Push an EVENT to the CONTEXT result.  Return the updated context."
+  (context-result-push context event))
+
+(define (push-buffer-to-stanza context event)
+  "Push the CONTEXT buffer content to the CONTEXT stanza and clear the CONTEXT buffer.
+Return the updated context."
+  (clear-buffer context
+                (context-stanza-set context
+                                    (cons (context-buffer context)
+                                          (context-stanza context)))))
+
+(define (push-stanza-to-result context event)
+  "Push the CONTEXT stanza content to the CONTEXT result and clear the CONTEXT stanza.
+Return the updated context."
+  (clear-stanza context
+                (context-result-set context
+                                    (cons (context-stanza context)
+                                          (context-result context))))
 
 
 ;;; Error reporting.
