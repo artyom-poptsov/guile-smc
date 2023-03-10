@@ -5,6 +5,10 @@
             context?
             context-debug-mode?
             context-debug-mode-set
+            context-buffer
+            context-buffer-set
+            context-stanza
+            context-stanza-set
             context-result
             context-result/reversed
             context-result-set
@@ -18,11 +22,26 @@
 
 
 (define-immutable-record-type <context>
-  (%make-context debug-mode? result)
+  (%make-context debug-mode? counter buffer stanza result)
   context?
   (debug-mode? context-debug-mode? context-debug-mode-set)
   (counter     context-counter     context-counter-set)
+  (buffer      context-buffer      context-buffer-set)
+  (stanza      context-stanza      context-stanza-set)
   (result      context-result      context-result-set))
+
+
+(define* (make-context #:key
+                       (debug-mode? #f)
+                       (counter 0)
+                       (buffer '())
+                       (stanza '())
+                       (result '()))
+  (%make-context debug-mode?
+                 counter
+                 buffer
+                 stanza
+                 result))
 
 
 
@@ -51,7 +70,7 @@
   (context-counter-update context))
 
 (define (append-result ctx event)
-  ((context-result-append ctx event)))
+  (context-result-append ctx event))
 
 
 ;;; Error reporting.
