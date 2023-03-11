@@ -121,7 +121,7 @@
 
 (define (push-event-to-result context event)
   "Push an EVENT to the CONTEXT result.  Return the updated context."
-  (context-result-push context event))
+  (context-result-set context (cons event (context-result context))))
 
 (define (push-buffer-to-stanza context event)
   "Push the CONTEXT buffer content to the CONTEXT stanza and clear the CONTEXT buffer.
