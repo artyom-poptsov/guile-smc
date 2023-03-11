@@ -6,7 +6,7 @@
   #:use-module (smc core common)
   #:use-module (smc context char)
   #:re-export (guard:#t
-               guard:eof-object?
+               char:eof-object?
                action:no-op)
   #:export (<trace-context>
             trace-context-previous-entry
