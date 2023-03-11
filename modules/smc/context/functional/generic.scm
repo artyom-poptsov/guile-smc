@@ -117,7 +117,7 @@ Return the updated context."
   (clear-stanza context
                 (context-result-set context
                                     (cons (context-stanza context)
-                                          (context-result context))))
+                                          (context-result context)))))
 
 
 ;;; Error reporting.
