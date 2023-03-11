@@ -1,5 +1,5 @@
 (define-module (smc context functional generic)
-  #:use-module (srfi srfi-9 gnqu)
+  #:use-module (srfi srfi-9 gnu)
   #:use-module (smc core common)
   #:export (<context>
             %make-context
