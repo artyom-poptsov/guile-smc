@@ -33,10 +33,30 @@
 (define-immutable-record-type <context>
   (%make-context debug-mode? counter buffer stanza result)
   context?
+
+  ;; Flag that specifies whether the debug mode for the context is enabled.
+  ;;
+  ;; <boolean>
   (debug-mode? context-debug-mode? context-debug-mode-set)
+
+  ;; Context counter.  Can be used to count incoming events, for example.
+  ;;
+  ;; <number>
   (counter     context-counter     context-counter-set)
+
+  ;; Context buffer to store intermediate values.
+  ;;
+  ;; <list>
   (buffer      context-buffer      context-buffer-set)
+
+  ;; Context stanza to store the chunks of intermediate context data.
+  ;;
+  ;; <list>
   (stanza      context-stanza      context-stanza-set)
+
+  ;; Context result to store the end result of the parser.
+  ;;
+  ;; <list>
   (result      context-result      context-result-set))
 
 
@@ -46,6 +66,7 @@
                        (buffer '())
                        (stanza '())
                        (result '()))
+  "<context> constructor."
   (%make-context debug-mode?
                  counter
                  buffer
