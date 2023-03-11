@@ -3,7 +3,7 @@
 [*] ---> read_line
 
 read_line: Read lines from a log.
-read_line --> [*]: guard:eof-object?
+read_line --> [*]: char:eof-object?
 read_line --> read_line: guard:transition? -> action:parse-transition
 read_line --> read_line: guard:message? -> action:parse-message
 read_line -> [*]: guard:#t -> action:format-error
