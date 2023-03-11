@@ -7,6 +7,8 @@
             context?
             context-debug-mode?
             context-debug-mode-set
+            context-counter
+            context-counter-update
             context-buffer
             context-buffer-set
             context-stanza
@@ -87,7 +89,7 @@
 (define (context-result/reversed context)
   (reverse (context-result context)))
 
-(define* (context-counter-update context #:key (delta 1))
+(define* (context-counter-update context #:optional (delta 1))
   (context-counter-set context (+ (context-counter context) delta)))
 
 
