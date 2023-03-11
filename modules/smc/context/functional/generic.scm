@@ -84,9 +84,6 @@
 
 
 
-(define (context-result-push context event)
-  (context-result-set context (cons event (context-result context))))
-
 (define (context-result/reversed context)
   (reverse (context-result context)))
 
