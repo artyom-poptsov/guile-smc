@@ -358,9 +358,7 @@
                                  #f
                                  to)))))
 
-    (context-stanza-clear! ctx)
-
-    ctx))
+    (clear-stanza ctx ch)))
 
 
 ;; Try to parse a LINE as event source definition.  Returns a match or #f if
