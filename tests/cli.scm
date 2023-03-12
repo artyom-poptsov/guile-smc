@@ -1,6 +1,6 @@
 ;;; cli.scm -- Guile-SMC CLI tests.
 
-;; Copyright (C) 2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2022-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@
        "[*] -> state_1\n"
        "state_1: A state description.\n"
        "state_1 --> state_1: guard:#t\n"
-       "state_1 -> [*]: guard:eof-object?\n"
+       "state_1 -> [*]: char:eof-object?\n"
        "@enduml\n")
     (lambda ()
       (with-output-to-string
