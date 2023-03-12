@@ -22,6 +22,9 @@
             clear-buffer
             clear-stanza
             clear-result
+            reverse-buffer
+            reverse-stanza
+            reverse-result
             push-event-to-buffer
             push-event-to-stanza
             push-event-to-result
@@ -113,6 +116,15 @@
 (define (update-counter context event)
   "Update the CONTEXT counter.  Return the updated context."
   (context-counter-update context))
+
+(define* (reverse-buffer context #:optional event)
+  (context-buffer-set context (reverse (context-buffer context))))
+
+(define* (reverse-stanza context #:optional event)
+  (context-stanza-set context (reverse (context-stanza context))))
+
+(define* (reverse-result context #:optional event)
+  (context-result-set context (reverse (context-result context))))
 
 (define (push-event-to-buffer context event)
   "Push an EVENT to the CONTEXT buffer.  Return the updated context."

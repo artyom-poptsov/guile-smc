@@ -68,6 +68,20 @@
 
 
 
+(test-equal "reverse-buffer"
+  '(a b c)
+  (context-buffer (reverse-buffer (make-context #:buffer '(c b a)))))
+
+(test-equal "reverse-stanza"
+  '(a b c)
+  (context-stanza (reverse-stanza (make-context #:stanza '(c b a)))))
+
+(test-equal "reverse-result"
+  '(a b c)
+  (context-result (reverse-result (make-context #:result '(c b a)))))
+
+
+
 (test-equal "push-event-to-buffer"
   '(event)
   (context-buffer (push-event-to-buffer (make-context) 'event)))
