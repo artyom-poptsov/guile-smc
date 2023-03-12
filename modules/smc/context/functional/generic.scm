@@ -8,6 +8,7 @@
             context-debug-mode?
             context-debug-mode-set
             context-counter
+            context-counter-set
             context-counter-update
             context-buffer
             context-buffer-set
