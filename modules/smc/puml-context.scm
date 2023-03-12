@@ -258,8 +258,7 @@
 
 (define (add-description ctx ch)
   (fsm-description-set! (puml-context-fsm ctx) (context-buffer->string ctx))
-  (context-clear! ctx)
-  ctx)
+  (clear-buffer (clear-stanza ctx ch) ch))
 
 (define (validate-start-tag ctx ch)
   (let ((tag (context-buffer->string ctx)))
