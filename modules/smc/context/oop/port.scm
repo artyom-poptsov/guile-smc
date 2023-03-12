@@ -23,6 +23,8 @@
             ;; Actions.
             update-counter
             push-event-to-buffer
+            push-buffer-to-stanza
+            push-stanza-to-result
             action:store
             action:clear-buffer
             action:update-stanza))
@@ -85,6 +87,66 @@
 
 
 
+(define* (clear-buffer context #:optional event)
+  (context-buffer-set! context '())
+  context)
+
+(define* (clear-stanza context #:optional event)
+  (context-stanza-set! context '())
+  context)
+
+(define* (clear-result context #:optional event)
+  (context-result-set! context '())
+  context)
+
+
+
+(define* (reverse-buffer context #:optional event)
+  (context-buffer-set! context (reverse (context-buffer context)))
+  context)
+
+(define* (reverse-stanza context #:optional event)
+  (context-stanza-set! context (reverse (context-stanza context)))
+  context)
+
+(define* (reverse-result context #:optional event)
+  (context-result-set! context (reverse (context-result context)))
+  context)
+
+
+
+(define (push-event-to-buffer context event)
+  "Push a new EVENT in a CONTEXT buffer."
+  (when (context-debug-mode? context)
+    (log-debug "push-event-to-buffer: event: ~a; buffer: ~a"
+               event
+               (context-buffer context)))
+  (context-buffer-set! context (cons event (context-buffer context)))
+  context)
+
+(define (push-buffer-to-stanza context event)
+  "Push the CONTEXT buffer contents to a CONTEXT stanza."
+  (when (context-debug-mode? context)
+    (log-debug "push-buffer-to-stanza: event: ~a; buffer: ~a; stanza: ~a"
+               event
+               (context-buffer context)
+               (context-stanza context)))
+  (context-result-set! context (cons (context-stanza context)
+                                     (context-result context)))
+  (clear-buffer context event))
+
+(define (push-stanza-to-result context event)
+  "Push the CONTEXT stanza contents to a CONTEXT result."
+  (when (context-debug-mode? context)
+    (log-debug "push-buffer-to-result: event: ~a; buffer: ~a; stanza: ~a"
+               event
+               (context-buffer context)
+               (context-stanza context)))
+  (context-result-set! context (cons (context-stanza context)
+                                     (context-result context)))
+  (clear-stanza context event))
+
+
 (define-method (context-buffer-clear! (ctx <port-context>))
   "Clear the context CTX buffer."
   (context-buffer-set! ctx '()))
