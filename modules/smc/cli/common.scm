@@ -43,7 +43,7 @@
 
 ;; Core modules required to run the 'puml->fsm' converter.
 (define %core-modules
-  (list (resolve-module '(smc context char-context))
+  (list (resolve-module '(smc context char))
         (resolve-module '(smc puml))
         (resolve-module '(smc fsm))))
 
