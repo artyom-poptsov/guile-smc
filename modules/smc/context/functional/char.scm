@@ -32,7 +32,6 @@
   #:use-module (smc core log)
   #:use-module ((smc context functional generic)
                 #:renamer (symbol-prefix-proc 'generic:))
-  #:re-export (throw-error)
   #:export (<char-context>
             char-context?
             make-char-context
@@ -283,6 +282,8 @@ string."
 
 
 ;;; Error reporting.
+
+(define throw-error generic:throw-error)
 
 (define (throw-syntax-error context char)
   (error "Syntax error"
