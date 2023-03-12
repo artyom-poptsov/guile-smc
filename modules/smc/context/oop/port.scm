@@ -114,9 +114,9 @@
   (when (context-debug-mode? context)
     (log-debug "push-to-buffer: event: ~a; buffer: ~a"
                event
-               (context-buffer ctx)))
+               (context-buffer context)))
   (context-buffer-set! context (cons event (context-buffer context)))
-  ctx)
+  context)
 
 (define (action:clear-buffer ctx event)
   "Clear the context CTX buffer."
