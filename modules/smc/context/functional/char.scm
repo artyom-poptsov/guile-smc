@@ -72,7 +72,7 @@
             clear-stanza
             clear-result
             reset-col-number
-            append-to-buffer
+            push-event-to-buffer
             throw-syntax-error
 
             ;; Logging procedures
@@ -229,7 +229,7 @@ Guile-SMC API."
 (define* (reset-col-number context #:optional event)
   (context-col-number-set context 0))
 
-(define (append-to-buffer context event)
+(define (push-event-to-buffer context event)
   "Append a DATA to a CONTEXT buffer.  Return the updated context."
   (context-buffer-append context event))
 

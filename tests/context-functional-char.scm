@@ -119,6 +119,11 @@
      'b)
     'c)))
 
+(test-equal "push-event-to-buffer"
+  '(a b c)
+  (context-buffer (push-event-to-buffer (make-char-context #:buffer '(b c))
+                                        'a)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
