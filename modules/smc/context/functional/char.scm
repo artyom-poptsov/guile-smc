@@ -67,7 +67,7 @@
             update-row-number
             update-col-number
             update-result
-            update-stanza
+            push-buffer-to-stanza
             clear-buffer
             clear-stanza
             clear-result
@@ -254,7 +254,7 @@ EVENT parameter is optional and is needed only for compatibility with
 Guile-SMC API."
   (context-stanza-set context '()))
 
-(define (update-stanza context event)
+(define (push-buffer-to-stanza context event)
   "Propagate the data from a CONTEXT buffer to the CONTEXT stanza and reset the
 buffer, ignoring an EVENT.  Return the updated context."
   (let ((buffer (context-buffer context)))
