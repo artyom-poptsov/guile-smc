@@ -8,7 +8,7 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6147
+;;;   step-counter:              6259
 ;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:
@@ -29,9 +29,9 @@
 ;;;     #<procedure char:space? (ctx ch2)>
 ;;;   #<directory (smc context oop char)>
 ;;;     #<procedure action:clear-buffer (ctx event)>
-;;;     #<procedure action:store (ctx event)>
 ;;;     #<procedure action:syntax-error (ctx ch)>
 ;;;     #<procedure action:update-stanza (ctx event)>
+;;;     #<procedure push-event-to-buffer (context event)>
 ;;;   #<directory (smc puml-context)>
 ;;;     #<<generic> event-source (1)>
 ;;;     #<procedure action:add-description (ctx ch)>
@@ -90,7 +90,7 @@
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:letter?
-        ,action:store
+        ,push-event-to-buffer
         read_state_transition_guard)
        (,#{guard:#t}#
         ,action:no-op
@@ -106,7 +106,9 @@
         #f)
        (,char:space? ,action:check-start-tag read)
        (,char:newline? ,action:check-start-tag read)
-       (,#{guard:#t}# ,action:store read_start_tag)))
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_start_tag)))
     ((name . read_state_description)
      (description
        .
@@ -118,7 +120,7 @@
         ,action:process-state-description
         read)
        (,#{guard:#t}#
-        ,action:store
+        ,push-event-to-buffer
         read_state_description)))
     ((name . read_word)
      (description . "Read a word.")
@@ -134,7 +136,7 @@
        (,char:space?
         ,action:update-stanza
         search_state_transition)
-       (,#{guard:#t}# ,action:store read_word)))
+       (,#{guard:#t}# ,push-event-to-buffer read_word)))
     ((name . read_skip_comment)
      (description
        .
@@ -155,14 +157,16 @@
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
         #f)
-       (,char:at-symbol? ,action:store read_end_tag)
+       (,char:at-symbol?
+        ,push-event-to-buffer
+        read_end_tag)
        (,char:single-quote?
         ,action:no-op
         read_skip_comment)
        (,char:left-square-bracket?
         ,action:no-op
         read_state)
-       (,char:letter? ,action:store read_word)
+       (,char:letter? ,push-event-to-buffer read_word)
        (,#{guard:#t}# ,action:no-op read)))
     ((name . search_state_transition_action)
      (description
@@ -174,7 +178,7 @@
         ,action:unexpected-end-of-file-error
         #f)
        (,char:letter?
-        ,action:store
+        ,push-event-to-buffer
         read_state_transition_action)
        (,char:newline? ,action:no-op #f)
        (,#{guard:#t}#
@@ -203,7 +207,9 @@
        (,char:eof-object? ,action:no-op #f)
        (,char:newline? ,action:no-op #f)
        (,char:space? ,action:no-op #f)
-       (,#{guard:#t}# ,action:store read_end_tag)))
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_end_tag)))
     ((name . read_state_transition_guard)
      (description . "Read a state transition guard.")
      (event-source unquote event-source)
@@ -216,7 +222,7 @@
         ,action:add-state-transition
         read)
        (,#{guard:#t}#
-        ,action:store
+        ,push-event-to-buffer
         read_state_transition_guard)))
     ((name . read_state)
      (description . "Read a PlantUML stanza.")
@@ -233,7 +239,7 @@
        (,char:colon?
         ,action:update-stanza
         read_state_description)
-       (,#{guard:#t}# ,action:store read_state)))
+       (,#{guard:#t}# ,push-event-to-buffer read_state)))
     ((name . read_state_action_arrow)
      (description . "Read and skip the action arrow.")
      (event-source unquote event-source)
@@ -258,7 +264,7 @@
         ,action:add-state-transition
         read)
        (,#{guard:#t}#
-        ,action:store
+        ,push-event-to-buffer
         read_state_transition_action)))
     ((name . read_state_transition_to)
      (description
@@ -277,7 +283,7 @@
         ,action:add-state-transition
         read)
        (,#{guard:#t}#
-        ,action:store
+        ,push-event-to-buffer
         read_state_transition_to)))
     ((name . read_title)
      (description . "Read a diagram title.")
@@ -287,7 +293,7 @@
         ,action:unexpected-end-of-file-error
         #f)
        (,char:newline? ,action:add-description read)
-       (,#{guard:#t}# ,action:store read_title)))
+       (,#{guard:#t}# ,push-event-to-buffer read_title)))
     ((name . search_state_transition_to)
      (description
        .
@@ -296,7 +302,7 @@
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:letter?
-        ,action:store
+        ,push-event-to-buffer
         read_state_transition_to)
        (,char:left-square-bracket?
         ,action:no-op
