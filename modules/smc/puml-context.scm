@@ -265,15 +265,13 @@
   (let ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@startuml")
       (puml-error ctx "Misspelled @startuml"))
-    (context-buffer-clear! ctx)
-    ctx))
+    (clear-buffer ctx ch)))
 
-(define (validate-end-tag ctx)
+(define (validate-end-tag ctx ch)
   (let* ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@enduml")
       (puml-error ctx "Misspelled @enduml"))
-    (context-buffer-clear! ctx)
-    ctx))
+    (clear-buffer ctx ch)))
 
 
 
