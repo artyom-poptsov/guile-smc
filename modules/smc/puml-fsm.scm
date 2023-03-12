@@ -8,7 +8,7 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6208
+;;;   step-counter:              6202
 ;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:
@@ -34,11 +34,11 @@
 ;;;     #<procedure push-event-to-buffer (context event)>
 ;;;   #<directory (smc puml-context)>
 ;;;     #<<generic> char-context-event-source (1)>
-;;;     #<procedure action:add-state-transition (ctx ch)>
 ;;;     #<procedure add-description (ctx ch)>
-;;;     #<procedure guard:title? (ctx ch)>
+;;;     #<procedure add-state-transition (ctx ch)>
 ;;;     #<procedure process-state-description (ctx ch)>
 ;;;     #<procedure throw-unexpected-end-of-file-error (ctx ch)>
+;;;     #<procedure title? (ctx ch)>
 ;;;     #<procedure validate-end-tag (ctx)>
 ;;;     #<procedure validate-start-tag (ctx ch)>
 
@@ -127,7 +127,7 @@
        (,char:eof-object?
         ,throw-unexpected-end-of-file-error
         #f)
-       (,guard:title? ,action:clear-buffer read_title)
+       (,title? ,action:clear-buffer read_title)
        (,char:colon?
         ,action:update-stanza
         read_state_description)
@@ -216,9 +216,7 @@
        (,char:space?
         ,action:update-stanza
         search_state_action_arrow)
-       (,char:newline?
-        ,action:add-state-transition
-        read)
+       (,char:newline? ,add-state-transition read)
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_transition_guard)))
@@ -258,9 +256,7 @@
        (,char:eof-object?
         ,throw-unexpected-end-of-file-error
         #f)
-       (,char:newline?
-        ,action:add-state-transition
-        read)
+       (,char:newline? ,add-state-transition read)
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_transition_action)))
@@ -277,9 +273,7 @@
        (,char:colon?
         ,action:update-stanza
         search_state_transition_guard)
-       (,char:newline?
-        ,action:add-state-transition
-        read)
+       (,char:newline? ,add-state-transition read)
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_transition_to)))
