@@ -67,10 +67,10 @@
      'b)
     'c)))
 
-(test-equal "reset-buffer"
+(test-equal "clear-buffer"
   '()
   (context-buffer
-   (reset-buffer
+   (clear-buffer
     (context-buffer-append (make-char-context) 'a))))
 
 (test-equal "context-stanza"
@@ -95,10 +95,10 @@
      'b)
     'c)))
 
-(test-equal "reset-stanza"
+(test-equal "clear-stanza"
   '()
   (context-stanza
-   (reset-stanza
+   (clear-stanza
     (context-stanza-append (make-char-context) 'a))))
 
 (test-equal "context-result-append"

@@ -68,8 +68,8 @@
             update-col-number
             update-result
             update-stanza
-            reset-buffer
-            reset-stanza
+            clear-buffer
+            clear-stanza
             reset-col-number
             append-to-buffer
             throw-syntax-error
@@ -232,15 +232,15 @@ Guile-SMC API."
   "Append a DATA to a CONTEXT buffer.  Return the updated context."
   (context-buffer-append context event))
 
-(define* (reset-buffer context #:optional event)
-  "Reset a CONTEXT buffer to an empty list.  Return the updated context.
+(define* (clear-buffer context #:optional event)
+  "Clear a CONTEXT buffer to an empty list.  Return the updated context.
 
 EVENT parameter is optional and is needed only for compatibility with
 Guile-SMC API."
   (context-buffer-set context '()))
 
-(define* (reset-stanza context #:optional event)
-  "Reset a CONTEXT stanza to an empty list.  Return the updated context.
+(define* (clear-stanza context #:optional event)
+  "Clear a CONTEXT stanza to an empty list.  Return the updated context.
 
 EVENT parameter is optional and is needed only for compatibility with
 Guile-SMC API."
@@ -258,7 +258,7 @@ buffer, ignoring an EVENT.  Return the updated context."
                        event
                        buffer
                        stanza)))
-        (reset-buffer (context-stanza-append context reversed-buffer))))))
+        (clear-buffer (context-stanza-append context reversed-buffer))))))
 
 (define (update-result ctx event)
   (let ((stanza (context-stanza ctx)))
@@ -268,7 +268,7 @@ buffer, ignoring an EVENT.  Return the updated context."
           (log-debug "context-result-update: event: ~a; stanza: ~a"
                      event
                      reversed-stanza))
-        (reset-stanza
+        (clear-stanza
          (context-result-append ctx reversed-stanza))))))
 
 
