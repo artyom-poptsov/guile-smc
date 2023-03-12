@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -45,19 +45,21 @@ SUFFIXES = .in
 
 puml-fsm.scm: puml.puml
 	@echo "  SMC      $<"
-	@cat $< | smc compile \
+	@smc compile \
 	    --load-path "$(abs_top_srcdir)/modules" \
 	    --fsm-name "puml-fsm" \
 	    --fsm-module "(smc puml-fsm)" \
-	    --modules "((smc context char) (smc context oop char) (smc puml-context))" > $@
+	    --modules "((smc context char) (smc context oop char) (smc puml-context))" \
+	    $< > $@
 
 trace-fsm.scm: trace.puml
 	@echo "  SMC      $<"
-	@cat $< | smc compile \
+	@smc compile \
 		--load-path $(abs_top_srcdir)/modules \
 		--fsm-name "trace-fsm" \
 		--fsm-module "(smc trace-fsm)" \
-		--modules "((smc trace-context) (smc context char) (smc context oop char))" > $@
+		--modules "((smc trace-context) (smc context char) (smc context oop char))" \
+		$< > $@
 
 root_moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/
 config_substitute = sed -e 's,[@]MODDIR[@],$(root_moddir),g'
