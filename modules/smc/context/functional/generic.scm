@@ -27,6 +27,9 @@
             push-event-to-result
             push-buffer-to-stanza
             push-stanza-to-result
+            pop-buffer
+            pop-stanza
+            pop-result
             update-counter
             throw-error))
 
@@ -126,10 +129,10 @@
 (define (push-buffer-to-stanza context event)
   "Push the CONTEXT buffer content to the CONTEXT stanza and clear the CONTEXT buffer.
 Return the updated context."
-  (clear-buffer context
-                (context-stanza-set context
+  (clear-buffer (context-stanza-set context
                                     (cons (context-buffer context)
-                                          (context-stanza context)))))
+                                          (context-stanza context)))
+                event))
 
 (define (push-stanza-to-result context event)
   "Push the CONTEXT stanza content to the CONTEXT result and clear the CONTEXT stanza.
@@ -138,6 +141,18 @@ Return the updated context."
                 (context-result-set context
                                     (cons (context-stanza context)
                                           (context-result context)))))
+
+(define (pop-buffer context event)
+  "Remove the last element of CONTEXT buffer.  Return the updated context."
+  (context-buffer-set context (cdr (context-buffer context))))
+
+(define (pop-stanza context event)
+  "Remove the last element of CONTEXT stanza.  Return the updated context."
+  (context-stanza-set context (cdr (context-stanza context))))
+
+(define (pop-result context event)
+  "Remove the last element of CONTEXT result.  Return the updated context."
+  (context-result-set context (cdr (context-result context))))
 
 
 ;;; Error reporting.
