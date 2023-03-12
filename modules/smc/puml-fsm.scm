@@ -33,7 +33,7 @@
 ;;;     #<procedure action:update-stanza (ctx event)>
 ;;;     #<procedure push-event-to-buffer (context event)>
 ;;;   #<directory (smc puml-context)>
-;;;     #<<generic> event-source (1)>
+;;;     #<<generic> char-context-event-source (1)>
 ;;;     #<procedure action:add-description (ctx ch)>
 ;;;     #<procedure action:add-state-transition (ctx ch)>
 ;;;     #<procedure action:check-end-tag (ctx)>
@@ -67,7 +67,7 @@
      (description
        .
        "Check if a state has a transition.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:colon?
@@ -86,7 +86,7 @@
      (description
        .
        "Check if the transition has a guard.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:letter?
@@ -99,7 +99,7 @@
      (description
        .
        "Read the start @startuml tag and check it for errors")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -113,7 +113,7 @@
      (description
        .
        "Read a state description if it is present.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:newline?
@@ -124,7 +124,7 @@
         read_state_description)))
     ((name . read_word)
      (description . "Read a word.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -141,7 +141,7 @@
      (description
        .
        "Skip commentaries that are written between stanzas.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -152,7 +152,7 @@
      (description
        .
        "Read the PlantUML transition table.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -172,7 +172,7 @@
      (description
        .
        "Check if an action is present after the arrow.  Issue an error if it is not.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -185,13 +185,13 @@
         ,action:no-op
         search_state_transition_action)))
     ((name . read_state_left_arrow)
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions))
     ((name . read_state_right_arrow)
      (description
        .
        "Read a right arrow that indicates a transition.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:space?
@@ -202,7 +202,7 @@
         read_state_right_arrow)))
     ((name . read_end_tag)
      (description . "Read and check the @enduml tag.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:newline? ,action:no-op #f)
@@ -212,7 +212,7 @@
         read_end_tag)))
     ((name . read_state_transition_guard)
      (description . "Read a state transition guard.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:space?
@@ -226,7 +226,7 @@
         read_state_transition_guard)))
     ((name . read_state)
      (description . "Read a PlantUML stanza.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:newline? ,action:syntax-error #f)
@@ -242,7 +242,7 @@
        (,#{guard:#t}# ,push-event-to-buffer read_state)))
     ((name . read_state_action_arrow)
      (description . "Read and skip the action arrow.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -255,7 +255,7 @@
      (description
        .
        "Read the state transition action.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -270,7 +270,7 @@
      (description
        .
        "Read a state that the current state transitions to.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:right-square-bracket?
@@ -287,7 +287,7 @@
         read_state_transition_to)))
     ((name . read_title)
      (description . "Read a diagram title.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,action:unexpected-end-of-file-error
@@ -298,7 +298,7 @@
      (description
        .
        "Search for a state that the current state transitions to.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:letter?
@@ -314,7 +314,7 @@
      (description
        .
        "Check if a transition has an attached action.")
-     (event-source unquote event-source)
+     (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:newline? ,action:no-op read)
@@ -335,7 +335,9 @@
   (fsm-description-set!
     self
     "PlantUML <https://plantuml.com> Reader Finite-State Machine.\\nThis FSM is a part of Guile State-Machine Compiler (Guile-SMC)\\n<https://github.com/artyom-poptsov/guile-smc>")
-  (fsm-event-source-set! self event-source)
+  (fsm-event-source-set!
+    self
+    char-context-event-source)
   (fsm-transition-table-set!
     self
     (transition-list->hash-table
