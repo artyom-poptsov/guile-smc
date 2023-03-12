@@ -60,7 +60,7 @@ search_state_transition ->  search_state_transition
 
 read_state_description: Read a state description if it is present.
 read_state_description --> [*]: char:eof-object?
-read_state_description --> read: char:newline? -> action:process-state-description
+read_state_description --> read: char:newline? -> process-state-description
 read_state_description ->  read_state_description: guard:#t -> push-event-to-buffer
 
 read_state_right_arrow: Read a right arrow that indicates a transition.
