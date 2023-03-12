@@ -14,14 +14,10 @@
 (test-begin %test-suite-name)
 
 (test-assert "%make-char-context"
-  (%make-char-context (current-input-port) ; port
-                      #f                   ; debug-mode?
-                      0                    ; counter
+  (%make-char-context #f                   ; parent-context
+                      #f                   ; port
                       0                    ; row-number
-                      0                    ; col-number
-                      '()                  ; buffer
-                      '()                  ; stanza
-                      '()))                ; result
+                      0))                  ; col-number
 
 (test-assert "make-char-context"
   (make-char-context #:port (current-input-port)
@@ -50,68 +46,21 @@
   (let ((ctx (make-char-context)))
     (context-counter (context-counter-update ctx))))
 
-(test-equal "context-buffer-append"
-  '(c b a)
-  (context-buffer (context-buffer-append
-                   (context-buffer-append
-                    (context-buffer-append (make-char-context) 'a)
-                    'b)
-                   'c)))
-
 (test-equal "context-buffer/reversed"
   '(a b c)
-  (context-buffer/reversed
-   (context-buffer-append
-    (context-buffer-append
-     (context-buffer-append (make-char-context) 'a)
-     'b)
-    'c)))
-
-(test-equal "clear-buffer"
-  '()
-  (context-buffer
-   (clear-buffer
-    (context-buffer-append (make-char-context) 'a))))
+  (context-buffer/reversed (make-char-context #:buffer '(c b a))))
 
 (test-equal "context-stanza"
   '()
   (context-stanza (make-char-context)))
 
-(test-equal "context-stanza-append"
-  '(c b a)
-  (context-stanza
-   (context-stanza-append
-    (context-stanza-append
-     (context-stanza-append (make-char-context) 'a)
-     'b)
-    'c)))
-
 (test-equal "context-stanza/reversed"
   '(a b c)
-  (context-stanza/reversed
-   (context-stanza-append
-    (context-stanza-append
-     (context-stanza-append (make-char-context) 'a)
-     'b)
-    'c)))
-
-(test-equal "context-result-append"
-  '(c b a)
-  (context-result
-   (context-result-append
-    (context-result-append
-     (context-result-append (make-char-context) 'a)
-     'b)
-    'c)))
+  (context-stanza/reversed (make-char-context #:stanza '(c b a))))
 
 (test-equal "context-result/reversed"
   '(a b c)
-  (context-result/reversed
-   (context-result-append
-    (context-result-append
-     (context-result-append (make-char-context) 'a)
-     'b)
-    'c)))
+  (context-result/reversed (make-char-context #:result '(c b a))))
 
 
 ;;; clear
