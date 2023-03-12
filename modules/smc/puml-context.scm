@@ -52,7 +52,9 @@
             parse-event-source
             parse-entry-action
             parse-exit-action
-            guard:title?
+
+            ;; Guards.
+            title?
 
             ;; Actions.
             add-description
@@ -64,6 +66,7 @@
             throw-no-start-tag-error
 
             ;; Deprecated.
+            guard:title?
             action:add-description
             action:add-state-transition
             action:process-state-description
@@ -242,7 +245,7 @@
 
 
 
-(define (guard:title? ctx ch)
+(define (title? ctx ch)
   (and (char=? ch #\space)
        (string=? (context-buffer->string ctx) "title")))
 
@@ -460,6 +463,7 @@
 
 ;; Deprecated procedures.
 
+(define guard:title? title?)
 (define action:add-description add-description)
 (define action:check-end-tag validate-end-tag)
 (define action:check-start-tag validate-start-tag)

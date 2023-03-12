@@ -33,7 +33,7 @@ read_skip_comment ->  read_skip_comment
 
 read_word: Read a word.
 read_word --> [*]: char:eof-object?  -> throw-unexpected-end-of-file-error
-read_word --> read_title: guard:title? -> action:clear-buffer
+read_word --> read_title: title? -> action:clear-buffer
 read_word --> read_state_description: char:colon? -> action:update-stanza
 read_word --> search_state_transition: char:space? -> action:update-stanza
 read_word -> read_word: guard:#t -> push-event-to-buffer
