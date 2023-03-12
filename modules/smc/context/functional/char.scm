@@ -51,15 +51,12 @@
             context-buffer
             context-buffer/reversed
             context-buffer-set
-            context-buffer-append
             context-stanza
             context-stanza/reversed
             context-stanza-set
-            context-stanza-append
             context-result
             context-result/reversed
             context-result-set
-            context-result-append
 
             ;; Event source.
             next-char
