@@ -40,7 +40,7 @@ read_word -> read_word: guard:#t -> push-event-to-buffer
 
 read_title: Read a diagram title.
 read_title --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
-read_title --> read: char:newline? -> action:add-description
+read_title --> read: char:newline? -> add-description
 read_title -> read_title: guard:#t -> push-event-to-buffer
 
 read_state: Read a PlantUML stanza.
