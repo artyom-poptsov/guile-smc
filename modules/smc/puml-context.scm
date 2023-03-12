@@ -53,6 +53,17 @@
             parse-entry-action
             parse-exit-action
             guard:title?
+
+            ;; Actions.
+            add-description
+            add-state-transition
+            process-state-description
+            validate-start-tag
+            validate-end-tag
+            throw-unexpected-end-of-file-error
+            throw-no-start-tag-error
+
+            ;; Deprecated.
             action:add-description
             action:add-state-transition
             action:process-state-description
@@ -261,6 +272,12 @@
     (context-buffer-clear! ctx)
     ctx))
 
+(define add-description action:add-description)
+(define validate-start-tag action:check-start-tag)
+(define validate-end-tag action:check-end-tag)
+(define throw-unexpected-end-of-file-error action:unexpected-end-of-file-error)
+(define throw-no-start-tag-error action:no-start-tag-error)
+
 
 
 (define (%puml-transition:from tr)
@@ -349,6 +366,8 @@
     (context-stanza-clear! ctx)
 
     ctx))
+
+(define add-state-transition action:add-state-transition)
 
 
 ;; Try to parse a LINE as event source definition.  Returns a match or #f if
@@ -445,5 +464,7 @@
                                     new-description))))
     (context-clear! ctx)
     ctx))
+
+(define process-state-description action:process-state-description)
 
 ;;; puml-context.scm ends here.
