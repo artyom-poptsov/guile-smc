@@ -101,19 +101,19 @@
 
 ;;; Actions.
 
-(define (clear-buffer context event)
+(define* (clear-buffer context #:optional event)
   "Set the CONTEXT buffer to an empty list.  Return the updated context."
   (context-buffer-set context '()))
 
-(define (clear-stanza context event)
+(define* (clear-stanza context #:optional event)
   "Set the CONTEXT stanza to an empty list.  Return the updated context."
   (context-stanza-set context '()))
 
-(define (clear-result context event)
+(define* (clear-result context #:optional event)
   "Set the CONTEXT result to an empty list.  Return the updated context."
   (context-result-set context '()))
 
-(define (update-counter context event)
+(define* (update-counter context #:optional event)
   "Update the CONTEXT counter.  Return the updated context."
   (context-counter-update context))
 
