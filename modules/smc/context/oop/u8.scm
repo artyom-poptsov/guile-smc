@@ -79,7 +79,7 @@
 ;; CH.  These counters are thrown when a syntax error occurred.
 (define-method (u8-context-update-counters! (ctx <u8-context>) byte)
   (unless (eof-object? byte)
-    (context-counter++! ctx)))
+    (context-counter-update! ctx)))
 
 
 ;;; Event source.
