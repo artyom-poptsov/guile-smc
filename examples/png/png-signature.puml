@@ -1,40 +1,40 @@
 @startuml
 [*] ---> read_first_byte
 
-read_first_byte --> [*]: guard:eof-object?
-read_first_byte -down-> P: guard:correct-first-byte?
-read_first_byte --> [*]: action:wrong-first-byte-error
+read_first_byte --> [*]: char:eof-object?
+read_first_byte -down-> P: correct-first-byte?
+read_first_byte --> [*]: throw-wrong-first-byte-error
 
 P: Read the "P" letter
-P --> [*]: guard:eof-object? -> action:unexpected-eof-error
-P -down-> N: guard:letter-P?
-P --> [*]: action:unexpected-byte-error
+P --> [*]: char:eof-object? -> throw-unexpected-eof-error
+P -down-> N: char:letter-P?
+P --> [*]: throw-unexpected-byte-error
 
 N: Read the "N" letter
-N --> [*]: guard:eof-object? -> action:unexpected-eof-error
-N -down-> G: guard:letter-N?
-N --> [*]: action:unexpected-byte-error
+N --> [*]: char:eof-object? -> throw-unexpected-eof-error
+N -down-> G: char:letter-N?
+N --> [*]: throw-unexpected-byte-error
 
 G: Read the "G" letter
-G --> [*]: guard:eof-object? -> action:unexpected-eof-error
-G -down-> CR: guard:letter-G?
-G --> [*]: action:unexpected-byte-error
+G --> [*]: char:eof-object? -> throw-unexpected-eof-error
+G -down-> CR: char:letter-G?
+G --> [*]: throw-unexpected-byte-error
 
 CR: Read the carriage return (CR)
-CR ---> [*]: guard:eof-object? -> action:unexpected-eof-error
-CR -down-> LF: guard:letter-CR?
-CR --> [*]: action:unexpected-byte-error
+CR ---> [*]: char:eof-object? -> throw-unexpected-eof-error
+CR -down-> LF: char:cr?
+CR --> [*]: throw-unexpected-byte-error
 
 LF: Read the linefeed (LF)
-LF ---> [*]: guard:eof-object? -> action:unexpected-eof-error
-LF -down-> ctrl_z: guard:letter-LF?
-LF ---> [*]: action:unexpected-byte-error
+LF ---> [*]: char:eof-object? -> throw-unexpected-eof-error
+LF -down-> ctrl_z: char:lf?
+LF ---> [*]: throw-unexpected-byte-error
 
-ctrl_z --> [*]: guard:eof-object? -> action:unexpected-eof-error
-ctrl_z -down-> final_LF: guard:letter-ctrl-z?
-ctrl_z --> [*]: action:unexpected-byte-error
+ctrl_z --> [*]: char:eof-object? -> throw-unexpected-eof-error
+ctrl_z -down-> final_LF: char:sub?
+ctrl_z --> [*]: throw-unexpected-byte-error
 
-final_LF ---> [*]: guard:eof-object? -> action:unexpected-eof-error
-final_LF -down-> [*]: guard:letter-LF?
-final_LF ---> [*]: action:unexpected-byte-error
+final_LF ---> [*]: char:eof-object? -> throw-unexpected-eof-error
+final_LF -down-> [*]: char:lf?
+final_LF ---> [*]: throw-unexpected-byte-error
 @enduml
