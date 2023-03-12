@@ -10,8 +10,10 @@
             context-counter-set
             context-counter-update
             context-buffer
+            context-buffer/reversed
             context-buffer-set
             context-stanza
+            context-stanza/reversed
             context-stanza-set
             context-result
             context-result/reversed
@@ -121,6 +123,12 @@
            (object-address/hex-string record))))
 
 
+
+(define (context-buffer/reversed context)
+  (reverse (context-buffer context)))
+
+(define (context-stanza/reversed context)
+  (reverse (context-stanza context)))
 
 (define (context-result/reversed context)
   (reverse (context-result context)))
