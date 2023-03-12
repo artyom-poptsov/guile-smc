@@ -2,7 +2,6 @@
   #:use-module (srfi srfi-9 gnu)
   #:use-module (smc core common)
   #:export (<context>
-            %make-context
             make-context
             context?
             context-debug-mode?
@@ -35,7 +34,37 @@
             pop-stanza
             pop-result
             update-counter
-            throw-error))
+            throw-error
+
+            ;; Internal procedures.
+            %make-context
+
+            ;; Internal macros.
+            %make-parent-accessor
+            %make-parent-setter
+            %make-parent-action))
+
+
+(define-macro (%make-parent-accessor name)
+  `(define (,name context)
+     (,(string->symbol (string-append "generic:" (symbol->string name)))
+      (context-parent context))))
+
+(define-macro (%make-parent-setter name)
+  `(define (,name context value)
+     (context-parent-set context
+                         (,(string->symbol (string-append "generic:"
+                                                          (symbol->string name)))
+                          (context-parent context)
+                          value))))
+
+(define-macro (%make-parent-action name)
+  `(define (,name context event)
+     (context-parent-set context
+                         (,(string->symbol (string-append "generic:"
+                                                          (symbol->string name)))
+                          (context-parent context)
+                          event))))
 
 
 
@@ -155,15 +184,15 @@ Return the updated context."
                                     (cons (context-stanza context)
                                           (context-result context)))))
 
-(define (pop-buffer context event)
+(define* (pop-buffer context #:optional event)
   "Remove the last element of CONTEXT buffer.  Return the updated context."
   (context-buffer-set context (cdr (context-buffer context))))
 
-(define (pop-stanza context event)
+(define* (pop-stanza context #:optional event)
   "Remove the last element of CONTEXT stanza.  Return the updated context."
   (context-stanza-set context (cdr (context-stanza context))))
 
-(define (pop-result context event)
+(define* (pop-result context #:optional event)
   "Remove the last element of CONTEXT result.  Return the updated context."
   (context-result-set context (cdr (context-result context))))
 
