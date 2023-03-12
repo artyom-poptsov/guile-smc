@@ -95,12 +95,6 @@
      'b)
     'c)))
 
-(test-equal "clear-stanza"
-  '()
-  (context-stanza
-   (clear-stanza
-    (context-stanza-append (make-char-context) 'a))))
-
 (test-equal "context-result-append"
   '(c b a)
   (context-result
@@ -119,10 +113,70 @@
      'b)
     'c)))
 
+
+;;; clear
+
+(test-equal "clear-buffer"
+  '()
+  (context-buffer (clear-buffer (make-char-context #:buffer '(a b c)) 'event)))
+
+(test-equal "clear-stanza"
+  '()
+  (context-stanza (clear-stanza (make-char-context #:stanza '(a b c)) 'event)))
+
+(test-equal "clear-result"
+  '()
+  (context-result (clear-result (make-char-context #:stanza '(a b c)) 'event)))
+
+
+;;; reverse
+
+(test-equal "reverse-buffer"
+  '(a b c)
+  (context-buffer (reverse-buffer (make-char-context #:buffer '(c b a)))))
+
+(test-equal "reverse-stanza"
+  '(a b c)
+  (context-stanza (reverse-stanza (make-char-context #:stanza '(c b a)))))
+
+(test-equal "reverse-result"
+  '(a b c)
+  (context-result (reverse-result (make-char-context #:result '(c b a)))))
+
+
+;;; push
+
 (test-equal "push-event-to-buffer"
   '(a b c)
   (context-buffer (push-event-to-buffer (make-char-context #:buffer '(b c))
                                         'a)))
+
+(test-equal "push-event-to-stanza"
+  '(event)
+  (context-stanza (push-event-to-stanza (make-char-context) 'event)))
+
+(test-equal "push-event-to-result"
+  '(event)
+  (context-result (push-event-to-result (make-char-context) 'event)))
+
+(test-equal "push-buffer-to-stanza"
+  '((a b c))
+  (context-stanza (push-buffer-to-stanza (make-char-context #:buffer '(a b c))
+                                         'event)))
+
+
+;;; pop
+(test-equal "pop-buffer"
+  '(b c)
+  (context-buffer (pop-buffer (make-char-context #:buffer '(a b c)) 'event)))
+
+(test-equal "pop-stanza"
+  '(b c)
+  (context-stanza (pop-stanza (make-char-context #:stanza '(a b c)) 'event)))
+
+(test-equal "pop-result"
+  '(b c)
+  (context-result (pop-result (make-char-context #:result '(a b c)) 'event)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))

@@ -63,16 +63,24 @@
             next-char
 
             ;; Actions.
-            update-counter
-            update-row-number
-            update-col-number
-            update-result
-            push-buffer-to-stanza
             clear-buffer
             clear-stanza
             clear-result
-            reset-col-number
+            reverse-buffer
+            reverse-stanza
+            reverse-result
             push-event-to-buffer
+            push-event-to-stanza
+            push-event-to-result
+            push-buffer-to-stanza
+            push-stanza-to-result
+            pop-buffer
+            pop-stanza
+            pop-result
+            update-counter
+            update-row-number
+            update-col-number
+            reset-col-number
             throw-syntax-error
 
             ;; Logging procedures
@@ -205,6 +213,58 @@
 ;;; Actions.
 ;; Those procedures are to be called from a FSM directly.
 
+(define* (clear-buffer context #:optional event)
+  "Set the CONTEXT buffer to an empty list.  Return the updated context."
+  (context-buffer-set context '()))
+
+(define* (clear-stanza context #:optional event)
+  "Set the CONTEXT stanza to an empty list.  Return the updated context."
+  (context-stanza-set context '()))
+
+(define* (clear-result context #:optional event)
+  "Set the CONTEXT result to an empty list.  Return the updated context."
+  (context-result-set context '()))
+
+
+
+(define* (reverse-buffer context #:optional event)
+  (context-buffer-set context (reverse (context-buffer context))))
+
+(define* (reverse-stanza context #:optional event)
+  (context-stanza-set context (reverse (context-stanza context))))
+
+(define* (reverse-result context #:optional event)
+  (context-result-set context (reverse (context-result context))))
+
+
+(define (push-event-to-buffer context event)
+  "Push an EVENT to the CONTEXT buffer.  Return the updated context."
+  (context-buffer-set context (cons event (context-buffer context))))
+
+(define (push-event-to-stanza context event)
+  "Push an EVENT to the CONTEXT stanza.  Return the updated context."
+  (context-stanza-set context (cons event (context-stanza context))))
+
+(define (push-event-to-result context event)
+  "Push an EVENT to the CONTEXT result.  Return the updated context."
+  (context-result-set context (cons event (context-result context))))
+
+(define (push-buffer-to-stanza context event)
+  "Push the CONTEXT buffer content to the CONTEXT stanza and clear the CONTEXT buffer.
+Return the updated context."
+  (clear-buffer (context-stanza-set context
+                                    (cons (context-buffer context)
+                                          (context-stanza context)))
+                event))
+
+(define (push-stanza-to-result context event)
+  "Push the CONTEXT stanza content to the CONTEXT result and clear the CONTEXT stanza.
+Return the updated context."
+  (clear-stanza context
+                (context-result-set context
+                                    (cons (context-stanza context)
+                                          (context-result context)))))
+
 (define* (update-counter context #:optional event)
   "Increment the CONTEXT read counter.  Return the updated context.
 
@@ -229,55 +289,17 @@ Guile-SMC API."
 (define* (reset-col-number context #:optional event)
   (context-col-number-set context 0))
 
-(define (push-event-to-buffer context event)
-  "Append a DATA to a CONTEXT buffer.  Return the updated context."
-  (context-buffer-append context event))
+(define (pop-buffer context event)
+  "Remove the last element of CONTEXT buffer.  Return the updated context."
+  (context-buffer-set context (cdr (context-buffer context))))
 
-(define* (clear-buffer context #:optional event)
-  "Clear a CONTEXT buffer to an empty list.  Return the updated context.
+(define (pop-stanza context event)
+  "Remove the last element of CONTEXT stanza.  Return the updated context."
+  (context-stanza-set context (cdr (context-stanza context))))
 
-EVENT parameter is optional and is needed only for compatibility with
-Guile-SMC API."
-  (context-buffer-set context '()))
-
-(define* (clear-result context #:optional event)
-  "Clear a CONTEXT buffer to an empty list.  Return the updated context.
-
-EVENT parameter is optional and is needed only for compatibility with
-Guile-SMC API."
-  (context-result-set context '()))
-
-(define* (clear-stanza context #:optional event)
-  "Clear a CONTEXT stanza to an empty list.  Return the updated context.
-
-EVENT parameter is optional and is needed only for compatibility with
-Guile-SMC API."
-  (context-stanza-set context '()))
-
-(define (push-buffer-to-stanza context event)
-  "Propagate the data from a CONTEXT buffer to the CONTEXT stanza and reset the
-buffer, ignoring an EVENT.  Return the updated context."
-  (let ((buffer (context-buffer context)))
-    (unless (null? buffer)
-      (let ((reversed-buffer (reverse buffer)))
-        (when (context-debug-mode? context)
-          (let ((stanza (context-stanza/reversed context)))
-            (log-debug "context-stanza-update: event: ~a; buffer: ~a; stanza: ~a"
-                       event
-                       buffer
-                       stanza)))
-        (clear-buffer (context-stanza-append context reversed-buffer))))))
-
-(define (update-result ctx event)
-  (let ((stanza (context-stanza ctx)))
-    (unless (null? stanza)
-      (let ((reversed-stanza (reverse stanza)))
-        (when (context-debug-mode? ctx)
-          (log-debug "context-result-update: event: ~a; stanza: ~a"
-                     event
-                     reversed-stanza))
-        (clear-stanza
-         (context-result-append ctx reversed-stanza))))))
+(define (pop-result context event)
+  "Remove the last element of CONTEXT result.  Return the updated context."
+  (context-result-set context (cdr (context-result context))))
 
 
 ;;; Logging.
