@@ -167,6 +167,11 @@
 (generic:%make-parent-action clear-result)
 
 
+
+(define* (context-counter-update context #:key (delta 1))
+  (context-counter-set context (+ (context-counter context) delta)))
+
+
 ;;; Logging.
 
 (define (%current-position-prefix ctx)
