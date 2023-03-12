@@ -452,8 +452,7 @@
         (fsm-state-description-add! fsm
                                     state-name
                                     new-description))))
-    (context-clear! ctx)
-    ctx))
+    (clear-stanza (clear-buffer ctx ch) ch)))
 
 
 ;; Deprecated procedures.
