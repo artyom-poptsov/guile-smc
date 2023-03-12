@@ -8,7 +8,7 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6252
+;;;   step-counter:              6231
 ;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:

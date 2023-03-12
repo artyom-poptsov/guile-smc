@@ -78,7 +78,7 @@ read_state_transition_to: Read a state that the current state transitions to.
 read_state_transition_to --> [*]: char:eof-object?
 read_state_transition_to --> read_state_transition_to: char:right-square-bracket?
 read_state_transition_to --> search_state_transition_guard: char:colon? -> action:update-stanza
-read_state_transition_to --> read: char:newline? -> action:add-state-transition
+read_state_transition_to --> read: char:newline? -> add-state-transition
 read_state_transition_to -> read_state_transition_to: guard:#t -> push-event-to-buffer
 
 search_state_transition_guard: Check if the transition has a guard.
@@ -89,7 +89,7 @@ search_state_transition_guard -> search_state_transition_guard
 read_state_transition_guard: Read a state transition guard.
 read_state_transition_guard --> [*]: char:eof-object?
 read_state_transition_guard --> search_state_action_arrow: char:space? -> action:update-stanza
-read_state_transition_guard --> read: char:newline? -> action:add-state-transition
+read_state_transition_guard --> read: char:newline? -> add-state-transition
 read_state_transition_guard -> read_state_transition_guard: guard:#t -> push-event-to-buffer
 
 search_state_action_arrow: Check if a transition has an attached action.
@@ -112,6 +112,6 @@ search_state_transition_action -> search_state_transition_action
 
 read_state_transition_action: Read the state transition action.
 read_state_transition_action --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
-read_state_transition_action --> read: char:newline? -> action:add-state-transition
+read_state_transition_action --> read: char:newline? -> add-state-transition
 read_state_transition_action -> read_state_transition_action: guard:#t -> push-event-to-buffer
 @enduml
