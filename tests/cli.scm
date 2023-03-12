@@ -67,6 +67,44 @@
         (lambda ()
           (command-compile '("smc" "--log-driver" "null" "--validate")))))))
 
+(test-error "compile-validate: error: no start tag"
+  'puml-error
+  (with-input-from-string
+      (string-append
+       "[*] -> state_1\n"
+       "state_1: A state description.\n"
+       "state_1 --> state_1: guard:#t\n"
+       "state_1 -> [*]: char:eof-object?\n"
+       "@enduml\n")
+    (lambda ()
+      (with-output-to-string
+        (lambda ()
+          (command-compile '("smc" "--log-driver" "null" "--validate")))))))
+
+(test-error "compile-validate: error: no end tag"
+  'puml-error
+  (with-input-from-string
+      (string-append
+       "@startuml\n")
+    (lambda ()
+      (with-output-to-string
+        (lambda ()
+          (command-compile '("smc" "--log-driver" "null" "--validate")))))))
+
+(test-error "compile-validate: error: unresolved procedure"
+  'puml-error
+  (with-input-from-string
+      (string-append
+       "@startuml\n"
+       "[*] -> state_1\n"
+       "state_1 --> state_1: guard:#t\n"
+       "state_1 -> [*]: unknown-procedure\n"
+       "@startuml\n")
+    (lambda ()
+      (with-output-to-string
+        (lambda ()
+          (command-compile '("smc" "--log-driver" "null" "--validate")))))))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
