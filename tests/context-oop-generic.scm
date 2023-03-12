@@ -4,7 +4,6 @@
              (srfi srfi-26)
              (oop goops)
              (tests common)
-             (smc context context)
              (smc context oop generic))
 
 
