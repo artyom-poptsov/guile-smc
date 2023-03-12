@@ -31,6 +31,7 @@ SCM_TESTS = \
 	context-functional-generic.scm	\
 	context-functional-port.scm	\
 	context-functional-char.scm	\
+	context-functional-u8.scm	\
 	fsm.scm		\
 	puml-context.scm	\
 	puml.scm		\
