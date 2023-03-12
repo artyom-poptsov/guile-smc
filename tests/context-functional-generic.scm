@@ -28,13 +28,31 @@
                 #:result '()))
 
 
+(test-assert "context?"
+  (context? (make-context)))
+
+(test-assert "context-debug-mode?"
+  (context-debug-mode? (make-context #:debug-mode? #t)))
+
+(test-equal "context-counter"
+  0
+  (context-counter (make-context)))
+
 (test-equal "context-buffer"
   '()
   (context-buffer (make-context)))
 
+(test-equal "context-buffer/reversed"
+  '(a b c)
+  (context-buffer/reversed (make-context #:buffer '(c b a))))
+
 (test-equal "context-stanza"
   '()
   (context-stanza (make-context)))
+
+(test-equal "context-stanza/reversed"
+  '(a b c)
+  (context-stanza/reversed (make-context #:stanza '(c b a))))
 
 (test-equal "context-result"
   '()
@@ -99,6 +117,8 @@
   (context-stanza (push-buffer-to-stanza (make-context #:buffer '(a b c))
                                          'event)))
 
+
+
 (test-equal "pop-buffer"
   '(b c)
   (context-buffer (pop-buffer (make-context #:buffer '(a b c)) 'event)))
@@ -110,6 +130,10 @@
 (test-equal "pop-result"
   '(b c)
   (context-result (pop-result (make-context #:result '(a b c)) 'event)))
+
+(test-error "throw-error"
+  'misc-error
+  (throw-error (make-context) 'event))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
