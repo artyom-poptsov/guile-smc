@@ -80,7 +80,7 @@
 (make-char-guard char:etb?                    #\etb)
 (make-char-guard char:can?                    #\can)
 (make-char-guard char:em?                     #\em)
-(make-char-guard char:sub?                    #\sub)
+(make-char-guard char:sub?                    #\sub) ; Ctrl+Z
 (make-char-guard char:esc?                    #\esc)
 (make-char-guard char:fs?                     #\fs)
 (make-char-guard char:gs?                     #\gs)
