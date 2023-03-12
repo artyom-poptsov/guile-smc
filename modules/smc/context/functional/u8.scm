@@ -30,6 +30,8 @@
   #:use-module (ice-9 binary-ports)
   #:use-module (smc core common)
   #:use-module (smc core log)
+  #:use-module ((smc context functional generic)
+                #:renamer (symbol-prefix-proc 'generic:))
   #:export (<u8-context>
             u8-context?
             make-u8-context
@@ -53,25 +55,32 @@
             context-stanza
             context-stanza/reversed
             context-stanza-set
-            context-stanza-append
             context-result
             context-result/reversed
             context-result-set
-            context-result-append
 
             ;; Event source.
             next-char
 
             ;; Actions.
+            clear-buffer
+            clear-stanza
+            clear-result
+            reverse-buffer
+            reverse-stanza
+            reverse-result
+            push-event-to-buffer
+            push-event-to-stanza
+            push-event-to-result
+            push-buffer-to-stanza
+            push-stanza-to-result
+            pop-buffer
+            pop-stanza
+            pop-result
             update-counter
             update-row-number
             update-col-number
-            update-result
-            update-stanza
-            reset-buffer
-            reset-stanza
             reset-col-number
-            append-to-buffer
             throw-syntax-error
 
             ;; Logging procedures
@@ -81,30 +90,22 @@
             context-log-debug
 
             ;; Low-level procedures.
-            %make-char-context))
+            %make-u8-context))
 
 
 
 (define-immutable-record-type <u8-context>
-  (%make-u8-context port
-                    debug-mode?
-                    counter
-                    buffer
-                    stanza
-                    result)
-  char-context?
-  ;; <boolean>
-  (debug-mode?  context-debug-mode?  context-debug-mode-set)
+  (%make-u8-context parent-context
+                    port)
+  u8-context?
+
+  ;; <context>
+  (parent-context context-parent context-parent-set)
+
+  ;; Context port that is used to read the data.
+  ;;
   ;; <port>
-  (port         context-port         context-port-set)
-  ;; <number>
-  (counter      context-counter      context-counter-set)
-  ;; <list>
-  (buffer       context-buffer       context-buffer-set)
-  ;; <list>
-  (stanza       context-stanza       context-stanza-set)
-  ;; <list>
-  (result       context-result       context-result-set))
+  (port context-port context-port-set))
 
 (define* (make-u8-context #:key
                             (port (current-input-port))
@@ -113,12 +114,12 @@
                             (buffer '())
                             (stanza '())
                             (result '()))
-  (%make-u8-context port
-                    debug-mode?
-                    counter
-                    buffer
-                    stanza
-                    result))
+  (%make-u8-context (generic:make-context #:debug-mode? debug-mode?
+                                          #:counter     counter
+                                          #:buffer      buffer
+                                          #:stanza      stanza
+                                          #:result      result)
+                    port))
 
 
 
@@ -137,82 +138,33 @@
 
 
 
-(define* (context-counter-update context #:key (delta 1))
-  (context-counter-set context (+ (context-counter context) delta)))
-
-(define (context-buffer/reversed context)
-  (reverse (context-buffer context)))
-
-(define (context-stanza/reversed context)
-  (reverse (context-stanza context)))
-
-(define (context-stanza-append context token)
-  "Append a TOKEN to a CONTEXT stanza.  Return the updated context."
-  (context-stanza-set context (cons token (context-stanza context))))
-
-(define (context-result-append context stanza)
-  "Append a STANZA to a CONTEXT result.  Return the updated context."
-  (context-result-set context (cons stanza (context-result context))))
-
-(define (context-result/reversed context)
-  (reverse (context-result context)))
-
-(define (context-buffer-append context event)
-  (context-buffer-set context (cons event (context-buffer context))))
-
 
-;;; Actions.
-;; Those procedures are to be called from a FSM directly.
 
-(define* (update-counter context #:optional event)
-  "Increment the CONTEXT read counter.  Return the updated context.
+;; Parent accessors/setters.
+(generic:%make-parent-accessor context-debug-mode?)
+(generic:%make-parent-setter   context-debug-mode-set)
+(generic:%make-parent-accessor context-counter)
+(generic:%make-parent-setter   context-counter-set)
+(generic:%make-parent-accessor context-buffer)
+(generic:%make-parent-setter   context-buffer-set)
+(generic:%make-parent-accessor context-stanza)
+(generic:%make-parent-setter   context-stanza-set)
+(generic:%make-parent-accessor context-result)
+(generic:%make-parent-setter   context-result-set)
 
-EVENT parameter is optional and is needed only for compatibility with
-Guile-SMC API."
-  (context-counter-update context))
-
-(define (append-to-buffer context event)
-  "Append a DATA to a CONTEXT buffer.  Return the updated context."
-  (context-buffer-append context event))
-
-(define* (reset-buffer context #:optional event)
-  "Reset a CONTEXT buffer to an empty list.  Return the updated context.
-
-EVENT parameter is optional and is needed only for compatibility with
-Guile-SMC API."
-  (context-buffer-set context '()))
-
-(define* (reset-stanza context #:optional event)
-  "Reset a CONTEXT stanza to an empty list.  Return the updated context.
-
-EVENT parameter is optional and is needed only for compatibility with
-Guile-SMC API."
-  (context-stanza-set context '()))
-
-(define (update-stanza context event)
-  "Propagate the data from a CONTEXT buffer to the CONTEXT stanza and reset the
-buffer, ignoring an EVENT.  Return the updated context."
-  (let ((buffer (context-buffer context)))
-    (unless (null? buffer)
-      (let ((reversed-buffer (reverse buffer)))
-        (when (context-debug-mode? context)
-          (let ((stanza (context-stanza/reversed context)))
-            (log-debug "context-stanza-update: event: ~a; buffer: ~a; stanza: ~a"
-                       event
-                       buffer
-                       stanza)))
-        (reset-buffer (context-stanza-append context reversed-buffer))))))
-
-(define (update-result ctx event)
-  (let ((stanza (context-stanza ctx)))
-    (unless (null? stanza)
-      (let ((reversed-stanza (reverse stanza)))
-        (when (context-debug-mode? ctx)
-          (log-debug "context-result-update: event: ~a; stanza: ~a"
-                     event
-                     reversed-stanza))
-        (reset-stanza
-         (context-result-append ctx reversed-stanza))))))
+;; Parent actions.
+(generic:%make-parent-action push-event-to-buffer)
+(generic:%make-parent-action push-event-to-stanza)
+(generic:%make-parent-action push-event-to-result)
+(generic:%make-parent-action push-buffer-to-stanza)
+(generic:%make-parent-action push-stanza-to-result)
+(generic:%make-parent-action update-counter)
+(generic:%make-parent-action pop-buffer)
+(generic:%make-parent-action pop-stanza)
+(generic:%make-parent-action pop-result)
+(generic:%make-parent-action clear-buffer)
+(generic:%make-parent-action clear-stanza)
+(generic:%make-parent-action clear-result)
 
 
 ;;; Logging.
@@ -256,5 +208,3 @@ string."
          context))
 
 ;;; char.scm ends here.
-
-
