@@ -21,7 +21,7 @@
 
             ;; Actions.
             update-counter
-            push-to-buffer
+            push-event-to-buffer
             action:store
             action:clear-buffer
             action:update-stanza))
@@ -109,7 +109,7 @@
 (define (update-counter ctx event)
   (context-counter-update! ctx))
 
-(define (push-to-buffer context event)
+(define (push-event-to-buffer context event)
   "Push a new EVENT in a CONTEXT buffer."
   (when (context-debug-mode? context)
     (log-debug "push-to-buffer: event: ~a; buffer: ~a"
