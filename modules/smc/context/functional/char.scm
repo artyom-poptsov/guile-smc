@@ -95,13 +95,45 @@
                       stanza
                       result)
   char-context?
+
+  ;; Flag that specifies whether the debug mode for the context is enabled.
+  ;;
+  ;; <boolean>
   (debug-mode?  context-debug-mode?  context-debug-mode-set)
+
+  ;; Context port that is used to read the data.
+  ;;
+  ;; <port>
   (port         context-port         context-port-set)
+
+  ;; Context counter.  Can be used to count incoming events, for example.
+  ;;
+  ;; <number>
   (counter      context-counter      context-counter-set)
+
+  ;; Context row counter.  Can be used to count rows that have been read.
+  ;;
+  ;; <number>
   (row-number   context-row-number   context-row-number-set)
+
+  ;; Context column counter.  Can be used to indicate the current column that
+  ;; have been read.
+  ;;
+  ;; <number>
   (col-number   context-col-number   context-col-number-set)
+
+  ;;
+  ;; <list>
   (buffer       context-buffer       context-buffer-set)
+
+  ;; Context stanza to store the chunks of intermediate context data.
+  ;;
+  ;; <list>
   (stanza       context-stanza       context-stanza-set)
+
+  ;; Context result to store the end result of the parser.
+  ;;
+  ;; <list>
   (result       context-result       context-result-set))
 
 (define* (make-char-context #:key
