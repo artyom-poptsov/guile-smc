@@ -18,7 +18,6 @@
             context-result
             context-result/reversed
             context-result-set
-            context-result-append
 
             ;; Actions.
             clear-buffer
