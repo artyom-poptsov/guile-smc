@@ -25,7 +25,6 @@
 ;;; Code:
 
 (define-module (smc context functional port)
-  #:use-module (ice-9 binary-ports)
   #:use-module (srfi srfi-9 gnu)
   #:use-module (smc core common)
   #:use-module (smc core log)
@@ -149,12 +148,6 @@
 
 (define* (context-counter-update context #:key (delta 1))
   (context-counter-set context (+ (context-counter context) delta)))
-
-
-
-(define (next-u8 context)
-  "Event source."
-  (get-u8 (context-port context)))
 
 
 
