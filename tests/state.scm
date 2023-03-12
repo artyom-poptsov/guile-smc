@@ -5,7 +5,7 @@
              (ice-9 receive)
              (ice-9 regex)
              (oop goops)
-             (smc context char-context)
+             (smc context char)
              (smc fsm)
              (smc core transition)
              (smc core state)

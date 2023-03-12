@@ -6,7 +6,7 @@
              (ice-9 regex)
              (oop goops)
              (tests common)
-             (smc context char-context)
+             (smc context char)
              (smc core transition))
 
 
