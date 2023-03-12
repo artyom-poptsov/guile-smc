@@ -70,6 +70,7 @@
             update-stanza
             clear-buffer
             clear-stanza
+            clear-result
             reset-col-number
             append-to-buffer
             throw-syntax-error
@@ -238,6 +239,13 @@ Guile-SMC API."
 EVENT parameter is optional and is needed only for compatibility with
 Guile-SMC API."
   (context-buffer-set context '()))
+
+(define* (clear-result context #:optional event)
+  "Clear a CONTEXT buffer to an empty list.  Return the updated context.
+
+EVENT parameter is optional and is needed only for compatibility with
+Guile-SMC API."
+  (context-result-set context '()))
 
 (define* (clear-stanza context #:optional event)
   "Clear a CONTEXT stanza to an empty list.  Return the updated context.
