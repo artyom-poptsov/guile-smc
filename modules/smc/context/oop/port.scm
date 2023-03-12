@@ -17,6 +17,8 @@
             context-buffer-set!
             context-buffer-add!
             context-buffer-clear!
+            context-result
+            context-result-set!
             context-clear!
 
             ;; Actions.
@@ -59,7 +61,15 @@
   (stanza
    #:init-value '()
    #:getter     context-stanza
-   #:setter     context-stanza-set!))
+   #:setter     context-stanza-set!)
+
+  ;; The context result holds the result of the FSM work.
+  ;;
+  ;; <list> | <top>
+  (result
+   #:init-value '()
+   #:getter     context-result
+   #:setter     context-result-set!))
 
 
 
