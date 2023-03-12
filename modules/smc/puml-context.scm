@@ -1,6 +1,6 @@
 ;;; puml-context.scm -- PlantUML parser context.
 
-;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -246,37 +246,31 @@
   (and (char=? ch #\space)
        (string=? (context-buffer->string ctx) "title")))
 
-(define (action:no-start-tag-error ctx ch)
+(define (throw-no-start-tag-error ctx ch)
   (puml-error ctx "No start tag found"))
 
-(define (action:unexpected-end-of-file-error ctx ch)
+(define (throw-unexpected-end-of-file-error ctx ch)
   (puml-error ctx "Unexpected end of file"))
 
 
-(define (action:add-description ctx ch)
+(define (add-description ctx ch)
   (fsm-description-set! (puml-context-fsm ctx) (context-buffer->string ctx))
   (context-clear! ctx)
   ctx)
 
-(define (action:check-start-tag ctx ch)
+(define (validate-start-tag ctx ch)
   (let ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@startuml")
       (puml-error ctx "Misspelled @startuml"))
     (context-buffer-clear! ctx)
     ctx))
 
-(define (action:check-end-tag ctx)
+(define (validate-end-tag ctx)
   (let* ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@enduml")
       (puml-error ctx "Misspelled @enduml"))
     (context-buffer-clear! ctx)
     ctx))
-
-(define add-description action:add-description)
-(define validate-start-tag action:check-start-tag)
-(define validate-end-tag action:check-end-tag)
-(define throw-unexpected-end-of-file-error action:unexpected-end-of-file-error)
-(define throw-no-start-tag-error action:no-start-tag-error)
 
 
 
@@ -304,7 +298,7 @@
 
 
 
-(define (action:add-state-transition ctx ch)
+(define (add-state-transition ctx ch)
 
   (unless (null? (context-buffer ctx))
     (action:update-stanza ctx ch))
@@ -367,8 +361,6 @@
 
     ctx))
 
-(define add-state-transition action:add-state-transition)
-
 
 ;; Try to parse a LINE as event source definition.  Returns a match or #f if
 ;; line does not match.
@@ -400,7 +392,7 @@
 (define-method (parse-exit-action (line <string>))
   (string-match "[ \t]+exit-action:[ \t]+([^ \t\n]+)" line))
 
-(define (action:process-state-description ctx ch)
+(define (process-state-description ctx ch)
 
   (define (%resolve state-name proc-name)
     (let* ((proc-name (string->symbol proc-name))
@@ -465,6 +457,15 @@
     (context-clear! ctx)
     ctx))
 
-(define process-state-description action:process-state-description)
+
+;; Deprecated procedures.
+
+(define action:add-description add-description)
+(define action:check-end-tag validate-end-tag)
+(define action:check-start-tag validate-start-tag)
+(define action:no-start-tag-error throw-no-start-tag-error)
+(define action:unexpected-end-of-file-error throw-unexpected-end-of-file-error)
+(define action:process-state-description process-state-description)
+(define action:add-state-transition add-state-transition)
 
 ;;; puml-context.scm ends here.

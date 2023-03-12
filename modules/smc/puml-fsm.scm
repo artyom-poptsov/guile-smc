@@ -8,7 +8,7 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6224
+;;;   step-counter:              6208
 ;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:
@@ -34,13 +34,13 @@
 ;;;     #<procedure push-event-to-buffer (context event)>
 ;;;   #<directory (smc puml-context)>
 ;;;     #<<generic> char-context-event-source (1)>
-;;;     #<procedure action:add-description (ctx ch)>
 ;;;     #<procedure action:add-state-transition (ctx ch)>
-;;;     #<procedure action:check-end-tag (ctx)>
-;;;     #<procedure action:check-start-tag (ctx ch)>
-;;;     #<procedure action:process-state-description (ctx ch)>
-;;;     #<procedure action:unexpected-end-of-file-error (ctx ch)>
+;;;     #<procedure add-description (ctx ch)>
 ;;;     #<procedure guard:title? (ctx ch)>
+;;;     #<procedure process-state-description (ctx ch)>
+;;;     #<procedure throw-unexpected-end-of-file-error (ctx ch)>
+;;;     #<procedure validate-end-tag (ctx)>
+;;;     #<procedure validate-start-tag (ctx ch)>
 
 
 (define-module
@@ -102,10 +102,10 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
-       (,char:space? ,action:check-start-tag read)
-       (,char:newline? ,action:check-start-tag read)
+       (,char:space? ,validate-start-tag read)
+       (,char:newline? ,validate-start-tag read)
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_start_tag)))
@@ -116,9 +116,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
-       (,char:newline?
-        ,action:process-state-description
-        read)
+       (,char:newline? ,process-state-description read)
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_description)))
@@ -127,7 +125,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
        (,guard:title? ,action:clear-buffer read_title)
        (,char:colon?
@@ -144,7 +142,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
        (,char:newline? ,action:no-op read)
        (,#{guard:#t}# ,action:no-op read_skip_comment)))
@@ -155,7 +153,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
        (,char:at-symbol?
         ,push-event-to-buffer
@@ -175,7 +173,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
        (,char:letter?
         ,push-event-to-buffer
@@ -245,7 +243,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
        (,char:newline? ,action:no-op #f)
        (,char:more-than-sign?
@@ -258,7 +256,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
        (,char:newline?
         ,action:add-state-transition
@@ -290,9 +288,9 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
-        ,action:unexpected-end-of-file-error
+        ,throw-unexpected-end-of-file-error
         #f)
-       (,char:newline? ,action:add-description read)
+       (,char:newline? ,add-description read)
        (,#{guard:#t}# ,push-event-to-buffer read_title)))
     ((name . search_state_transition_to)
      (description

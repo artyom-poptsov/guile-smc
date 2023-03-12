@@ -5,13 +5,13 @@ title PlantUML <https://plantuml.com> Reader Finite-State Machine.\nThis FSM is 
 [*] -> read_start_tag
 
 read_start_tag: Read the start @startuml tag and check it for errors
-read_start_tag --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
-read_start_tag --> read: char:space? -> action:check-start-tag
-read_start_tag --> read: char:newline? -> action:check-start-tag
+read_start_tag --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_start_tag --> read: char:space? -> validate-start-tag
+read_start_tag --> read: char:newline? -> validate-start-tag
 read_start_tag -> read_start_tag: guard:#t -> push-event-to-buffer
 
 read: Read the PlantUML transition table.
-read -> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read --> read_end_tag: char:at-symbol? -> push-event-to-buffer
 read --> read_skip_comment: char:single-quote?
 read --> read_state: char:left-square-bracket?
@@ -27,19 +27,19 @@ read_end_tag --> [*]: char:space?
 read_end_tag ->  read_end_tag: guard:#t -> push-event-to-buffer
 
 read_skip_comment: Skip commentaries that are written between stanzas.
-read_skip_comment --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_skip_comment --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read_skip_comment --> read: char:newline?
 read_skip_comment ->  read_skip_comment
 
 read_word: Read a word.
-read_word --> [*]: char:eof-object?  -> action:unexpected-end-of-file-error
+read_word --> [*]: char:eof-object?  -> throw-unexpected-end-of-file-error
 read_word --> read_title: guard:title? -> action:clear-buffer
 read_word --> read_state_description: char:colon? -> action:update-stanza
 read_word --> search_state_transition: char:space? -> action:update-stanza
 read_word -> read_word: guard:#t -> push-event-to-buffer
 
 read_title: Read a diagram title.
-read_title --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_title --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read_title --> read: char:newline? -> add-description
 read_title -> read_title: guard:#t -> push-event-to-buffer
 
@@ -99,19 +99,19 @@ search_state_action_arrow --> read_state_action_arrow: char:hyphen-minus?
 search_state_action_arrow -> search_state_action_arrow
 
 read_state_action_arrow: Read and skip the action arrow.
-read_state_action_arrow --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_state_action_arrow --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read_state_action_arrow --> [*]: char:newline?
 read_state_action_arrow --> search_state_transition_action: char:more-than-sign?
 
 search_state_transition_action: Check if an action is present after the arrow.
 search_state_transition_action: Issue an error if it is not.
-search_state_transition_action --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+search_state_transition_action --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 search_state_transition_action --> read_state_transition_action: char:letter? -> push-event-to-buffer
 search_state_transition_action --> [*]: char:newline?
 search_state_transition_action -> search_state_transition_action
 
 read_state_transition_action: Read the state transition action.
-read_state_transition_action --> [*]: char:eof-object? -> action:unexpected-end-of-file-error
+read_state_transition_action --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read_state_transition_action --> read: char:newline? -> add-state-transition
 read_state_transition_action -> read_state_transition_action: guard:#t -> push-event-to-buffer
 @enduml
