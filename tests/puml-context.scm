@@ -77,7 +77,7 @@
                #:fsm-event-source 'test-event-source
                #:module           (list (resolve-module '(test-context))
                                         (current-module)))))
-    (for-each (lambda (ch) (action:store ctx ch))
+    (for-each (lambda (ch) (push-event-to-buffer ctx ch))
               (string->list "title"))
     (guard:title? ctx #\space)))
 
