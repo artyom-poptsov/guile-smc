@@ -23,6 +23,8 @@
             ;; Actions.
             update-counter
             push-event-to-buffer
+            push-event-to-stanza
+            push-event-to-result
             push-buffer-to-stanza
             push-stanza-to-result
             action:store
@@ -122,6 +124,24 @@
                event
                (context-buffer context)))
   (context-buffer-set! context (cons event (context-buffer context)))
+  context)
+
+(define (push-event-to-stanza context event)
+  "Push a new EVENT in a CONTEXT stanza."
+  (when (context-debug-mode? context)
+    (log-debug "push-event-to-stanza: event: ~a; stanza: ~a"
+               event
+               (context-stanza context)))
+  (context-stanza-set! context (cons event (context-stanza context)))
+  context)
+
+(define (push-event-to-result context event)
+  "Push a new EVENT in a CONTEXT result."
+  (when (context-debug-mode? context)
+    (log-debug "push-event-to-result: event: ~a; result: ~a"
+               event
+               (context-result context)))
+  (context-result-set! context (cons event (context-result context)))
   context)
 
 (define (push-buffer-to-stanza context event)
