@@ -21,6 +21,9 @@
             context-clear!
 
             ;; Actions.
+            clear-buffer
+            clear-stanza
+            clear-result
             update-counter
             push-event-to-buffer
             push-event-to-stanza
