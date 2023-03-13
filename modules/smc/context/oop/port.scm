@@ -21,6 +21,9 @@
             context-clear!
 
             ;; Actions.
+            pop-buffer
+            pop-stanza
+            pop-result
             clear-buffer
             clear-stanza
             clear-result
@@ -89,6 +92,17 @@
 
 (define-method (context-counter-update! (ctx <port-context>))
   (context-counter-update! ctx 1))
+
+
+
+(define* (pop-buffer context #:optional event)
+  (context-buffer-set! context (cdr (context-buffer context))))
+
+(define* (pop-stanza context #:optional event)
+  (context-stanza-set! context (cdr (context-stanza context))))
+
+(define* (pop-result context #:optional event)
+  (context-result-set! context (cdr (context-result context))))
 
 
 
