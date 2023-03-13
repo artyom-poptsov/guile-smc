@@ -8,7 +8,7 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6202
+;;;   step-counter:              6198
 ;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:
@@ -39,7 +39,7 @@
 ;;;     #<procedure process-state-description (ctx ch)>
 ;;;     #<procedure throw-unexpected-end-of-file-error (ctx ch)>
 ;;;     #<procedure title? (ctx ch)>
-;;;     #<procedure validate-end-tag (ctx)>
+;;;     #<procedure validate-end-tag (ctx ch)>
 ;;;     #<procedure validate-start-tag (ctx ch)>
 
 

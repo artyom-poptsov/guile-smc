@@ -20,7 +20,7 @@ read -> read
 
 read_end_tag: Read and check the @enduml tag.
 read_end_tag:
-read_end_tag: exit-action: action:check-end-tag
+read_end_tag: exit-action: validate-end-tag
 read_end_tag --> [*]: char:eof-object?
 read_end_tag --> [*]: char:newline?
 read_end_tag --> [*]: char:space?
