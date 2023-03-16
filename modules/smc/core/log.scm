@@ -1,6 +1,6 @@
 ;;; log.scm -- Guile-SMC logging facilities.
 
-;; Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@
             log-info
             log-debug
             log-use-stderr!
+            log-level-enabled?
 
             ;; Helper procedures.
             %precise-log-formatter
@@ -85,12 +86,12 @@
   "Check if X is a <precise-logger> instance."
   (is-a? x <precise-logger>))
 
-(define (level-enabled? lgr lvl)
+(define (log-level-enabled? lgr lvl)
   "Check if a log level LVL is enabled for a logger LGR."
   (hashq-ref (slot-ref lgr 'levels) lvl #t))
 
 (define-method (%precise-log-helper (self <precise-logger>) level objs)
-  (when (level-enabled? self level)
+  (when (log-level-enabled? self level)
     (let ((cur-time (gettimeofday)))
       (for-each (lambda (str)
                   (unless (string-null? str)

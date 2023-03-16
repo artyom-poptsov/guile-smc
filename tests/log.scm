@@ -3,6 +3,7 @@
              (ice-9 receive)
              (ice-9 regex)
              (oop goops)
+             (logging logger)
              (smc core log))
 
 
@@ -28,6 +29,18 @@
 
 (test-assert "precise-logger?"
   (precise-logger? (make <precise-logger>)))
+
+(test-equal "log-level-enabled?: #f"
+  #f
+  (let ((ctx (make <precise-logger>)))
+    (disable-log-level! ctx 'debug)
+    (log-level-enabled? ctx 'debug)))
+
+(test-equal "log-level-enabled?: #t"
+  #t
+  (let ((ctx (make <precise-logger>)))
+    (enable-log-level! ctx 'debug)
+    (log-level-enabled? ctx 'debug)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
