@@ -26,6 +26,9 @@
   (let ((h (make <precise-port-log>)))
     (slot-ref h 'formatter)))
 
+(test-assert "precise-logger?"
+  (precise-logger? (make <precise-logger>)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
