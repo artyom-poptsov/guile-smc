@@ -42,6 +42,9 @@
     (enable-log-level! ctx 'debug)
     (log-level-enabled? ctx 'debug)))
 
+(test-assert "precise-port-log?"
+  (precise-port-log? (make <precise-port-log>)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
