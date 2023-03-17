@@ -69,6 +69,10 @@
                                         (current-module)))))
     (resolve-procedure ctx 'entry-action)))
 
+(test-equal "module-name"
+  "(test module)"
+  (module-name '(test module)))
+
 
 
 (test-assert "guard:title?: #t"

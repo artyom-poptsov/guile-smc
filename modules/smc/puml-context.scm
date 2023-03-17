@@ -52,6 +52,7 @@
             parse-event-source
             parse-entry-action
             parse-exit-action
+            module-name
 
             ;; Guards.
             title?
