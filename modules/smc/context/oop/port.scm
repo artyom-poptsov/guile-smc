@@ -9,6 +9,7 @@
             context-counter-set!
             context-counter-update!
             context-stanza
+            context-stanza/reversed
             context-stanza-set!
             context-stanza-add!
             context-stanza-clear!
@@ -99,6 +100,9 @@
 
 (define-method (context-buffer/reversed (context <port-context>))
   (reverse (context-buffer context)))
+
+(define-method (context-stanza/reversed (context <port-context>))
+  (reverse (context-stanza context)))
 
 
 
