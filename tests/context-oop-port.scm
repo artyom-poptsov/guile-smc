@@ -30,6 +30,10 @@
   '()
   (context-buffer (make <port-context>)))
 
+(test-equal "context-buffer/reversed"
+  '(a b c)
+  (context-buffer/reversed (make <port-context> #:buffer '(c b a))))
+
 (test-equal "context-stanza"
   '()
   (context-stanza (make <port-context>)))
