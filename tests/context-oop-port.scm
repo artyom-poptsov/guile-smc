@@ -81,6 +81,19 @@
      'c)
     'event)))
 
+(test-equal "push-stanza-to-result"
+  '(((c b a)))
+  (context-result
+   (push-stanza-to-result
+    (push-buffer-to-stanza
+     (push-event-to-buffer
+      (push-event-to-buffer
+       (push-event-to-buffer (make <port-context>) 'a)
+       'b)
+      'c)
+     'event)
+    'event)))
+
 (test-equal "buffer-empty?: #t"
   #t
   (buffer-empty? (make <port-context>)))
