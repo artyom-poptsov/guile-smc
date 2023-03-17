@@ -58,6 +58,29 @@
     (context-counter-update! ctx 2)
     (context-counter ctx)))
 
+(test-equal "push-event-to-buffer"
+  '(event)
+  (context-buffer (push-event-to-buffer (make <port-context>) 'event)))
+
+(test-equal "push-event-to-stanza"
+  '(event)
+  (context-stanza (push-event-to-stanza (make <port-context>) 'event)))
+
+(test-equal "push-event-to-result"
+  '(event)
+  (context-result (push-event-to-result (make <port-context>) 'event)))
+
+(test-equal "push-buffer-to-stanza"
+  '((c b a))
+  (context-stanza
+   (push-buffer-to-stanza
+    (push-event-to-buffer
+     (push-event-to-buffer
+      (push-event-to-buffer (make <port-context>) 'a)
+      'b)
+     'c)
+    'event)))
+
 (test-equal "buffer-empty?: #t"
   #t
   (buffer-empty? (make <port-context>)))

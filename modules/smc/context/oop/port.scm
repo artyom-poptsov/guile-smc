@@ -183,8 +183,8 @@
                event
                (context-buffer context)
                (context-stanza context)))
-  (context-result-set! context (cons (context-stanza context)
-                                     (context-result context)))
+  (context-stanza-set! context (cons (context-buffer context)
+                                     (context-stanza context)))
   (clear-buffer context event))
 
 (define (push-stanza-to-result context event)
