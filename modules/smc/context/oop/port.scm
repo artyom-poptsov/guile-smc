@@ -23,6 +23,7 @@
             context-clear!
 
             ;; Actions.
+            buffer-empty?
             pop-buffer
             pop-stanza
             pop-result
@@ -103,6 +104,9 @@
 
 (define-method (context-stanza/reversed (context <port-context>))
   (reverse (context-stanza context)))
+
+(define* (buffer-empty? context #:optional event)
+  (null? (context-buffer context)))
 
 
 

@@ -58,6 +58,14 @@
     (context-counter-update! ctx 2)
     (context-counter ctx)))
 
+(test-equal "buffer-empty?: #t"
+  #t
+  (buffer-empty? (make <port-context>)))
+
+(test-equal "buffer-empty?: #f"
+  #f
+  (buffer-empty? (push-event-to-buffer (make <port-context>) 'event)))
+
 (test-equal "update-counter"
   1
   (let ((ctx (make <port-context>)))
