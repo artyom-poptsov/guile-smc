@@ -62,6 +62,7 @@
   ;; <list>
   (buffer
    #:init-value '()
+   #:init-keyword #:buffer
    #:getter     context-buffer
    #:setter     context-buffer-set!)
 
@@ -70,6 +71,7 @@
   ;;<list>
   (stanza
    #:init-value '()
+   #:init-keyword #:stanza
    #:getter     context-stanza
    #:setter     context-stanza-set!)
 
@@ -78,6 +80,7 @@
   ;; <list> | <top>
   (result
    #:init-value '()
+   #:init-keyword #:result
    #:getter     context-result
    #:setter     context-result-set!))
 
