@@ -38,6 +38,10 @@
   '()
   (context-stanza (make <port-context>)))
 
+(test-equal "context-stanza/reversed"
+  '(a b c)
+  (context-stanza/reversed (make <port-context> #:stanza '(c b a))))
+
 (test-equal "context-debug-mode?"
   #f
   (context-debug-mode? (make <port-context>)))
