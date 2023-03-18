@@ -228,7 +228,7 @@
 
 ;; Convert a context buffer of PUML-CONTEXT to a string.
 (define-method (context-buffer->string (puml-context <puml-context>))
-  (list->string (reverse (context-buffer puml-context))))
+  (list->string (context-buffer/reversed puml-context)))
 
 
 ;;; Error reporting.
