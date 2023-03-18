@@ -28,9 +28,9 @@
 ;;;     #<procedure char:single-quote? (ctx ch2)>
 ;;;     #<procedure char:space? (ctx ch2)>
 ;;;   #<directory (smc context oop char)>
-;;;     #<procedure action:clear-buffer (ctx event)>
 ;;;     #<procedure action:syntax-error (ctx ch)>
-;;;     #<procedure action:update-stanza (ctx event)>
+;;;     #<procedure clear-buffer (context #:optional event)>
+;;;     #<procedure push-buffer-to-stanza (context event)>
 ;;;     #<procedure push-event-to-buffer (context event)>
 ;;;   #<directory (smc puml-context)>
 ;;;     #<<generic> char-context-event-source (1)>
@@ -127,12 +127,12 @@
        (,char:eof-object?
         ,throw-unexpected-end-of-file-error
         #f)
-       (,title? ,action:clear-buffer read_title)
+       (,title? ,clear-buffer read_title)
        (,char:colon?
-        ,action:update-stanza
+        ,push-buffer-to-stanza
         read_state_description)
        (,char:space?
-        ,action:update-stanza
+        ,push-buffer-to-stanza
         search_state_transition)
        (,#{guard:#t}# ,push-event-to-buffer read_word)))
     ((name . read_skip_comment)
@@ -214,7 +214,7 @@
      (transitions
        (,char:eof-object? ,action:no-op #f)
        (,char:space?
-        ,action:update-stanza
+        ,push-buffer-to-stanza
         search_state_action_arrow)
        (,char:newline? ,add-state-transition read)
        (,#{guard:#t}#
@@ -227,13 +227,13 @@
        (,char:eof-object? ,action:no-op #f)
        (,char:newline? ,action:syntax-error #f)
        (,char:right-square-bracket?
-        ,action:update-stanza
+        ,push-buffer-to-stanza
         search_state_transition)
        (,char:space?
-        ,action:update-stanza
+        ,push-buffer-to-stanza
         search_state_transition)
        (,char:colon?
-        ,action:update-stanza
+        ,push-buffer-to-stanza
         read_state_description)
        (,#{guard:#t}# ,push-event-to-buffer read_state)))
     ((name . read_state_action_arrow)
@@ -271,7 +271,7 @@
         ,action:no-op
         read_state_transition_to)
        (,char:colon?
-        ,action:update-stanza
+        ,push-buffer-to-stanza
         search_state_transition_guard)
        (,char:newline? ,add-state-transition read)
        (,#{guard:#t}#

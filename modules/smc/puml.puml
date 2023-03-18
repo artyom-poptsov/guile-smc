@@ -33,9 +33,9 @@ read_skip_comment ->  read_skip_comment
 
 read_word: Read a word.
 read_word --> [*]: char:eof-object?  -> throw-unexpected-end-of-file-error
-read_word --> read_title: title? -> action:clear-buffer
-read_word --> read_state_description: char:colon? -> action:update-stanza
-read_word --> search_state_transition: char:space? -> action:update-stanza
+read_word --> read_title: title? -> clear-buffer
+read_word --> read_state_description: char:colon? -> push-buffer-to-stanza
+read_word --> search_state_transition: char:space? -> push-buffer-to-stanza
 read_word -> read_word: guard:#t -> push-event-to-buffer
 
 read_title: Read a diagram title.
@@ -46,9 +46,9 @@ read_title -> read_title: guard:#t -> push-event-to-buffer
 read_state: Read a PlantUML stanza.
 read_state --> [*]: char:eof-object?
 read_state --> [*]: char:newline? -> action:syntax-error
-read_state --> search_state_transition: char:right-square-bracket? -> action:update-stanza
-read_state --> search_state_transition: char:space? -> action:update-stanza
-read_state --> read_state_description: char:colon? -> action:update-stanza
+read_state --> search_state_transition: char:right-square-bracket? -> push-buffer-to-stanza
+read_state --> search_state_transition: char:space? -> push-buffer-to-stanza
+read_state --> read_state_description: char:colon? -> push-buffer-to-stanza
 read_state -> read_state: guard:#t -> push-event-to-buffer
 
 search_state_transition: Check if a state has a transition.
@@ -77,7 +77,7 @@ search_state_transition_to -> search_state_transition_to
 read_state_transition_to: Read a state that the current state transitions to.
 read_state_transition_to --> [*]: char:eof-object?
 read_state_transition_to --> read_state_transition_to: char:right-square-bracket?
-read_state_transition_to --> search_state_transition_guard: char:colon? -> action:update-stanza
+read_state_transition_to --> search_state_transition_guard: char:colon? -> push-buffer-to-stanza
 read_state_transition_to --> read: char:newline? -> add-state-transition
 read_state_transition_to -> read_state_transition_to: guard:#t -> push-event-to-buffer
 
@@ -88,7 +88,7 @@ search_state_transition_guard -> search_state_transition_guard
 
 read_state_transition_guard: Read a state transition guard.
 read_state_transition_guard --> [*]: char:eof-object?
-read_state_transition_guard --> search_state_action_arrow: char:space? -> action:update-stanza
+read_state_transition_guard --> search_state_action_arrow: char:space? -> push-buffer-to-stanza
 read_state_transition_guard --> read: char:newline? -> add-state-transition
 read_state_transition_guard -> read_state_transition_guard: guard:#t -> push-event-to-buffer
 

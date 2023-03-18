@@ -71,7 +71,7 @@
   (context-result (push-event-to-result (make <port-context>) 'event)))
 
 (test-equal "push-buffer-to-stanza"
-  '((c b a))
+  '((a b c))
   (context-stanza
    (push-buffer-to-stanza
     (push-event-to-buffer
@@ -82,7 +82,7 @@
     'event)))
 
 (test-equal "push-stanza-to-result"
-  '(((c b a)))
+  '(((a b c)))
   (context-result
    (push-stanza-to-result
     (push-buffer-to-stanza

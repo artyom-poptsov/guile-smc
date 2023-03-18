@@ -45,12 +45,26 @@
                context-stanza-add!
                context-stanza-clear!
                context-buffer
+               context-buffer/reversed
                context-buffer-set!
                context-buffer-add!
                context-buffer-clear!
                context-clear!
 
                ;; Actions.
+               buffer-empty?
+               pop-buffer
+               pop-stanza
+               pop-result
+               clear-buffer
+               clear-stanza
+               clear-result
+               update-counter
+               push-event-to-buffer
+               push-event-to-stanza
+               push-event-to-result
+               push-buffer-to-stanza
+               push-stanza-to-result
                action:clear-buffer
                action:update-stanza)
   #:export (<char-context>
@@ -61,15 +75,6 @@
             char-context-event-source
 
             ;; Actions.
-            clear-buffer
-            clear-stanza
-            clear-result
-            reverse-buffer
-            reverse-stanza
-            reverse-result
-            push-event-to-buffer
-            push-buffer-to-stanza
-            push-stanza-to-result
             action:syntax-error
 
             ;; All guards that are exported with 'define-public' below.
@@ -150,39 +155,6 @@ These counters are thrown when a syntax error occurred."
 (define* (reverse-result context #:optional event)
   (context-result-set! context (reverse (context-result context)))
   context)
-
-
-
-(define (push-event-to-buffer context event)
-  "Push a new EVENT in a CONTEXT buffer."
-  (when (context-debug-mode? context)
-    (log-debug "push-event-to-buffer: event: ~a; buffer: ~a"
-               event
-               (context-buffer context)))
-  (context-buffer-set! context (cons event (context-buffer context)))
-  context)
-
-(define (push-buffer-to-stanza context event)
-  "Push the CONTEXT buffer contents to a CONTEXT stanza."
-  (when (context-debug-mode? context)
-    (log-debug "push-buffer-to-stanza: event: ~a; buffer: ~a; stanza: ~a"
-               event
-               (context-buffer context)
-               (context-stanza context)))
-  (context-result-set! context (cons (context-stanza context)
-                                     (context-result context)))
-  (clear-buffer context event))
-
-(define (push-stanza-to-result context event)
-  "Push the CONTEXT stanza contents to a CONTEXT result."
-  (when (context-debug-mode? context)
-    (log-debug "push-buffer-to-result: event: ~a; buffer: ~a; stanza: ~a"
-               event
-               (context-buffer context)
-               (context-stanza context)))
-  (context-result-set! context (cons (context-stanza context)
-                                     (context-result context)))
-  (clear-stanza context event))
 
 
 ;;; Event source.

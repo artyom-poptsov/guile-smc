@@ -36,9 +36,10 @@
             push-event-to-result
             push-buffer-to-stanza
             push-stanza-to-result
-            action:store
-            action:clear-buffer
-            action:update-stanza))
+            action:update-stanza
+
+            ;; Deprecated.
+            action:clear-buffer))
 
 
 
@@ -90,6 +91,11 @@
 
 (define (port-context? x)
   (is-a? x <port-context>))
+
+
+
+(define-method (context-buffer/reversed (context <port-context>))
+  (reverse (context-buffer context)))
 
 
 
@@ -176,16 +182,19 @@
   (context-result-set! context (cons event (context-result context)))
   context)
 
-(define (push-buffer-to-stanza context event)
+(define* (push-buffer-to-stanza context #:optional event)
   "Push the CONTEXT buffer contents to a CONTEXT stanza."
   (when (context-debug-mode? context)
     (log-debug "push-buffer-to-stanza: event: ~a; buffer: ~a; stanza: ~a"
                event
                (context-buffer context)
                (context-stanza context)))
-  (context-stanza-set! context (cons (context-buffer context)
-                                     (context-stanza context)))
-  (clear-buffer context event))
+  (if (buffer-empty? context)
+      context
+      (begin
+        (context-stanza-set! context (cons (context-buffer/reversed context)
+                                           (context-stanza context)))
+        (clear-buffer context event))))
 
 (define (push-stanza-to-result context event)
   "Push the CONTEXT stanza contents to a CONTEXT result."
@@ -194,7 +203,7 @@
                event
                (context-buffer context)
                (context-stanza context)))
-  (context-result-set! context (cons (context-stanza context)
+  (context-result-set! context (cons (context-stanza/reversed context)
                                      (context-result context)))
   (clear-stanza context event))
 
@@ -222,25 +231,13 @@
   (context-buffer-clear! ctx)
   (context-stanza-clear! ctx))
 
-
-;;; Actions.
-
-(define (update-counter ctx event)
+(define* (update-counter ctx #:optional event)
   (context-counter-update! ctx))
 
-(define (push-event-to-buffer context event)
-  "Push a new EVENT in a CONTEXT buffer."
-  (when (context-debug-mode? context)
-    (log-debug "push-to-buffer: event: ~a; buffer: ~a"
-               event
-               (context-buffer context)))
-  (context-buffer-set! context (cons event (context-buffer context)))
-  context)
+
+;;; Deprecated.
 
-(define (action:clear-buffer ctx event)
-  "Clear the context CTX buffer."
-  (context-buffer-clear! ctx)
-  ctx)
+(define action:clear-buffer clear-buffer)
 
 (define (action:update-stanza ctx event)
   "Copy the context CTX buffer to the stanza, clear the buffer."
