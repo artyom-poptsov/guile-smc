@@ -62,7 +62,7 @@
                                  "@startuml\n"
                                  "[*] -> state_1\n"
                                  "@enduml\n"))
-                               #:debug-mode? #t)))
+                               #:debug-mode? #f)))
     (equal? (fsm-current-state fsm) (fsm-state fsm 'state_1))))
 
 (test-assert "puml-string->fsm: a transition with guard"
@@ -72,7 +72,7 @@
                                  "[*] -> state_1\n"
                                  "state_1 --> state_1: guard:#t\n"
                                  "@enduml\n"))
-                               #:debug-mode? #t)))
+                               #:debug-mode? #f)))
     (and (equal? (fsm-current-state fsm) (fsm-state fsm 'state_1))
          (equal? guard:#t
                  (car (car (state-transitions
@@ -85,7 +85,7 @@
                                   "[*] -> state_1\n"
                                   "state_1 --> state_1: guard:#t -> action:no-op\n"
                                   "@enduml\n"))
-                                #:debug-mode? #t))
+                                #:debug-mode? #f))
          (state (fsm-state fsm 'state_1)))
     (and (equal? (fsm-current-state fsm) state)
          (equal? guard:#t (car (car (state-transitions state))))
@@ -129,7 +129,7 @@
                                  "@enduml\n"))
                                #:module (list (resolve-module '(test-context))
                                               (current-module))
-                               #:debug-mode? #t)))
+                               #:debug-mode? #f)))
     (state-event-source (fsm-state fsm 'state_1))))
 
 (test-equal "puml-string->fsm: an FSM with an entry action"
@@ -145,7 +145,7 @@
                                  "@enduml\n"))
                                #:module (list (resolve-module '(test-context))
                                               (current-module))
-                               #:debug-mode? #t)))
+                               #:debug-mode? #f)))
     (state-entry-action (fsm-state fsm 'state_1))))
 
 (test-equal "puml-string->fsm: an FSM with an exit action"
@@ -161,7 +161,7 @@
                                  "@enduml\n"))
                                #:module (list (resolve-module '(test-context))
                                               (current-module))
-                               #:debug-mode? #t)))
+                               #:debug-mode? #f)))
     (state-exit-action (fsm-state fsm 'state_1))))
 
 
