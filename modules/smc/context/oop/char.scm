@@ -59,10 +59,12 @@
                push-stanza-to-result)
   #:export (<char-context>
             char-context?
-            char-context-row
+            context-row-number
+            context-row-number-set!
             context-row-number-update!
+            context-col-number
+            context-col-number-set!
             context-col-number-update!
-            char-context-col
             char-context-update-counters!
 
             char-context-event-source
@@ -85,16 +87,16 @@
   ;; <number>
   (col-number
    #:init-value 0
-   #:getter     char-context-col
-   #:setter     char-context-col-set!)
+   #:getter     context-col-number
+   #:setter     context-col-number-set!)
 
   ;; Current text row number.
   ;;
   ;; <number>
   (row-number
    #:init-value 0
-   #:getter     char-context-row
-   #:setter     char-context-row-set!))
+   #:getter     context-row-number
+   #:setter     context-row-number-set!))
 
 
 
@@ -106,12 +108,12 @@
 (define* (context-row-number-update! context #:optional (delta 1))
   "Increment the current row number. Resets the current column number to
 zero."
-  (char-context-row-set! context (+ (char-context-row context) 1)))
+  (context-row-number-set! context (+ (context-row-number context) 1)))
 
 (define* (context-col-number-update! context #:optional (delta 1))
   "Increment the current row number. Resets the current column number to
 zero."
-  (char-context-col-set! context (+ (char-context-col context) 1)))
+  (context-col-number-set! context (+ (context-col-number context) 1)))
 
 
 
@@ -123,7 +125,7 @@ These counters are thrown when a syntax error occurred."
     (context-col-number-update! ctx)
     (when (char=? ch #\newline)
       (context-row-number-update! ctx)
-      (char-context-col-set! ctx 0))))
+      (context-col-number-set! ctx 0))))
 
 
 ;;; Event source.
@@ -139,8 +141,8 @@ These counters are thrown when a syntax error occurred."
 (define (throw-syntax-error ctx ch)
   (error "Syntax error"
          (context-port ctx)
-         (char-context-row ctx)
-         (char-context-col ctx)
+         (context-row-number ctx)
+         (context-col-number ctx)
          ch
          ctx))
 
@@ -151,8 +153,8 @@ These counters are thrown when a syntax error occurred."
 string."
   (format #f "~a:~a:~a: "
           (context-port ctx)
-          (char-context-row ctx)
-          (char-context-col ctx)))
+          (context-row-number ctx)
+          (context-col-number ctx)))
 
 (define (context-log-error ctx fmt . rest)
   (apply log-error
