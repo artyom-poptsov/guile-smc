@@ -55,6 +55,8 @@
             context-result
             context-result/reversed
             context-result-set
+            context-custom-data
+            context-custom-data-set
 
             ;; Event source.
             next-char
