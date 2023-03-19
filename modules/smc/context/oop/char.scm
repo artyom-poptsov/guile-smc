@@ -63,9 +63,7 @@
                push-event-to-stanza
                push-event-to-result
                push-buffer-to-stanza
-               push-stanza-to-result
-               action:clear-buffer
-               action:update-stanza)
+               push-stanza-to-result)
   #:export (<char-context>
             char-context?
             char-context-row
