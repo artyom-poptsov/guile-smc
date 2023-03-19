@@ -42,13 +42,9 @@
                context-stanza
                context-stanza/reversed
                context-stanza-set!
-               context-stanza-add!
-               context-stanza-clear!
                context-buffer
                context-buffer/reversed
                context-buffer-set!
-               context-buffer-add!
-               context-buffer-clear!
                push-event-to-buffer
                push-event-to-stanza
                push-event-to-result

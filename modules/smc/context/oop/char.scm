@@ -44,16 +44,11 @@
                context-stanza
                context-stanza/reversed
                context-stanza-set!
-               context-stanza-add!
-               context-stanza-clear!
                context-buffer
                context-buffer/reversed
                context-buffer-set!
-               context-buffer-add!
-               context-buffer-clear!
                context-result
                context-result-set!
-               context-clear!
 
                ;; Actions.
                buffer-empty?
@@ -137,34 +132,6 @@ These counters are thrown when a syntax error occurred."
     (%col++! ctx)
     (when (char=? ch #\newline)
       (%row++! ctx))))
-
-
-
-(define* (clear-buffer context #:optional event)
-  (context-buffer-set! context '())
-  context)
-
-(define* (clear-stanza context #:optional event)
-  (context-stanza-set! context '())
-  context)
-
-(define* (clear-result context #:optional event)
-  (context-result-set! context '())
-  context)
-
-
-
-(define* (reverse-buffer context #:optional event)
-  (context-buffer-set! context (reverse (context-buffer context)))
-  context)
-
-(define* (reverse-stanza context #:optional event)
-  (context-stanza-set! context (reverse (context-stanza context)))
-  context)
-
-(define* (reverse-result context #:optional event)
-  (context-result-set! context (reverse (context-result context)))
-  context)
 
 
 ;;; Event source.
