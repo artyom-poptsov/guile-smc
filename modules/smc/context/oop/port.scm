@@ -49,10 +49,12 @@
             context-result/reversed
             context-clear!
 
-            ;; Actions.
+            ;; Guards.
             buffer-empty?
             stanza-empty?
             result-empty?
+
+            ;; Actions.
             pop-buffer
             pop-stanza
             pop-result
