@@ -13,7 +13,6 @@
 (test-begin %test-suite-name)
 
 
-;;; Guards.
 
 (test-assert "port-context?"
   (port-context? (make <port-context>)))
@@ -41,6 +40,14 @@
 (test-equal "context-stanza/reversed"
   '(a b c)
   (context-stanza/reversed (make <port-context> #:stanza '(c b a))))
+
+(test-equal "context-result"
+  '()
+  (context-result (make <port-context>)))
+
+(test-equal "context-result/reversed"
+  '(a b c)
+  (context-result/reversed (make <port-context> #:result '(c b a))))
 
 (test-equal "context-debug-mode?"
   #f
@@ -101,6 +108,14 @@
 (test-equal "buffer-empty?: #f"
   #f
   (buffer-empty? (push-event-to-buffer (make <port-context>) 'event)))
+
+(test-equal "stanza-empty?: #t"
+  #t
+  (stanza-empty? (make <port-context>)))
+
+(test-equal "result-empty?: #t"
+  #t
+  (result-empty? (make <port-context>)))
 
 (test-equal "update-counter"
   1
