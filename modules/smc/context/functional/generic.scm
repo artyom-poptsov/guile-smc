@@ -18,6 +18,8 @@
             context-result
             context-result/reversed
             context-result-set
+            context-custom-data
+            context-custom-data-set
 
             ;; Guards.
             buffer-empty?
