@@ -139,6 +139,18 @@
   '(b c)
   (context-result (pop-result (make-context #:result '(a b c)) 'event)))
 
+
+
+(test-equal "context-custom-data"
+  '()
+  (context-custom-data (make-context)))
+
+(test-equal "context-custom-data-set"
+  '(data)
+  (context-custom-data (context-custom-data-set (make-context) '(data))))
+
+
+
 (test-error "throw-error"
   'misc-error
   (throw-error (make-context) 'event))
