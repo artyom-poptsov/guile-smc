@@ -116,6 +116,7 @@
 
 
 (define (port-context? x)
+  "Check if X is a <port-context> instance."
   (is-a? x <port-context>))
 
 
