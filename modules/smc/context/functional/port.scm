@@ -67,11 +67,6 @@
             pop-stanza
             pop-result
             update-counter
-            update-counter
-            update-result
-            update-stanza
-            reset-buffer
-            reset-stanza
             throw-error
 
             ;; Event source.
