@@ -60,8 +60,8 @@
                clear-result)
   #:export (<u8-context>
             u8-context?
-            u8-context-update-counters!
 
+            u8-context-pre-action
             u8-context-event-source
 
             ;; Actions.
@@ -84,21 +84,20 @@
   "Check if X is an <u8-context> instance."
   (is-a? x <u8-context>))
 
-;; Update counters in a character context CTX based on an incoming character
-;; CH.  These counters are thrown when a syntax error occurred.
-(define-method (u8-context-update-counters! (ctx <u8-context>) byte)
+(define (u8-context-pre-action ctx byte)
+  "Update counters in a u8 context CTX based on an incoming character CH.
+These counters are thrown when a syntax error occurred.  Return the updated
+context."
   (unless (eof-object? byte)
-    (context-counter-update! ctx)))
+    (context-counter-update! ctx))
+  ctx)
 
 
 ;;; Event source.
 
 ;; Get the next character from a CONTEXT port.
 (define-method (u8-context-event-source (context <u8-context>))
-  (let ((byte (get-u8 (context-port context))))
-    (u8-context-update-counters! context byte)
-    byte))
-
+  (get-u8 (context-port context)))
 
 
 
