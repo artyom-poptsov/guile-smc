@@ -64,17 +64,7 @@
             validate-start-tag
             validate-end-tag
             throw-unexpected-end-of-file-error
-            throw-no-start-tag-error
-
-            ;; Deprecated.
-            guard:title?
-            action:add-description
-            action:add-state-transition
-            action:process-state-description
-            action:check-start-tag
-            action:check-end-tag
-            action:no-start-tag-error
-            action:unexpected-end-of-file-error))
+            throw-no-start-tag-error))
 
 
 (define-class <puml-context> (<char-context>)
