@@ -302,7 +302,7 @@
 (define (add-state-transition ctx ch)
 
   (unless (null? (context-buffer ctx))
-    (action:update-stanza ctx ch))
+    (push-buffer-to-stanza ctx ch))
 
   (let* ((fsm     (puml-context-fsm ctx))
          (stanza  (stanza->list-of-symbols (context-stanza ctx)))

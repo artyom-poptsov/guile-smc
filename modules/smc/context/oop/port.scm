@@ -61,13 +61,7 @@
                push-stanza-to-result)
   #:export (<port-context>
             port-context?
-            context-port
-
-            ;; Actions.
-            action:update-stanza
-
-            ;; Deprecated.
-            action:clear-buffer))
+            context-port))
 
 
 
@@ -85,24 +79,5 @@
 (define (port-context? x)
   "Check if X is a <port-context> instance."
   (is-a? x <port-context>))
-
-
-;;; Deprecated.
-
-(define action:clear-buffer clear-buffer)
-
-(define (action:update-stanza ctx event)
-  "Copy the context CTX buffer to the stanza, clear the buffer."
-  (let ((buf (reverse (context-buffer ctx))))
-    (unless (null? buf)
-      (when (context-debug-mode? ctx)
-        (let ((stanza (reverse (context-stanza ctx))))
-          (log-debug "action:update-stanza: event: ~a; buffer: ~a; stanza: ~a"
-                     event
-                     buf
-                     stanza)))
-      (push-buffer-to-stanza ctx buf)
-      (clear-buffer ctx))
-    ctx))
 
 ;;; port.scm ends here.
