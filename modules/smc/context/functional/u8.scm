@@ -37,21 +37,15 @@
             make-u8-context
 
             context-debug-mode?
+            context-debug-mode-set
             context-port
 
             context-counter
             context-counter-set
             context-counter-update
-            context-row-number
-            context-row-number-set
-            context-row-number-update
-            context-col-number
-            context-col-number-set
-            context-col-number-update
             context-buffer
             context-buffer/reversed
             context-buffer-set
-            context-buffer-append
             context-stanza
             context-stanza/reversed
             context-stanza-set
@@ -60,7 +54,7 @@
             context-result-set
 
             ;; Event source.
-            next-char
+            next-u8
 
             ;; Actions.
             clear-buffer
@@ -78,9 +72,6 @@
             pop-stanza
             pop-result
             update-counter
-            update-row-number
-            update-col-number
-            reset-col-number
             throw-syntax-error
 
             ;; Logging procedures
