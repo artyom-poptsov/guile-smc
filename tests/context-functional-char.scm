@@ -14,10 +14,14 @@
 (test-begin %test-suite-name)
 
 (test-assert "%make-char-context"
-  (%make-char-context #f                   ; parent-context
-                      #f                   ; port
+  (%make-char-context (current-input-port) ; port
+                      #f                   ; debug-mode?
                       0                    ; row-number
-                      0))                  ; col-number
+                      0                    ; col-number
+                      0                    ; counter
+                      '()                  ; buffer
+                      '()                  ; stanza
+                      '()))                ; result
 
 (test-assert "make-char-context"
   (make-char-context #:port (current-input-port)

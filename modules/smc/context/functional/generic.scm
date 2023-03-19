@@ -43,41 +43,7 @@
             throw-error
 
             ;; Internal procedures.
-            %make-context
-
-            ;; Internal macros.
-            %make-parent-accessor
-            %make-parent-setter
-            %make-parent-action
-            %make-parent-guard))
-
-
-(define-macro (%make-parent-accessor name)
-  `(define (,name context)
-     (,(string->symbol (string-append "generic:" (symbol->string name)))
-      (context-parent context))))
-
-(define-macro (%make-parent-setter name)
-  `(define (,name context value)
-     (context-parent-set context
-                         (,(string->symbol (string-append "generic:"
-                                                          (symbol->string name)))
-                          (context-parent context)
-                          value))))
-
-(define-macro (%make-parent-action name)
-  `(define (,name context event)
-     (context-parent-set context
-                         (,(string->symbol (string-append "generic:"
-                                                          (symbol->string name)))
-                          (context-parent context)
-                          event))))
-
-(define-macro (%make-parent-guard name)
-  `(define* (,name context #:optional event)
-     (,(string->symbol (string-append "generic:" (symbol->string name)))
-      (context-parent context)
-      event)))
+            %make-context))
 
 
 
