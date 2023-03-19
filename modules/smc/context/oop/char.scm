@@ -68,6 +68,7 @@
             char-context-update-counters!
 
             char-context-event-source
+            char-context-pre-action
 
             ;; Actions.
             throw-syntax-error
@@ -117,24 +118,26 @@ zero."
 
 
 
-(define-method (char-context-update-counters! (ctx <char-context>) ch)
+(define (char-context-pre-action ctx ch)
   "Update counters in a character context CTX based on an incoming character CH.
-These counters are thrown when a syntax error occurred."
+These counters are thrown when a syntax error occurred.  Return the updated
+context.
+
+This procedure can be used as a pre-action for an FSM."
   (unless (eof-object? ch)
     (context-counter-update! ctx)
     (context-col-number-update! ctx)
     (when (char=? ch #\newline)
       (context-row-number-update! ctx)
-      (context-col-number-set! ctx 0))))
+      (context-col-number-set! ctx 0)))
+  ctx)
 
 
 ;;; Event source.
 
 (define-method (char-context-event-source (context <char-context>))
   "Get the next character from a CONTEXT port."
-  (let ((ch (get-char (context-port context))))
-    (char-context-update-counters! context ch)
-    ch))
+  (get-char (context-port context)))
 
 
 

@@ -126,6 +126,7 @@
                             (cdr event-source))
           (puml-context-fsm-set! puml-context
                                  (make <fsm>
+                                   #:pre-action char-context-pre-action
                                    #:event-source (cdr event-source))))
         (if (puml-context-keep-going? puml-context)
             (begin
@@ -137,6 +138,7 @@
                         event-source-name)
               (puml-context-fsm-set! puml-context
                                      (make <fsm>
+                                       #:pre-action char-context-pre-action
                                        #:event-source (const #t))))
             (puml-error puml-context
                         "Could not resolve procedure ~a in ~a"
