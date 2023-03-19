@@ -40,7 +40,9 @@
                <port-context>
                context-port
                context-counter
+               context-counter-update!
                context-stanza
+               context-stanza/reversed
                context-stanza-set!
                context-stanza-add!
                context-stanza-clear!
@@ -49,6 +51,8 @@
                context-buffer-set!
                context-buffer-add!
                context-buffer-clear!
+               context-result
+               context-result-set!
                context-clear!
 
                ;; Actions.
