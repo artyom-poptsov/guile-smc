@@ -62,6 +62,7 @@
             result-empty?
 
             ;; Actions.
+            pre-action
             clear-buffer
             clear-stanza
             clear-result
@@ -170,7 +171,7 @@
 (define (context-result/reversed context)
   (reverse (context-result context)))
 
-(define* (context-counter-update context #:optional (delta 1))
+(define* (context-counter-update context #:key (delta 1))
   (context-counter-set context (+ (context-counter context) delta)))
 
 
@@ -271,8 +272,13 @@ Return the updated context."
 
 
 
-(define* (context-counter-update context #:key (delta 1))
-  (context-counter-set context (+ (context-counter context) delta)))
+(define (pre-action context byte)
+  "Update counters in a character CONTEXT based on an incoming BYTE.
+These counters are thrown when a syntax error occurred.  Return the updated
+context.
+
+This procedure can be used as a pre-action for an FSM."
+  (update-counter context))
 
 
 ;;; Logging.
