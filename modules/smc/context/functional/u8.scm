@@ -50,6 +50,8 @@
             context-result
             context-result/reversed
             context-result-set
+            context-custom-data
+            context-custom-data-set
 
             ;; Event source.
             next-u8
@@ -94,7 +96,8 @@
                     counter
                     buffer
                     stanza
-                    result)
+                    result
+                    custom-data)
   u8-context?
 
   ;; Flag that specifies whether the debug mode for the context is enabled.
@@ -125,7 +128,11 @@
   ;; Context result to store the end result of the parser.
   ;;
   ;; <list>
-  (result      context-result      context-result-set))
+  (result      context-result      context-result-set)
+
+  ;; Context custom data that can be used by the custom contexts to store
+  ;; different things such as ports or some data structures.
+  (custom-data context-custom-data context-custom-data-set))
 
 (define* (make-u8-context #:key
                             (port (current-input-port))
@@ -133,13 +140,15 @@
                             (counter 0)
                             (buffer '())
                             (stanza '())
-                            (result '()))
+                            (result '())
+                            (custom-data '()))
   (%make-u8-context debug-mode?
                     port
                     counter
                     buffer
                     stanza
-                    result))
+                    result
+                    custom-data))
 
 
 

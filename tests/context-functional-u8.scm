@@ -13,22 +13,14 @@
 (configure-test-logging! %test-suite-name)
 (test-begin %test-suite-name)
 
-(test-assert "%make-u8-context"
-  (%make-u8-context #f                   ; debug-mode?
-                    (current-input-port) ; port
-                    0                    ; counter
-                    '()                  ; buffer
-                    '()                  ; stanza
-                    '()))                ; result
-
-
 (test-assert "make-u8-context"
   (make-u8-context #:port (current-input-port)
                    #:debug-mode? #f
                    #:counter 0
                    #:buffer '()
                    #:stanza '()
-                   #:result '()))
+                   #:result '()
+                   #:custom-data '()))
 
 (test-equal "update-counter-update"
   2
