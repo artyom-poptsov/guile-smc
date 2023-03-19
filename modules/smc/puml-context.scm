@@ -455,16 +455,4 @@
                                     new-description))))
     (clear-stanza (clear-buffer ctx ch) ch)))
 
-
-;; Deprecated procedures.
-
-(define guard:title? title?)
-(define action:add-description add-description)
-(define action:check-end-tag validate-end-tag)
-(define action:check-start-tag validate-start-tag)
-(define action:no-start-tag-error throw-no-start-tag-error)
-(define action:unexpected-end-of-file-error throw-unexpected-end-of-file-error)
-(define action:process-state-description process-state-description)
-(define action:add-state-transition add-state-transition)
-
 ;;; puml-context.scm ends here.

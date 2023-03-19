@@ -75,7 +75,7 @@
 
 
 
-(test-assert "guard:title?: #t"
+(test-assert "title?: #t"
   (let ((ctx (make <puml-context>
                #:port             (current-input-port)
                #:fsm-event-source 'test-event-source
@@ -83,7 +83,7 @@
                                         (current-module)))))
     (for-each (lambda (ch) (push-event-to-buffer ctx ch))
               (string->list "title"))
-    (guard:title? ctx #\space)))
+    (title? ctx #\space)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
