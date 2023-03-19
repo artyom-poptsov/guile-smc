@@ -68,6 +68,7 @@
                action:clear-buffer
                action:update-stanza)
   #:export (<char-context>
+            char-context?
             char-context-row
             char-context-col
             char-context-update-counters!
@@ -102,6 +103,11 @@
    #:init-value 0
    #:getter     char-context-row
    #:setter     char-context-row-set!))
+
+
+
+(define (char-context? x)
+  (is-a? x <char-context>))
 
 
 
