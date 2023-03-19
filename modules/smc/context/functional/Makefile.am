@@ -21,7 +21,6 @@ include $(top_srcdir)/build-aux/am/guile.am
 
 SOURCES = \
 	generic.scm		\
-	port.scm		\
 	char.scm		\
 	u8.scm
 
