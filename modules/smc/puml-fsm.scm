@@ -8,7 +8,7 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6198
+;;;   step-counter:              6197
 ;;;   transition-counter:         788
 ;;;
 ;;; Resolver status:
@@ -28,10 +28,10 @@
 ;;;     #<procedure char:single-quote? (ctx ch2)>
 ;;;     #<procedure char:space? (ctx ch2)>
 ;;;   #<directory (smc context oop char)>
-;;;     #<procedure throw-syntax-error (ctx ch)>
 ;;;     #<procedure clear-buffer (context #:optional event)>
 ;;;     #<procedure push-buffer-to-stanza (context #:optional event)>
 ;;;     #<procedure push-event-to-buffer (context event)>
+;;;     #<procedure throw-syntax-error (ctx ch)>
 ;;;   #<directory (smc puml-context)>
 ;;;     #<<generic> char-context-event-source (1)>
 ;;;     #<procedure add-description (ctx ch)>

@@ -45,7 +45,7 @@ read_title -> read_title: guard:#t -> push-event-to-buffer
 
 read_state: Read a PlantUML stanza.
 read_state --> [*]: char:eof-object?
-read_state --> [*]: char:newline? -> action:syntax-error
+read_state --> [*]: char:newline? -> throw-syntax-error
 read_state --> search_state_transition: char:right-square-bracket? -> push-buffer-to-stanza
 read_state --> search_state_transition: char:space? -> push-buffer-to-stanza
 read_state --> read_state_description: char:colon? -> push-buffer-to-stanza
