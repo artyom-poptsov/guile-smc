@@ -13,19 +13,13 @@
 (configure-test-logging! %test-suite-name)
 (test-begin %test-suite-name)
 
-(test-assert "%make-context"
-  (%make-context #f                   ; debug-mode?
-                 0                    ; counter
-                 '()                  ; buffer
-                 '()                  ; stanza
-                 '()))                ; result
-
 (test-assert "make-context"
   (make-context #:debug-mode? #f
                 #:counter 0
                 #:buffer '()
                 #:stanza '()
-                #:result '()))
+                #:result '()
+                #:custom-data '()))
 
 
 (test-assert "context?"

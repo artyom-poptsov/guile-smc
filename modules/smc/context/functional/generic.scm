@@ -48,7 +48,7 @@
 
 
 (define-immutable-record-type <context>
-  (%make-context debug-mode? counter buffer stanza result)
+  (%make-context debug-mode? counter buffer stanza result custom-data)
   context?
 
   ;; Flag that specifies whether the debug mode for the context is enabled.
@@ -74,7 +74,11 @@
   ;; Context result to store the end result of the parser.
   ;;
   ;; <list>
-  (result      context-result      context-result-set))
+  (result      context-result      context-result-set)
+
+  ;; Context custom data that can be used by the custom contexts to store
+  ;; different things such as ports or some data structures.
+  (custom-data context-custom-data context-custom-data-set))
 
 
 (define* (make-context #:key
@@ -82,13 +86,15 @@
                        (counter 0)
                        (buffer '())
                        (stanza '())
-                       (result '()))
+                       (result '())
+                       (custom-data '()))
   "<context> constructor."
   (%make-context debug-mode?
                  counter
                  buffer
                  stanza
-                 result))
+                 result
+                 custom-data))
 
 
 
