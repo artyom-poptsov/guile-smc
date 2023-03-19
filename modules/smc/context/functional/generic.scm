@@ -19,6 +19,11 @@
             context-result/reversed
             context-result-set
 
+            ;; Guards.
+            buffer-empty?
+            stanza-empty?
+            result-empty?
+
             ;; Actions.
             clear-buffer
             clear-stanza
@@ -202,6 +207,15 @@ Return the updated context."
 (define* (pop-result context #:optional event)
   "Remove the last element of CONTEXT result.  Return the updated context."
   (context-result-set context (cdr (context-result context))))
+
+(define* (buffer-empty? context #:optional event)
+  (null? (context-buffer context)))
+
+(define* (stanza-empty? context #:optional event)
+  (null? (context-stanza context)))
+
+(define* (result-empty? context #:optional event)
+  (null? (context-result context)))
 
 
 ;;; Error reporting.

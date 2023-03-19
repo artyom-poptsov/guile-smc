@@ -86,6 +86,20 @@
 
 
 
+(test-equal "buffer-empty?: #t"
+  #t
+  (buffer-empty? (make-context)))
+
+(test-equal "stanza-empty?: #t"
+  #t
+  (stanza-empty? (make-context)))
+
+(test-equal "result-empty?: #t"
+  #t
+  (result-empty? (make-context)))
+
+
+
 (test-equal "reverse-buffer"
   '(a b c)
   (context-buffer (reverse-buffer (make-context #:buffer '(c b a)))))
