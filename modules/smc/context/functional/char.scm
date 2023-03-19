@@ -197,9 +197,6 @@
 (define (context-result/reversed context)
   (reverse (context-result context)))
 
-(define* (context-counter-update context #:optional (delta 1))
-  (context-counter-set context (+ (context-counter context) delta)))
-
 
 
 (define (next-char context)
