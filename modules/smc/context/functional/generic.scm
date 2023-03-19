@@ -110,15 +110,19 @@
 
 
 (define (context-buffer/reversed context)
+  "Return the reversed CONTEXT buffer."
   (reverse (context-buffer context)))
 
 (define (context-stanza/reversed context)
+  "Return the reversed CONTEXT stanza."
   (reverse (context-stanza context)))
 
 (define (context-result/reversed context)
+  "Return the reversed CONTEXT result."
   (reverse (context-result context)))
 
 (define* (context-counter-update context #:optional (delta 1))
+  "Increment the CONTEXT counter by DELTA value.  Return the updated CONTEXT."
   (context-counter-set context (+ (context-counter context) delta)))
 
 
@@ -141,12 +145,15 @@
   (context-counter-update context))
 
 (define* (reverse-buffer context #:optional event)
+  "Reverse the CONTEXT buffer.  Return the updated context."
   (context-buffer-set context (reverse (context-buffer context))))
 
 (define* (reverse-stanza context #:optional event)
+  "Reverse the CONTEXT stanza.  Return the updated context."
   (context-stanza-set context (reverse (context-stanza context))))
 
 (define* (reverse-result context #:optional event)
+  "Reverse the CONTEXT result.  Return the updated context."
   (context-result-set context (reverse (context-result context))))
 
 (define (push-event-to-buffer context event)
@@ -190,12 +197,15 @@ Return the updated context."
   (context-result-set context (cdr (context-result context))))
 
 (define* (buffer-empty? context #:optional event)
+  "Check if CONTEXT buffer is empty."
   (null? (context-buffer context)))
 
 (define* (stanza-empty? context #:optional event)
+  "Check if CONTEXT stanza is empty."
   (null? (context-stanza context)))
 
 (define* (result-empty? context #:optional event)
+  "Check if CONTEXT result is empty."
   (null? (context-result context)))
 
 
