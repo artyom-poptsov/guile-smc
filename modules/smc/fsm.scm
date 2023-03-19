@@ -1,6 +1,6 @@
 ;;; fsm.scm -- Finite State Machine facilities for Guile-SMC.
 
-;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -124,6 +124,24 @@
    #:init-keyword #:event-source
    #:getter       fsm-event-source
    #:setter       fsm-event-source-set!)
+
+  ;; Global action that is performed on a context and event before all the
+  ;; other guards and actions.
+  ;;
+  ;; <procedure>
+  (pre-action
+   #:init-value   (lambda (context event) context)
+   #:init-keyword #:pre-action
+   #:getter       fsm-pre-action)
+
+  ;; Global action that is performed on a context and event after all the
+  ;; other guards and actions are executed in a chain.
+  ;;
+  ;; <procedure>
+  (post-action
+   #:init-value   (lambda (context event) context)
+   #:init-keyword #:post-action
+   #:getter       fsm-post-action)
 
   ;; REQUIRED.  Name of the current state.
   ;;
@@ -411,12 +429,6 @@ The procedure returns two values: new-state and new-context"
         (state-run state event context)
       (%handle-state-transition! self state next-state new-context))))
 
-(define-method (fsm-step! (self <fsm>) context)
-  (let ((state (fsm-current-state self)))
-    (receive (next-state new-context)
-        (state-run state context)
-      (%handle-state-transition! self state next-state new-context))))
-
 (define-method-with-docs (fsm-run! (fsm          <fsm>)
                                    (event-source <procedure>)
                                    context)
@@ -426,28 +438,32 @@ parameter. CONTEXT can be any Scheme object.
 
 Return the CONTEXT after FSM execution."
   (if (fsm-current-state fsm)
-      (begin
+      (let ((pre-action  (fsm-pre-action fsm))
+            (post-action (fsm-post-action fsm)))
         (fsm-log-transition #f (fsm-current-state fsm))
         (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
-          (receive (new-state new-context)
-              (fsm-step! fsm (event-source context) context)
+          (let ((event (event-source context)))
+            (receive (new-state new-context)
+                (fsm-step! fsm event (pre-action context event))
             (if new-state
-                (loop new-context)
-                context))))
+                (loop (post-action new-context event))
+                context)))))
       context))
 
 (define-method-with-docs (fsm-run! (fsm <fsm>) context)
   "This version of the 'fsm-run!' procedure uses event sources specific for
 each state."
   (if (fsm-current-state fsm)
-      (begin
+      (let ((pre-action  (fsm-pre-action fsm))
+            (post-action (fsm-post-action fsm)))
         (fsm-log-transition #f (fsm-current-state fsm))
         (let loop ((context ((state-entry-action (fsm-current-state fsm)) context)))
-          (receive (new-state new-context)
-              (fsm-step! fsm context)
-            (if new-state
-                (loop new-context)
-                context))))
+          (let ((event ((state-event-source (fsm-current-state fsm)) context)))
+            (receive (new-state new-context)
+                (fsm-step! fsm event (pre-action context event))
+              (if new-state
+                  (loop (post-action new-context event))
+                  context)))))
       context))
 
 
