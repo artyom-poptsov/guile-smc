@@ -30,7 +30,7 @@
 ;;;   #<directory (smc context oop char)>
 ;;;     #<procedure action:syntax-error (ctx ch)>
 ;;;     #<procedure clear-buffer (context #:optional event)>
-;;;     #<procedure push-buffer-to-stanza (context event)>
+;;;     #<procedure push-buffer-to-stanza (context #:optional event)>
 ;;;     #<procedure push-event-to-buffer (context event)>
 ;;;   #<directory (smc puml-context)>
 ;;;     #<<generic> char-context-event-source (1)>
