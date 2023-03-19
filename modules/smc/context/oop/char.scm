@@ -31,14 +31,7 @@
   #:use-module (smc context oop generic)
   #:use-module (smc context oop port)
   #:use-module (smc core log)
-  #:re-export (;; From (smc context oop context)
-               ;; and (smc context oop port)
-               <context>
-               context?
-               context-debug-mode?
-               context-debug-mode-set!
-               <port-context>
-               context-port
+  #:re-export (context-port
                context-counter
                context-counter-update!
                context-stanza
@@ -67,6 +60,8 @@
   #:export (<char-context>
             char-context?
             char-context-row
+            context-row-number-update!
+            context-col-number-update!
             char-context-col
             char-context-update-counters!
 
@@ -108,28 +103,27 @@
 
 
 
-(define-method (%col++! (ctx <char-context>))
-  "Increment the current text column."
-  (char-context-col-set! ctx (+ (char-context-col ctx) 1)))
-
-(define-method (%col-reset! (ctx <char-context>))
-  "Reset the current text column."
-  (char-context-col-set! ctx 0))
-
-(define-method (%row++! (ctx <char-context>))
+(define* (context-row-number-update! context #:optional (delta 1))
   "Increment the current row number. Resets the current column number to
 zero."
-  (char-context-row-set! ctx (+ (char-context-row ctx) 1))
-  (%col-reset! ctx))
+  (char-context-row-set! context (+ (char-context-row context) 1)))
+
+(define* (context-col-number-update! context #:optional (delta 1))
+  "Increment the current row number. Resets the current column number to
+zero."
+  (char-context-col-set! context (+ (char-context-col context) 1)))
+
+
 
 (define-method (char-context-update-counters! (ctx <char-context>) ch)
   "Update counters in a character context CTX based on an incoming character CH.
 These counters are thrown when a syntax error occurred."
   (unless (eof-object? ch)
     (context-counter-update! ctx)
-    (%col++! ctx)
+    (context-col-number-update! ctx)
     (when (char=? ch #\newline)
-      (%row++! ctx))))
+      (context-row-number-update! ctx)
+      (char-context-col-set! ctx 0))))
 
 
 ;;; Event source.
