@@ -78,6 +78,19 @@
   (context-result (clear-result (make-char-context #:stanza '(a b c)) 'event)))
 
 
+(test-equal "buffer-empty?: #t"
+  #t
+  (buffer-empty? (make-char-context)))
+
+(test-equal "stanza-empty?: #t"
+  #t
+  (stanza-empty? (make-char-context)))
+
+(test-equal "result-empty?: #t"
+  #t
+  (result-empty? (make-char-context)))
+
+
 ;;; reverse
 
 (test-equal "reverse-buffer"

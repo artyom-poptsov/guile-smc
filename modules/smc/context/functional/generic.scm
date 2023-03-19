@@ -48,7 +48,8 @@
             ;; Internal macros.
             %make-parent-accessor
             %make-parent-setter
-            %make-parent-action))
+            %make-parent-action
+            %make-parent-guard))
 
 
 (define-macro (%make-parent-accessor name)
@@ -71,6 +72,12 @@
                                                           (symbol->string name)))
                           (context-parent context)
                           event))))
+
+(define-macro (%make-parent-guard name)
+  `(define* (,name context #:optional event)
+     (,(string->symbol (string-append "generic:" (symbol->string name)))
+      (context-parent context)
+      event)))
 
 
 

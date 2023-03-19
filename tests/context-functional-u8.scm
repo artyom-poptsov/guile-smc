@@ -35,6 +35,19 @@
   (context-stanza (make-u8-context)))
 
 
+(test-equal "buffer-empty?: #t"
+  #t
+  (buffer-empty? (make-u8-context)))
+
+(test-equal "stanza-empty?: #t"
+  #t
+  (stanza-empty? (make-u8-context)))
+
+(test-equal "result-empty?: #t"
+  #t
+  (result-empty? (make-u8-context)))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end %test-suite-name)

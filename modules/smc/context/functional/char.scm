@@ -61,6 +61,11 @@
             ;; Event source.
             next-char
 
+            ;; Guards.
+            buffer-empty?
+            stanza-empty?
+            result-empty?
+
             ;; Actions.
             clear-buffer
             clear-stanza
@@ -160,6 +165,11 @@
 (generic:%make-parent-setter   context-stanza-set)
 (generic:%make-parent-accessor context-result)
 (generic:%make-parent-setter   context-result-set)
+
+;; Parent guards.
+(generic:%make-parent-guard buffer-empty?)
+(generic:%make-parent-guard stanza-empty?)
+(generic:%make-parent-guard result-empty?)
 
 ;; Parent actions.
 (generic:%make-parent-action push-event-to-buffer)
