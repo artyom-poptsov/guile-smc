@@ -34,6 +34,7 @@
   #:use-module (smc context char)
   #:use-module (smc context oop char)
   #:use-module (smc fsm)
+  #:re-export (throw-syntax-error)
   #:export (<puml-context>
             puml-context-fsm
             puml-context-fsm-set!
