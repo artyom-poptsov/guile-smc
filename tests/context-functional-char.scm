@@ -13,16 +13,6 @@
 (configure-test-logging! %test-suite-name)
 (test-begin %test-suite-name)
 
-(test-assert "%make-char-context"
-  (%make-char-context (current-input-port) ; port
-                      #f                   ; debug-mode?
-                      0                    ; row-number
-                      0                    ; col-number
-                      0                    ; counter
-                      '()                  ; buffer
-                      '()                  ; stanza
-                      '()))                ; result
-
 (test-assert "make-char-context"
   (make-char-context #:port (current-input-port)
                      #:debug-mode? #f
@@ -31,7 +21,8 @@
                      #:col-number 0
                      #:buffer '()
                      #:stanza '()
-                     #:result '()))
+                     #:result '()
+                     #:custom-data '()))
 
 (test-equal "context-buffer: initially must be an empty list"
   '()

@@ -104,7 +104,8 @@
                       counter
                       buffer
                       stanza
-                      result)
+                      result
+                      custom-data)
 
   char-context?
 
@@ -147,7 +148,11 @@
   ;; Context result to store the end result of the parser.
   ;;
   ;; <list>
-  (result      context-result      context-result-set))
+  (result      context-result      context-result-set)
+
+  ;; Context custom data that can be used by the custom contexts to store
+  ;; different things such as ports or some data structures.
+  (custom-data context-custom-data context-custom-data-set))
 
 (define* (make-char-context #:key
                             (port (current-input-port))
@@ -157,7 +162,8 @@
                             (col-number 0)
                             (buffer '())
                             (stanza '())
-                            (result '()))
+                            (result '())
+                            (custom-data '()))
   (%make-char-context port
                       debug-mode?
                       counter
@@ -165,7 +171,8 @@
                       col-number
                       buffer
                       stanza
-                      result))
+                      result
+                      custom-data))
 
 
 
