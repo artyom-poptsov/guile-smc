@@ -69,9 +69,6 @@
             update-counter
             throw-error
 
-            ;; Event source.
-            next-u8
-
             ;; Low-level procedures.
             %make-port-context))
 
