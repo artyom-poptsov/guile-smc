@@ -1,4 +1,4 @@
-;;; context.scm -- Guile-SMC finite state machine context.
+;;; generic.scm -- Guile-SMC finite state machine generic OOP context.
 
 ;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
@@ -66,4 +66,4 @@
 (define-method (write (context <context>) (port <port>))
   (display context port))
 
-;;; context.scm ends here.
+;;; generic.scm ends here.
