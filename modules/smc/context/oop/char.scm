@@ -73,7 +73,7 @@
             char-context-event-source
 
             ;; Actions.
-            action:syntax-error
+            throw-syntax-error
 
             ;; All guards that are exported with 'define-public' below.
 
@@ -142,7 +142,7 @@ These counters are thrown when a syntax error occurred."
 
 
 
-(define (action:syntax-error ctx ch)
+(define (throw-syntax-error ctx ch)
   (error "Syntax error"
          (context-port ctx)
          (char-context-row ctx)
