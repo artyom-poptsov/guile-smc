@@ -67,6 +67,7 @@
             result-empty?
 
             ;; Actions.
+            pre-action
             clear-buffer
             clear-stanza
             clear-result
@@ -310,6 +311,9 @@ Return the updated context."
 
 
 
+(define* (update-counter context #:optional event)
+  (context-counter-set context (+ (context-counter context) 1)))
+
 (define* (update-row-number context #:optional event)
   "Increment the CONTEXT row number.  Return the updated context.
 
@@ -326,6 +330,19 @@ Guile-SMC API."
 
 (define* (reset-col-number context #:optional event)
   (context-col-number-set context 0))
+
+
+
+(define (pre-action context char)
+  "Update counters in a character CONTEXT based on an incoming character CHAR.
+These counters are thrown when a syntax error occurred.  Return the updated
+context.
+
+This procedure can be used as a pre-action for an FSM."
+  (unless (eof-object? char)
+    (if (char=? char #\newline)
+        (reset-col-number (update-row-number (update-counter context)))
+        (update-col-number (update-row-number (update-counter context))))))
 
 
 ;;; Logging.

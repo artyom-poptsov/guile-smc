@@ -136,6 +136,20 @@
   (context-result (pop-result (make-char-context #:result '(a b c)) 'event)))
 
 
+
+(test-equal "pre-action: counter"
+  1
+  (context-counter (pre-action (make-char-context) #\a)))
+
+(test-equal "pre-action: row-number"
+  1
+  (context-row-number (pre-action (make-char-context) #\a)))
+
+(test-equal "pre-action: col-number"
+  1
+  (context-col-number (pre-action (make-char-context) #\a)))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end %test-suite-name)
