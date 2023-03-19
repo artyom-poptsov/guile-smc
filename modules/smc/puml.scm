@@ -45,14 +45,7 @@
                puml-context-unresolved-procedures
                puml-context-print-resolver-status
                resolve-procedure
-               stanza->list-of-symbols
-               action:add-description
-               action:add-state-transition
-               action:process-state-description
-               action:check-start-tag
-               action:check-end-tag
-               action:no-start-tag-error
-               action:unexpected-end-of-file-error)
+               stanza->list-of-symbols)
   #:export (puml->fsm
             puml-string->fsm))
 

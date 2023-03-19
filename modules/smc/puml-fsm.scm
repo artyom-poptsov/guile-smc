@@ -28,7 +28,7 @@
 ;;;     #<procedure char:single-quote? (ctx ch2)>
 ;;;     #<procedure char:space? (ctx ch2)>
 ;;;   #<directory (smc context oop char)>
-;;;     #<procedure action:syntax-error (ctx ch)>
+;;;     #<procedure throw-syntax-error (ctx ch)>
 ;;;     #<procedure clear-buffer (context #:optional event)>
 ;;;     #<procedure push-buffer-to-stanza (context #:optional event)>
 ;;;     #<procedure push-event-to-buffer (context event)>
@@ -225,7 +225,7 @@
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object? ,action:no-op #f)
-       (,char:newline? ,action:syntax-error #f)
+       (,char:newline? ,throw-syntax-error #f)
        (,char:right-square-bracket?
         ,push-buffer-to-stanza
         search_state_transition)
