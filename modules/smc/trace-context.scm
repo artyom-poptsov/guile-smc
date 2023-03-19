@@ -6,6 +6,7 @@
   #:use-module (smc core common)
   #:use-module (smc context common)
   #:use-module (smc context char)
+  #:use-module (smc context oop generic)
   #:use-module (smc context oop char)
   #:re-export (guard:#t
                char:eof-object?
