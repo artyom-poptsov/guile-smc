@@ -46,10 +46,13 @@
             context-buffer-clear!
             context-result
             context-result-set!
+            context-result/reversed
             context-clear!
 
             ;; Actions.
             buffer-empty?
+            stanza-empty?
+            result-empty?
             pop-buffer
             pop-stanza
             pop-result
@@ -118,11 +121,16 @@
 (define (port-context? x)
   "Check if X is a <port-context> instance."
   (is-a? x <port-context>))
-
 
 
 (define-method (context-buffer/reversed (context <port-context>))
   (reverse (context-buffer context)))
+
+(define-method (context-stanza/reversed (context <port-context>))
+  (reverse (context-stanza context)))
+
+(define-method (context-result/reversed (context <port-context>))
+  (reverse (context-result context)))
 
 
 
@@ -132,14 +140,16 @@
 (define-method (context-counter-update! (ctx <port-context>))
   (context-counter-update! ctx 1))
 
-(define-method (context-buffer/reversed (context <port-context>))
-  (reverse (context-buffer context)))
-
-(define-method (context-stanza/reversed (context <port-context>))
-  (reverse (context-stanza context)))
+
 
 (define* (buffer-empty? context #:optional event)
   (null? (context-buffer context)))
+
+(define* (stanza-empty? context #:optional event)
+  (null? (context-stanza context)))
+
+(define* (result-empty? context #:optional event)
+  (null? (context-result context)))
 
 
 
