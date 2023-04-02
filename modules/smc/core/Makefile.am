@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -33,7 +33,6 @@ EXTRA_DIST += \
 moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/core/
 godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/core/
 
-LOGGER_BINARY = $(shell which logger)
 config_substitute = sed -e 's,[@]LOGGER_BINARY[@],$(LOGGER_BINARY),g'
 config.scm: config.scm.in
 	@echo "  GEN      $@"

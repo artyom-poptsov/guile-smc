@@ -3,7 +3,7 @@ dnl   Process this file with autoconf to produce configure.
 dnl
 
 define(GUILE_SMC_CONFIGURE_COPYRIGHT, [[
-Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 
 This file is part of Guile-SMC.
 
@@ -80,6 +80,8 @@ AS_IF([test x"$MAKEINFO_CHECK" != x"yes"],
 
 AC_CONFIG_FILES([pre-inst-env:build-aux/pre-inst-env.in],
         [chmod +x pre-inst-env])
+
+AC_PATH_PROG(LOGGER_BINARY, [logger])
 
 # Generate a Makefile, based on the results.
 AC_OUTPUT
