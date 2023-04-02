@@ -187,6 +187,8 @@ code as a list."
               (log-debug "fsm-get-context-code Reading module ~a/~a ... done"
                          path
                          module-name)
+              (when (null? result)
+                (error "Module is empty" path module-name))
               (reverse result))))))
 
   (let ((core-path    (string-append guile-smc-modules-path "core"))
