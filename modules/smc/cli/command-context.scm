@@ -145,9 +145,11 @@ context."
 
 (define (get-module-exports defmod)
   "Get all the exports from a module definition DEFMOD as a list."
-  (if (equal? (car defmod) '#:export)
-      (cadr defmod)
-      (get-module-exports (cdr defmod))))
+  (if (null? defmod)
+      '()
+      (if (equal? (car defmod) '#:export)
+          (cadr defmod)
+          (get-module-exports (cdr defmod)))))
 
 (define (generate-smc-context core-modules-path module output-port)
   "Generate a Guile-SMC context that can server as intermediate module for the
