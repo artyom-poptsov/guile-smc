@@ -188,8 +188,7 @@ code as a list."
     `(,@(read-module core-path "config.scm")
       ,@(read-module core-path "common.scm")
       ,@(read-module core-path "log.scm")
-      ,@(read-module context-path "context.scm")
-      ,@(read-module context-path "port.scm")
+      ,@(read-module context-path "common.scm")
       ,@(read-module context-path "char.scm")
       ,@(read-module context-path "u8.scm"))))
 
