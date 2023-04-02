@@ -245,7 +245,7 @@ specified OUTPUT-PORT."
                                         'core-modules-path
                                         %guile-smc-modules-directory))
          (extra-modules    (option-ref options 'use-modules #f))
-         (module           (option-ref options 'module    #f))
+         (module           (option-ref options 'module    "(context)"))
          (resolve?         (option-ref options 'resolve   #f))
          (generate?        (option-ref options 'generate  #f))
          (standalone?      (option-ref options 'standalone #f))
