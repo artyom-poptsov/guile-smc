@@ -173,10 +173,9 @@ specified OUTPUT-PORT."
     (pretty-print `(define-module ,(eval-string
                                     (string-append "(quote " module ")"))
                      #:use-module (smc core common)
-                     #:use-module (smc context context)
-                     #:use-module (smc context port)
-                     #:use-module (smc context char-context)
-                     #:use-module (smc context binary)
+                     #:use-module (smc context common)
+                     #:use-module (smc context u8)
+                     #:use-module (smc context char)
                      #:use-module (smc core config)
                      #:use-module (smc core log)
                      #:re-export ,exports))))
