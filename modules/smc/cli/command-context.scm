@@ -188,6 +188,8 @@ derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
   (write-header output-port)
   (newline)
+  (log-debug "generate-smc-context/standalone: Core modules path: ~a"
+             core-modules-path)
   (let* ((context-code (fsm-get-context-code core-modules-path
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
