@@ -26,7 +26,9 @@
 (define-module (smc context u8)
   #:use-module (smc context common)
   #:re-export (guard:#t
-               action:no-op))
+               action:no-op)
+  #:export(u8:make-char-guard
+           u8:make-charset-guard))
 
 
 ;; Make a procedure that checks if a CH1 equals to CH2.
