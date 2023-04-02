@@ -168,6 +168,9 @@ neither in the DEFINITIONS nor HARDWIRED-DEFINITIONS lists."
   "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the
 code as a list."
   (define (read-module path module-name)
+    (log-debug "fsm-get-context-code: Reading module ~a/~a ..."
+               path
+               module-name)
     (let ((port (open-input-file (string-append path "/" module-name))))
 
       (when skip-define-module?
@@ -181,6 +184,9 @@ code as a list."
                   (cons sexp result))
             (begin
               (close port)
+              (log-debug "fsm-get-context-code Reading module ~a/~a ... done"
+                         path
+                         module-name)
               (reverse result))))))
 
   (let ((core-path    (string-append guile-smc-modules-path "core"))
