@@ -6,5 +6,5 @@
              (custom-fsm))
 
 (define (main args)
-  (display (run-fsm 0))
+  (display (fsm-run! (make <custom-fsm>) 0))
   (newline))
