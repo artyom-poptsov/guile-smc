@@ -23,7 +23,12 @@ There are three procedures exported from the module:
 You have two choices of how to run this example.  The first option is to
 compile the finite-state machine from the =fsm.puml= file like follows:
 #+BEGIN_EXAMPLE shell
-$ cat fsm.puml | smc compile -L .  -U "((context))" -m "(custom-fsm)" > custom-fsm.scm
+$ smc compile -L .  -U "((context))" -m "(custom-fsm)" fsm.puml > custom-fsm.scm
+#+END_EXAMPLE
+
+Standalone target:
+#+BEGIN_EXAMPLE shell
+$ smc compile -L .  -U "((context))" -m "(custom-fsm)" -t guile-standalone fsm.puml > custom-fsm.scm
 #+END_EXAMPLE
 
 After the compilation you can run the FSM like this:
