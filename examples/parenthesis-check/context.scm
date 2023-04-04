@@ -1,12 +1,12 @@
 (define-module (context)
   #:use-module (oop goops)
   #:use-module (ice-9 textual-ports)
-  #:use-module (smc context char-context)
+  #:use-module (smc context char)
   #:re-export (guard:#t
-               guard:semicolon?
-               guard:double-quote?
-               guard:newline?
-               guard:eof-object?
+               char:semicolon?
+               char:double-quote?
+               char:newline?
+               char:eof-object?
                action:no-op)
   #:export (event-source
             action:count

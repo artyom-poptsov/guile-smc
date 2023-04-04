@@ -1,16 +1,16 @@
 @startuml
 [*] --> DEFAULT
 DEFAULT: Count parenthesis.
-DEFAULT --> [*]: guard:eof-object? -> action:validate
-DEFAULT --> COMMENT: guard:semicolon?
-DEFAULT --> STRING: guard:double-quote?
+DEFAULT --> [*]: char:eof-object? -> action:validate
+DEFAULT --> COMMENT: char:semicolon?
+DEFAULT --> STRING: char:double-quote?
 DEFAULT --> DEFAULT: guard:#t -> action:count
 
 COMMENT: Skip a comment.
-COMMENT --> DEFAULT: guard:newline?
+COMMENT --> DEFAULT: char:newline?
 COMMENT --> COMMENT
 
 STRING: Skip a string.
-STRING --> DEFAULT: guard:double-quote?
+STRING --> DEFAULT: char:double-quote?
 STRING -> STRING
 @enduml
