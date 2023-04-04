@@ -58,6 +58,7 @@ AC_CONFIG_FILES([
         build-aux/Makefile
         build-aux/m4/Makefile
         examples/png/Makefile
+        examples/parenthesis-check/Makefile
         modules/smc/Makefile
         modules/smc/core/Makefile
         modules/smc/compiler/Makefile
