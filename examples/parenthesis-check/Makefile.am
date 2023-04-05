@@ -57,7 +57,7 @@ custom-fsm.scm: fsm.puml
 	--target guile-standalone \
 	--fsm-name ini-fsm \
 	--fsm-module "(custom-fsm)" \
-	--validate
+	--validate \
 	$< > $@
 
 CLEANFILES = \
