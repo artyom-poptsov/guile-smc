@@ -1,6 +1,6 @@
 ;;; command-compile.scm -- Guile-SMC 'smc compile' command.
 
-;; Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
   #:use-module (smc fsm)
   #:use-module (smc puml)
   #:use-module (smc cli common)
+  #:use-module (smc config)
   #:export (command-compile))
 
 
@@ -74,6 +75,8 @@ Options:
                       \"file=/tmp/smc.log\"
   --load-path, -L <paths>
                     Add a paths separated by a colon to load paths.
+  --guile-smc-path <path>
+                    The path to Guile-SMC modules.
   --modules, -U <extra-modules>
                     Load additional modules.  The value must be the same
                     as for 'use-modules'.  Example value:
@@ -101,6 +104,7 @@ Options:
     (log-driver                                 (value #t))
     (log-opt                                    (value #t))
     (load-path                (single-char #\L) (value #t))
+    (guile-smc-path                             (value #t))
     (modules                  (single-char #\U) (value #t))
     (fsm-name                 (single-char #\n) (value #t))
     (fsm-module               (single-char #\m) (value #t))
@@ -114,6 +118,8 @@ Options:
          (log-driver       (option-ref options 'log-driver "syslog"))
          (log-opt          (cli-options->alist
                             (option-ref options 'log-opt "")))
+         (guile-smc-path   (option-ref options 'guile-smc-path
+                                       %guile-smc-modules-directory))
          (module           (option-ref options 'fsm-module #f))
          (extra-modules    (option-ref options 'modules    #f))
          (target           (option-ref options 'target     "guile"))
@@ -167,6 +173,7 @@ Options:
           (fsm-compile fsm
                        #:fsm-name      name
                        #:fsm-module    fsm-module
+                       #:modules-path  guile-smc-path
                        #:extra-modules fsm-extra-modules-rewritten
                        #:target        (string->symbol target))))))))
 
