@@ -56,7 +56,7 @@ custom-fsm.scm: fsm.puml
 	-U "((context))" \
 	--guile-smc-path $(abs_top_srcdir)/modules/smc/ \
 	--target guile-standalone \
-	--fsm-name ini-fsm \
+	--fsm-name custom-fsm \
 	--fsm-module "(custom-fsm)" \
 	--validate \
 	$< > $@
