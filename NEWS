@@ -7,6 +7,10 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
+
+* Unreleased
+** =smc compile=
+*** Now handles "--guile-smc-path" option
 * Version 0.5.2 (2022-09-02)
 ** Bugfixes
 *** =smc context=: Add missing =(smc core config)= to the FSM context
