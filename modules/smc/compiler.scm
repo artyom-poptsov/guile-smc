@@ -124,7 +124,7 @@
                                        fsm-module
                                        extra-modules
                                        output-port
-                                       (core-modules-path %guile-smc-modules-directory)
+                                       (modules-path %guile-smc-modules-directory)
                                        (optimize? #t))
   (write-header output-port)
 
@@ -147,7 +147,7 @@
   (newline output-port)
   (form-feed output-port)
 
-  (let ((context-code (fsm-get-context-code core-modules-path))
+  (let ((context-code (fsm-get-context-code modules-path))
         (fsm-code     (fsm->standalone-code fsm fsm-name)))
     (for-each (lambda (sexp)
                 (if (equal? (car sexp) 'define-module)
@@ -196,7 +196,7 @@
                         #:output-port   output-port))
     ((guile-standalone)
      (fsm-compile/guile-standalone fsm
-                                   #:core-modules-path core-modules-path
+                                   #:modules-path  core-modules-path
                                    #:fsm-name      fsm-name
                                    #:fsm-module    fsm-module
                                    #:extra-modules extra-modules
