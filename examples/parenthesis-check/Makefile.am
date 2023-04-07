@@ -54,7 +54,7 @@ custom-fsm.scm: fsm.puml
 	--log-driver null \
 	-L "$(top_srcdir)/modules:." \
 	-U "((context))" \
-	--guile-smc-path $(abs_top_srcdir)/modules/ \
+	--guile-smc-path $(abs_top_srcdir)/modules/smc/ \
 	--target guile-standalone \
 	--fsm-name ini-fsm \
 	--fsm-module "(custom-fsm)" \
