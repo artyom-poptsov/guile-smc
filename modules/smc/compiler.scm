@@ -177,7 +177,7 @@
                       (fsm-name      'custom-fsm)
                       (fsm-module    #f)
                       (extra-modules '())
-                      (core-modules-path %guile-smc-modules-directory)
+                      (modules-path  %guile-smc-modules-directory)
                       (target        'guile)
                       (output-port   (current-output-port)))
 
@@ -196,7 +196,7 @@
                         #:output-port   output-port))
     ((guile-standalone)
      (fsm-compile/guile-standalone fsm
-                                   #:modules-path  core-modules-path
+                                   #:modules-path  modules-path
                                    #:fsm-name      fsm-name
                                    #:fsm-module    fsm-module
                                    #:extra-modules extra-modules
