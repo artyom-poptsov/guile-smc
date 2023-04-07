@@ -180,6 +180,8 @@
                       (modules-path  %guile-smc-modules-directory)
                       (target        'guile)
                       (output-port   (current-output-port)))
+  "Compile an FSM for the specified TARGET and print the result to an
+OUTPUT-PORT.  Use an FSM-NAME as the name of the output FSM."
 
   (when (fsm-event-source-anonymous? fsm)
     (let ((error-message
