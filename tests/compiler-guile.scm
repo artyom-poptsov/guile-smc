@@ -24,6 +24,29 @@
     (lambda ()
       (write-define-class '<test> (current-output-port)))))
 
+(test-equal "write-module"
+  (string-join
+   (list
+    "(define-module"
+    "  (test module)"
+    "  #:use-module"
+    "  (oop goops)"
+    "  #:use-module"
+    "  (smc fsm)"
+    "  #:re-export"
+    "  (fsm-run!)"
+    "  #:export"
+    "  (test))"
+    ""
+    "")
+   "\n")
+  (with-output-to-string
+    (lambda ()
+      (write-module '(test module)
+                    #:extra-modules '()
+                    #:class-name 'test
+                    #:port (current-output-port)))))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
