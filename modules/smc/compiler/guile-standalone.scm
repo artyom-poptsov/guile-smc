@@ -164,7 +164,10 @@ neither in the DEFINITIONS nor HARDWIRED-DEFINITIONS lists."
               (main-loop (cdr defs)
                          result))))))
 
-(define* (fsm-get-context-code guile-smc-modules-path #:key (skip-define-module? #t))
+(define* (fsm-get-context-code guile-smc-modules-path
+                               #:key
+                               (type #f)
+                               (skip-define-module? #t))
   "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the
 code as a list."
   (define (read-module path module-name)
@@ -191,14 +194,31 @@ code as a list."
                 (error "Module is empty" path module-name))
               (reverse result))))))
 
-  (let ((core-path    (string-append guile-smc-modules-path "core"))
-        (context-path (string-append guile-smc-modules-path "context")))
-    `(,@(read-module core-path "config.scm")
-      ,@(read-module core-path "common.scm")
-      ,@(read-module core-path "log.scm")
-      ,@(read-module context-path "common.scm")
-      ,@(read-module context-path "char.scm")
-      ,@(read-module context-path "u8.scm"))))
+  (let* ((core-path    (string-append guile-smc-modules-path "core"))
+         (context-path (string-append guile-smc-modules-path "context"))
+         (common-context-code
+          `(,@(read-module core-path "config.scm")
+            ,@(read-module core-path "common.scm")
+            ,@(read-module core-path "log.scm")
+            ,@(read-module context-path "common.scm")
+            ,@(read-module context-path "char.scm")
+            ,@(read-module context-path "u8.scm"))))
+    (case type
+      ((oop)
+       (append
+        common-context-code
+        `(,@(read-module context-path "oop/generic.scm")
+          ,@(read-module context-path "oop/port.scm")
+          ,@(read-module context-path "oop/char.scm")
+          ,@(read-module context-path "oop/u8.scm"))))
+      ((functional)
+       (append
+        common-context-code
+        `(,@(read-module context-path "functional/generic.scm")
+          ,@(read-module context-path "functional/char.scm")
+          ,@(read-module context-path "functional/u8.scm"))))
+      (else
+       common-context-code))))
 
 (define (fsm-get-class-code fsm-name)
   (let ((cname (string->symbol (format #f "<~a>" fsm-name))))
