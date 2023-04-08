@@ -2,6 +2,7 @@
 
 (use-modules (srfi srfi-64)
              (srfi srfi-26)
+             (srfi srfi-1)
              (oop goops)
              (smc fsm)
              (smc compiler guile-standalone)
@@ -39,6 +40,19 @@
                               (define (f2 x) (f1 x))
                               (define (f3 x) x))
                             '(f3)))
+
+(test-assert "fsm-get-context-code: type: #f"
+  (find (lambda (exp)
+          (and (equal? (car exp) 'define)
+               (equal? (cadr exp) '(action:no-op ctx event))))
+        (fsm-get-context-code (string-append (getenv "abs_top_srcdir") "/modules/smc/"))))
+
+(test-assert "fsm-get-context-code: type: oop"
+  (find (lambda (exp)
+          (and (equal? (car exp) 'define-class)
+               (equal? (cadr exp) '<char-context>)))
+        (fsm-get-context-code (string-append (getenv "abs_top_srcdir") "/modules/smc/")
+                              #:type 'oop)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
