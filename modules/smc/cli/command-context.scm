@@ -169,8 +169,10 @@ specified OUTPUT-PORT."
                                  (append (get-module-exports sexp) prev))
                                 ((equal? (car sexp) 'define-public)
                                  (append (list (caadr sexp)) prev))
-                                ((or (equal? (car sexp) 'make-char-guard)
-                                     (equal? (car sexp) 'make-charset-guard))
+                                ((or (equal? (car sexp) 'char:make-guard)
+                                     (equal? (car sexp) 'char:make-charset-guard)
+                                     (equal? (car sexp) 'u8:make-char-guard)
+                                     (equal? (car sexp) 'u8:make-charset-guard))
                                  (append (list (cadr sexp)) prev))
                                 (else
                                  prev)))
@@ -178,15 +180,34 @@ specified OUTPUT-PORT."
                              context-code)))
     (write-header output-port)
     (newline)
-    (pretty-print `(define-module ,(eval-string
-                                    (string-append "(quote " module ")"))
-                     #:use-module (smc core common)
-                     #:use-module (smc context common)
-                     #:use-module (smc context u8)
-                     #:use-module (smc context char)
-                     #:use-module (smc core config)
-                     #:use-module (smc core log)
-                     #:re-export ,exports))))
+    (let ((common-context-code
+           `(define-module ,(eval-string
+                             (string-append "(quote " module ")"))
+              #:use-module (smc core common)
+              #:use-module (smc context common)
+              #:use-module (smc context u8)
+              #:use-module (smc context char)
+              #:use-module (smc core config)
+              #:use-module (smc core log)))
+          (re-exports-list `(#:re-export ,exports)))
+      (pretty-print
+       (case type
+         ((oop)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context oop generic)
+                #:use-module (smc context oop port)
+                #:use-module (smc context oop char)
+                #:use-module (smc context oop u8))
+            ,@re-exports-list))
+         ((functional)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context functional generic)
+                #:use-module (smc context functional char)
+                #:use-module (smc context functional u8))
+            ,@re-exports-list))
+         (else
+          `(,@common-context-code
+            ,@re-exports-list)))))))
 
 (define* (generate-smc-context/standalone core-modules-path
                                           module
