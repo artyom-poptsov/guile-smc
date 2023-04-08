@@ -1,102 +1,31 @@
 @c -*-texinfo-*-
 @c This file is part of Guile-SMC Reference Manual.
-@c Copyright (C) 2021 Artyom V. Poptsov
+@c Copyright (C) 2021-2023 Artyom V. Poptsov
 @c See the file guile-smc.texi for copying conditions.
 
+@cindex Context
 @node Context
 @section Context
 
-@code{(smc context context)} contains the implementation of a generic context
-that can be used with an FSM to provide a memory.  Also a context module
-usually provides event sources, guards, actions and other vital procedures for
-a FSM to work.
+@code{(smc context)} contains the implementation of contexts that can be used
+to provide required FSM guards, actions, event sources and some data
+structures.
 
-Custom contexts are required for some FSMs that need store some extra state
-(e.g. number of characters read by the parser.)
-
-Guile-SMC can use any Scheme object as the context for a finite-state machine.
-
-@cindex Stanza
-@cindex Buffer
-@cindex Context
-@deftp {Class} <context> [#:debug-mode?=#f]
-The main class.
-
-This class holds two kinds of stack memory: a buffer to store events (data
-chunks) and a stanza that store a logical unit of data.
-@end deftp
-
-@deffn {Scheme Procedure} context? x
-Check if an @var{x} is a @code{<context>} instance.
-@end deffn
-
-@deffn {Scheme Procedure} context-buffer-clear! (context <context>)
-Clear the @var{context} buffer.
-@end deffn
-
-@deffn {Scheme Procedure} context-stanza-clear! (context <context>)
-Clear the @var{context} stanza.
-@end deffn
-
-@deffn {Scheme Procedure} context-clear! (context <context>)
-Clear both the @var{context} buffer and the current context stanza.
-@end deffn
-
-@deffn {Scheme Procedure} action:store context event
-Store an @var{event} into a @var{context} buffer.
-@end deffn
-
-@deffn {Scheme Procedure} action:update-stanza context event
-Store an @var{event} into a @var{context} stanza.
-@end deffn
-
-@subsection Character Context
-
-@code{(smc context char-context)} contains an implementation of a character
-context that can be used to handle a stream of characters.
-
-@deftp {Class} <char-context> [#:debug-mode?=#f]
-The main class.
-@end deftp
-
-@deffn  {Scheme Procedure} char-context-counter (ctx <char-context>)
-Returns the value of the character counter of a context @var{ctx}.
-@end deffn
-
-@deffn {Scheme Procedure} char-context-row-number (ctx <char-context>)
-Returns the current row number for a context @var{ctx}. 
-@end deffn
-
-@deffn {Scheme Procedure} char-context-col-number (ctx <char-context>)
-Returns the current column number for a context @var{ctx}.
-@end deffn
+In a broad sense a @emph{context} is an aggregate of an FSM memory that is
+passed between each state, guards, actions and all the auxiliary procedures
+that are required for the FSM machinery to work.
 
 @cindex Guard
-@subsubsection Guards
+@subsection Guards
+A guard is a predicate that takes a context and an event and returns @code{#t}
+or @code{#f}.
+
 Each transition path in a FSM is guarded by a @dfn{guard}, when a guard
 returns @code{#t} the FSM transitions to the next state guarded by the guard
 and a @dfn{transition action} is performed.
 
-@deffn  {Scheme Procedure} guard:asterisk? ctx ch
-@deffnx {Scheme Procedure} guard:equals-sign? ctx ch
-@deffnx {Scheme Procedure} guard:newline? ctx ch
-@deffnx {Scheme Procedure} guard:hyphen-minus? ctx ch
-@deffnx {Scheme Procedure} guard:space? ctx ch
-@deffnx {Scheme Procedure} guard:less-than-sign? ctx ch
-@deffnx {Scheme Procedure} guard:letter? ctx ch
-@deffnx {Scheme Procedure} guard:more-than-sign? ctx ch
-@deffnx {Scheme Procedure} guard:colon? ctx ch
-@deffnx {Scheme Procedure} guard:semicolon? ctx ch
-@deffnx {Scheme Procedure} guard:eof-object? ctx ch
-@deffnx {Scheme Procedure} guard:single-quote? ctx ch
-@deffnx {Scheme Procedure} guard:left-square-bracket? ctx ch
-@deffnx {Scheme Procedure} guard:right-square-bracket? ctx ch
-@deffnx {Scheme Procedure} guard:at-symbol? ctx ch
-These procedures check if a @var{ch} is a specific symbol.
-@end deffn
-
 @cindex Action
-@subsubsection Actions
+@subsection Actions
 An action can be attached to a state transition (thus producing a
 @dfn{transition action}) or to a state itself (in the form of either
 @dfn{entry action} or @dfn{exit action}.)
@@ -104,50 +33,141 @@ An action can be attached to a state transition (thus producing a
 A @dfn{transition action} is performed when its transition guard returns
 @code{#t}.
 
+@subsection Pre-defined Guards
+
+Note that Guile-SMC can use any Scheme object as the context memory for a
+finite-state machine.  The pre-defined guards and actions do not depend on any
+specific context memory type.
+
+@subsubsection ``common''
+
+@deffn {Scheme Procedure} guard:#t context event
+This is ``default'' guard that just always returns @code{#t}.
+@end deffn
+
 @deffn {Scheme Procedure} action:no-op context event
 This is ``no operation'' action that just returns the @var{context} as is.
 @end deffn
 
-@subsubsection Character Context
-@deftp {Class} <char-context>
-A context to handle streams of characters.
+@subsubsection ``char''
+@code{(smc context char)} module provides guards for working with characters.
+There are lots of predicates such as @code{char:left-parenthesis?},
+@code{char:right-parenthesis?}, @code{char:single-quote?} etc.
+
+Please see the module source code for the full list of predicates.
+
+@subsubsection ``u8''
+
+@code{(smc context u8)} module provides guards for working with bytes.  It
+contains the same predicates as @code{(smc context char)} but the predicates
+are accepting numbers instead of characters.
+
+@subsection Context Memory
+
+@subsubsection Functional
+
+See the @code{(smc context functional)} modules.
+
+@deftp {Structure} <context> @
+                   debug-mode? @
+                   counter @
+                   buffer @
+                   stanza @
+                   result @
+                   custom-data
+
+Structure fields:
+@table @asis
+@item @var{debug-mode?}
+Flag that specifies whether the debug mode for the context is enabled.
+@item @var{counter}
+Context counter.  Can be used to count incoming events, for example.
+@item @var{buffer}
+Context buffer to store intermediate values.
+@item @var{stanza}
+Context stanza to store the chunks of intermediate context data.
+@item @var{result}
+Context result to store the end result of the parser.
+@item @var{custom-data}
+Context custom data that can be used by the custom contexts to store different
+things such as ports or some data structures.
+@end table
+
 @end deftp
 
-@deffn {Scheme Procedure} char-context-port (context <char-context>)
+@deffn {Scheme Procedure} make-context @
+       [#:debug-mode?=#f] @
+       [#:counter=0] @
+       [#:buffer='()] @
+       [#:stanza='()] @
+       [#:result='()] @
+       [#:custom-data='()]
+The @code{<context>} constructor.
+@end deffn
+
+@deffn {Scheme Procedure} context-buffer/reversed context
+Return the reversed @var{context} buffer.
+@end deffn
+
+@deffn {Scheme Procedure} context-stanza/reversed context
+Return the reversed @var{context} stanza.
+@end deffn
+
+@deffn {Scheme Procedure} context-result/reversed context
+Return the reversed @var{context} result.
+@end deffn
+
+@deffn {Scheme Procedure} context-counter-update @
+       context @
+       [delta=1]
+
+Increment the @var{context} counter by @var{delta} value.  Return the updated
+@var{context}.
+@end deffn
+
+@deffn {Scheme Procedure} clear-buffer context [event]
 
 @end deffn
 
-@deffn {Scheme Procedure} char-context-counter (context <char-context>)
-Get the @var{context} character counter.
-@end deffn
-
-@deffn {Scheme Procedure} char-context-row (context <char-context>)
+@deffn {Scheme Procedure} clear-stanza context [event]
 
 @end deffn
 
-@deffn {Scheme Procedure} char-context-col (context <char-context>)
+@deffn {Scheme Procedure} clear-result context [event]
 
 @end deffn
 
-@deffn {Scheme Procedure} char-context-update-counters! (context <char-context>)
+@deffn {Scheme Procedure} update-counter context [event]
 
 @end deffn
 
-@deffn {Scheme Procedure} event-source (context <char-context>)
+@deffn {Scheme Procedure} reverse-buffer context [event]
 
 @end deffn
 
-@deffn  {Scheme Procedure} context-log-error ctx fmt . rest
-@deffnx {Scheme Procedure} context-log-warning ctx fmt . rest
-@deffnx {Scheme Procedure} context-log-info ctx fmt . rest
-@deffnx {Scheme Procedure} context-log-debug ctx fmt . rest
-Context logging procedures.
+@deffn {Scheme Procedure} reverse-stanza context [event]
+
 @end deffn
 
-@deffn {Scheme Procedure} action:syntax-error ctx ch
-Throw a syntactic error with the current symbol @var{ch}, row, column and the
-context @var{ctx}.
+@deffn {Scheme Procedure} reverse-result context [event]
+
 @end deffn
+
+@deffn {Scheme Procedure} push-event-to-buffer context event
+
+@end deffn
+
+@deffn {Scheme Procedure} push-event-to-stanza context event
+
+@end deffn
+
+@deffn {Scheme Procedure} push-event-to-result context event
+
+@end deffn
+
+@subsubsection OOP
+
+See the @code{(smc context oop)} modules.
 
 @c Local Variables:
 @c TeX-master: "guile-smc.texi"
