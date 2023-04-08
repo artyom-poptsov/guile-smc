@@ -37,6 +37,7 @@ SCM_TESTS = \
 	puml.scm		\
 	compiler.scm		\
 	compiler-guile.scm	\
+	compiler-guile-standalone.scm	\
 	cli.scm
 
 TESTS = ${SCM_TESTS}
