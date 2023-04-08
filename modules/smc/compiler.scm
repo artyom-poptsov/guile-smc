@@ -1,6 +1,6 @@
 ;;; compiler.scm -- Guile-SMC state machine compiler.
 
-;; Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -61,22 +61,22 @@
 
         (write-use-modules extra-modules output-port))
 
-        (newline output-port)
+    (newline output-port)
 
-        (form-feed output-port)
-        (write-transition-table fsm output-port)
+    (form-feed output-port)
+    (write-transition-table fsm output-port)
 
-        (newline output-port)
+    (newline output-port)
 
-        (form-feed output-port)
-        (write-define-class class-name output-port)
+    (form-feed output-port)
+    (write-define-class class-name output-port)
 
-        (newline output-port)
+    (newline output-port)
 
-        (form-feed output-port)
-        (write-initialize fsm class-name output-port)
+    (form-feed output-port)
+    (write-initialize fsm class-name output-port)
 
-        (newline output-port)))
+    (newline output-port)))
 
 (define* (fsm-compile/guile-standalone-copy fsm
                                             #:key
