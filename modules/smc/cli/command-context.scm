@@ -1,6 +1,6 @@
 ;;; command-profile.scm -- Guile-SMC 'smc profile' command.
 
-;; Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ Options:
   --resolve, -r     Show resolved and unresolved procedures.
   --standalone, -s
                     Generate a standalone compiler context.
+  --type, -T <type> Set the context type for the output context.
   --generate, -g    Generate a context stub from a given PlantUML file.
   --core-modules-path <path>
                     Set the path where Guile-SMC core modules are stored.
@@ -151,11 +152,16 @@ context."
           (cadr defmod)
           (get-module-exports (cdr defmod)))))
 
-(define (generate-smc-context core-modules-path module output-port)
+(define* (generate-smc-context core-modules-path
+                               module
+                               output-port
+                               #:key
+                               (type #f))
   "Generate a Guile-SMC context that can server as intermediate module for the
 derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
   (let* ((context-code (fsm-get-context-code core-modules-path
+                                             #:type type
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
                                (cond
@@ -184,7 +190,9 @@ specified OUTPUT-PORT."
 
 (define* (generate-smc-context/standalone core-modules-path
                                           module
-                                          output-port)
+                                          output-port
+                                          #:key
+                                          (type #f))
   "Generate a Guile-SMC context that contains everything that is needed for
 derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
@@ -193,6 +201,7 @@ specified OUTPUT-PORT."
   (log-debug "generate-smc-context/standalone: Core modules path: ~a"
              core-modules-path)
   (let* ((context-code (fsm-get-context-code core-modules-path
+                                             #:type type
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
                                (cond
@@ -230,6 +239,7 @@ specified OUTPUT-PORT."
     (load-path                (single-char #\L) (value #t))
     (standalone               (single-char #\s) (value #f))
     (use-modules              (single-char #\U) (value #t))
+    (type                     (single-char #\T) (value #t))
     (resolve                  (single-char #\r) (value #f))
     (generate                 (single-char #\g) (value #f))
     (core-modules-path                          (value #t))
@@ -241,6 +251,7 @@ specified OUTPUT-PORT."
 (define (command-context args)
   (let* ((options          (getopt-long args %option-spec))
          (extra-load-paths (option-ref options 'load-path ""))
+         (type             (option-ref options 'type #f))
          (core-modules-path (option-ref options
                                         'core-modules-path
                                         %guile-smc-modules-directory))
@@ -295,10 +306,14 @@ specified OUTPUT-PORT."
         (if standalone?
             (generate-smc-context/standalone core-modules-path
                                              module
-                                             (current-output-port))
+                                             (current-output-port)
+                                             #:type (and (string? type)
+                                                         (string->symbol type)))
             (generate-smc-context core-modules-path
                                   module
-                                  (current-output-port))))))))
+                                  (current-output-port)
+                                  #:type (and (string? type)
+                                              (string->symbol type)))))))))
 
 ;;; command-context.scm ends here.
 
