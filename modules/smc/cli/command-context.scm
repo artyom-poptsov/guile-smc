@@ -37,7 +37,8 @@
   #:use-module (smc config)
   #:use-module (smc compiler guile-common)
   #:use-module (smc compiler guile-standalone)
-  #:export (command-context))
+  #:export (command-context
+            cli-context-write-commentary))
 
 (define (print-help)
   (display (string-append "\
@@ -90,15 +91,6 @@ Options:
   (display #\ff port)
   (newline port))
 
-(define %write-commentary
-  (case-lambda
-    ((port comment)
-     (format port ";; ~a~%" comment))
-    ((port . comments)
-     (for-each (lambda (line)
-                 (format port ";; ~a~%" line))
-               comments))))
-
 (define* (%generate-context-module module exports port)
   (pretty-print `(define-module ,(eval-string
                                   (string-append "(quote " module ")"))
@@ -126,7 +118,7 @@ context."
 
   (newline port)
   (%write-separator port)
-  (%write-commentary port "Guards.")
+  (cli-write-commentary port "Guards.")
   (for-each (lambda (proc)
               (%generate-context-guard-procedure proc port))
             (filter (lambda (proc)
@@ -135,7 +127,7 @@ context."
 
   (newline port)
   (%write-separator port)
-  (%write-commentary port "Actions.")
+  (cli-write-commentary port "Actions.")
   (for-each (lambda (proc)
               (%generate-context-action-procedure proc port))
             (filter (lambda (proc)
