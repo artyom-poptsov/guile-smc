@@ -1,6 +1,6 @@
 ;;; common.scm -- Common CLI procedures for Guile-SMC.
 
-;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@
             pretty-print-transition-table
             string-any=?
             command-match
-            cli-options->alist))
+            cli-options->alist
+            cli-write-commentary))
 
 
 (define (pretty-print-transition-table fsm)
@@ -93,5 +94,16 @@ are present, or an empty list if the string is empty.."
              (let ((lst (string-split opt #\=)))
                (cons (string->symbol (car lst)) (cadr lst))))
            (string-split opt-string #\,))))
+
+
+
+(define cli-write-commentary
+  (case-lambda
+    ((port comment)
+     (format port ";; ~a~%" comment))
+    ((port . comments)
+     (for-each (lambda (line)
+                 (format port ";; ~a~%" line))
+               comments))))
 
 ;;; common.scm ends here.

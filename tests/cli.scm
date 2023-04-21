@@ -29,6 +29,7 @@
              (srfi srfi-26)
              (oop goops)
              (tests common)
+             (smc cli common)
              (smc cli command-compile)
              (tests test-context))
 
@@ -104,6 +105,23 @@
       (with-output-to-string
         (lambda ()
           (command-compile '("smc" "--log-driver" "null" "--validate")))))))
+
+(test-equal "cli-write-commentary: Single-line comment"
+  ";; hello\n"
+  (with-output-to-string
+    (lambda ()
+      (cli-write-commentary (current-output-port)
+                            "hello"))))
+
+(test-equal "cli-write-commentary: Multi-line comment"
+  (string-append
+   ";; hello\n"
+   ";; world\n")
+  (with-output-to-string
+    (lambda ()
+      (cli-write-commentary (current-output-port)
+                            "hello"
+                            "world"))))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
