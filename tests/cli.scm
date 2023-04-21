@@ -31,6 +31,7 @@
              (tests common)
              (smc cli common)
              (smc cli command-compile)
+             (smc cli command-context)
              (tests test-context))
 
 
@@ -122,6 +123,19 @@
       (cli-write-commentary (current-output-port)
                             "hello"
                             "world"))))
+
+
+
+(test-assert "command-context: oop"
+  (let ((output (with-output-to-string
+                  (lambda ()
+                    (command-context
+                     `("smc"
+                       "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
+                                                             "/modules/smc/")
+                       "--log-driver" "null"
+                       "-T" "oop"))))))
+    (string-contains output "(smc context oop generic)")))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
