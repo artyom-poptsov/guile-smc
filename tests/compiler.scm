@@ -34,7 +34,9 @@
                                       (,guard:#t ,action:no-op state-1)))))))
     (with-output-to-string
       (lambda ()
-        (fsm-compile fsm)))))
+        (fsm-compile fsm
+                     #:modules-path (string-append (getenv "abs_top_srcdir")
+                                                   "/modules/smc/"))))))
 
 (test-assert "fsm-compile: target: standalone"
   (let ((fsm (make <fsm>
