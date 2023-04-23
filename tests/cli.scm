@@ -137,6 +137,17 @@
                        "-T" "oop"))))))
     (string-contains output "(smc context oop generic)")))
 
+(test-assert "command-context: functional"
+  (let ((output (with-output-to-string
+                  (lambda ()
+                    (command-context
+                     `("smc"
+                       "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
+                                                             "/modules/smc/")
+                       "--log-driver" "null"
+                       "-T" "functional"))))))
+    (string-contains output "(smc context functional char)")))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
