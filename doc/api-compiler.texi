@@ -74,6 +74,126 @@ Usage example:
 @end deffn
 
 @c --------------------------------------------------------------------------------
+@subsection Common Guile Compiler Code
+@code{(smc compiler guile-common)} module contains the common code for the
+Guile FSM compiler.
+
+@deffn {Scheme Procedure} form-feed port
+Write a form feed symbol with the following newline to a @var{port}.
+@end deffn
+
+@deffn {Scheme Procedure} write-header port
+Write a header commentary to a @var{port}.
+@end deffn
+
+@deffn {Scheme Procedure} write-section-header description port
+Write a section to a @var{port}.
+@end deffn
+
+@deffn {Scheme Procedure} write-footer file-name port
+Write a file footer to a @var{port}.
+@end deffn
+
+@deffn {Scheme Procedure} write-parent-fsm-info (fsm <fsm>) (port <port>)
+Print the information about the parent FSM for a @var{fsm} to a @var{port}.
+@end deffn
+
+@c --------------------------------------------------------------------------------
+@subsection Guile
+@code{(smc compiler guile)} module contains the code for ``guile'' compiler
+target.
+
+@deffn {Scheme Procedure} write-module module @
+       [#:extra-modules] @
+       [#:class-name] @
+       [#:port] @
+       [#:standalone-mode=#f]
+
+Write a @code{define-module} part to a @var{port}.  @var{class-name} is used
+to export a FSM class in the @code{#:export} part.  @var{extra-modules} allow
+to specify a list of extra modules that required for the output FSM to work.
+
+@end deffn
+
+@deffn {Scheme Procedure} write-use-modules extra-modules port
+
+Write @code{use-modules} section to the @var{port}.
+
+@end deffn
+
+@deffn {Scheme Procedure} write-transition-table (fsm <fsm>) (port <port>)
+
+Write a @var{fsm} transition table to a @var{port}.
+
+@end deffn
+
+@deffn {Scheme Procedure} write-define-class class-name port
+
+Write @code{define-class} for a @var{class-name} to a @var{port}.
+
+@end deffn
+
+@deffn {Scheme Procedure} write-initialize fsm class-name port
+
+Write the class constructor for @var{class-name} to the @var{port}.
+
+@end deffn
+
+@c --------------------------------------------------------------------------------
+@subsection Guile Standalone
+@code{(smc compiler guile-standalone)} module contains the code for
+``guile-standalone'' target.
+
+@deffn {Scheme Procedure} state->standalone-code (fsm <fsm>) (state <list>)
+Convert a @var{state} to a plain Scheme @code{define} that does not depend on
+Guile-SMC.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-transition-table->standalone-code (fsm <fsm>)
+Convert a @var{fsm} transition table to a list of Scheme procedures that do
+not depend on Guile-SMC.
+@end deffn
+
+@deffn {Scheme Procedure} string-drop-both str
+Drop one symbol from both left and right parts of a string @var{str}
+@end deffn
+
+@deffn {Scheme Procedure} fsm-define-module fsm fsm-name module @
+       [#:extra-modules]
+
+Generate a @code{define-module} code for an @var{fsm}.
+
+@end deffn
+
+@deffn {Scheme Procedure} tree-contains? root element
+Check if a @var{root} contains an @var{element}.
+@end deffn
+
+@deffn {Scheme Procedure} prune-unused-definitions definitions hardwired-definitions
+
+Remove all the definitions from the @var{definitions} list that are not used
+neither in the @var{definitions} nor @var{hardwired-definitions} lists.
+
+@end deffn
+
+@deffn {Scheme Procedure} fsm-get-context-code guile-smc-modules-path @
+       [#:type=#f] @
+       [#:skip-define-module?=#t]
+
+Read the Guile-SCM context from the @var{guile-smc-modules-path} and return
+the code as a list.
+
+@end deffn
+
+@deffn {Scheme Procedure} fsm-get-class-code fsm-name
+Generate class code for an @var{fsm-name}.
+@end deffn
+
+@deffn {Scheme Procedure} fsm->standalone-code (fsm <fsm>) fsm-name
+Convert an @var{fsm} to a procedure that does not depend on Guile-SMC.
+@end deffn
+
+@c --------------------------------------------------------------------------------
 @subsection Examples
 
 For more examples, take a look into @file{examples/compiler} directory in the
