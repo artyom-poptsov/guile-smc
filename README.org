@@ -67,6 +67,57 @@ For each command there's '--help' option (or '-h' for short) that prints a
 help message for the given command.
 #+END_EXAMPLE
 
+*** The Context Generator
+=smc context= command performs two main tasks:
+- Generate intermediate contexts for providing Guile-SMC API for custom code.
+- Generate a context stub for a state machine based on a PlantUML file.
+
+Here's the =smc context --help= output:
+#+BEGIN_EXAMPLE shell
+$ smc context --help
+Usage: smc context [options] [input-file]
+
+Analyze or generate a context stub based on a given PlantUML file.  If
+INPUT-FILE is not provided, than the command will read the standard input.
+
+Options:
+  --help, -h        Print this message and exit.
+  --resolve, -r     Show resolved and unresolved procedures.
+  --standalone, -s
+                    Generate a standalone compiler context.
+  --type, -T <type> Set the context type for the output context.
+  --generate, -g    Generate a context stub from a given PlantUML file.
+  --core-modules-path <path>
+                    Set the path where Guile-SMC core modules are stored.
+
+                    Default value:
+                      /gnu/store/yr919ghb37fdma8wmjx4ly7j2bwl5m2z-guile-smc-git/share/guile/site/3.0/smc/
+  --module, -m <module>
+                    Place the output code into a specified module
+  --load-path, -L <load-path>
+                    Add an extra load path.
+  --log-driver <driver>
+                    Set the log driver.
+                    Supported values:
+                    - "syslog" -- use syslog as the logging driver.
+                    - "file" -- log to a specified file. Output files are
+                      rotated as needed.
+                      Options:
+                      "file" -- the full path to the log file.
+                    - "null" -- disable logging (discard all the messages.)
+
+                    Default value is "syslog"
+  --log-opt <options>
+                    Set the logging options.  The set of options depends on
+                    the logging driver.
+                    Format:
+                      "key1=value1,key2=value2"
+                    Example:
+                      "file=/tmp/smc.log"
+  --debug           Enable the debug mode.
+
+#+END_EXAMPLE
+
 *** The Compiler
 The state machine compiler allows to compile state machines from a formal
 description (currently only PlantUML format is supported.)
