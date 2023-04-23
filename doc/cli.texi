@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @c This file is part of Guile-SMC Reference Manual.
-@c Copyright (C) 2022 Artyom V. Poptsov
+@c Copyright (C) 2022-2023 Artyom V. Poptsov
 @c See the file guile-smc.texi for copying conditions.
 
 @node Command-Line Interface
@@ -89,114 +89,6 @@ Guile-SMC that normally goes before this procedure):
                (COMMENT context))))))
   (DEFAULT context))
 @end example
-
-@subsubsection @code{guile-standalone-copy} target
-The compiler can be configured in such way that it will copy all the modules
-that are needed to run the output FSM so the FSM will not depend on Guile-SMC.
-
-For example, let's imagine that we have the following file set:
-
-@example shell
-.
-├── context.scm
-├── fsm.puml
-├── main.scm
-└── README.org
-
-0 directories, 4 files
-@end example
-
-The @file{context.scm} contains all actions, guards and event sources for FSM
-to run:
-
-@example lisp
-(define-module (context)
-  #:use-module (opp goops)
-  #:use-module (ice-9 textual-ports)
-  #:use-module (smc context char-context)
-  #:re-export (guard:#t
-               guard:semicolon?
-               guard:double-quote?
-               guard:newline?
-               guard:eof-object?
-               action:no-op)
-  #:export (event-source
-            action:count
-            action:validate))
-
-(define-method (event-source (ctx <number>))
-  (get-char (current-input-port)))
-
-(define (action:count ctx char)
-  (cond
-   ((char=? char #\()
-    (+ ctx 1))
-   ((char=? char #\))
-    (- ctx 1))
-   (else
-    ctx)))
-
-(define (action:validate ctx char)
-  (unless (zero? ctx)
-    (error "Parenthesis mismatch" ctx))
-  ctx)
-@end example
-
-The @file{fsm.puml} file contains the FSM description in the PlantUML format:
-
-@example
-@@startuml
-[*] --> DEFAULT
-DEFAULT: Count parenthesis.
-DEFAULT --> [*]: guard:eof-object? -> action:validate
-DEFAULT --> COMMENT: guard:semicolon?
-DEFAULT --> STRING: guard:double-quote?
-DEFAULT --> DEFAULT: guard:#t -> action:count
-
-COMMENT: Skip a comment.
-COMMENT --> DEFAULT: guard:newline?
-COMMENT --> COMMENT
-
-STRING: Skip a string.
-STRING --> DEFAULT: guard:double-quote?
-STRING -> STRING
-@@enduml
-@end example
-
-Now let's compile the FSM, using the @code{guile-standalone} target:
-@example shell
-$ cat fsm.puml | /usr/bin/smc compile -L . -U "((context))" -m "(custom-fsm)" \
-    --target guile-standalone-copy > custom-fsm.scm
-@end example
-
-Now the project root directory looks like this:
-@example shell
-$ tree
-.
-├── context.scm
-├── custom-fsm
-│   ├── context.scm
-│   └── smc
-│       ├── context
-│       │   ├── char-context.scm
-│       │   └── context.scm
-│       ├── core
-│       │   ├── common.scm
-│       │   ├── log.scm
-│       │   ├── state.scm
-│       │   └── transition.scm
-│       └── fsm.scm
-├── custom-fsm.scm
-├── fsm.puml
-├── main.scm
-└── README.org
-
-4 directories, 13 files
-@end example
-
-@file{custom-fsm} directory contains all the required Guile-SMC modules that
-the output FSM needs to run, plus the extra modules (like @code{(context)})
-specified for the compiler.
 
 @section The Context Generator and Analyzer
 @command{smc context} allows to generate and analyze Guile-SMC FSM contexts.
