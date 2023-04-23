@@ -78,46 +78,6 @@
 
     (newline output-port)))
 
-(define* (fsm-compile/guile-standalone-copy fsm
-                                            #:key
-                                            fsm-name
-                                            fsm-module
-                                            extra-modules
-                                            output-port)
-  (write-header output-port)
-
-  (when (fsm-parent fsm)
-    (write-parent-fsm-info fsm output-port))
-
-  (form-feed output-port)
-  (let ((class-name (string->symbol (format #f "<~a>" fsm-name))))
-    (if fsm-module
-        (write-module fsm-module
-                      #:extra-modules    extra-modules
-                      #:class-name       class-name
-                      #:port             output-port
-                      #:standalone-mode? #t)
-
-        (write-use-modules extra-modules output-port))
-
-        (newline output-port)
-
-        (form-feed output-port)
-        (write-transition-table fsm output-port)
-
-        (newline output-port)
-
-        (form-feed output-port)
-        (write-define-class class-name output-port)
-
-        (newline output-port)
-
-        (form-feed output-port)
-        (write-initialize fsm class-name output-port)
-
-        (newline output-port)
-        (write-footer fsm-name output-port)))
-
 (define* (fsm-compile/guile-standalone fsm
                                        #:key
                                        fsm-name
@@ -203,13 +163,7 @@ OUTPUT-PORT.  Use an FSM-NAME as the name of the output FSM."
                                    #:fsm-module    fsm-module
                                    #:extra-modules extra-modules
                                    #:output-port   output-port))
-    ((guile-standalone-copy)
-     (fsm-compile/guile-standalone-copy fsm
-                                        #:fsm-name      fsm-name
-                                        #:fsm-module    fsm-module
-                                        #:extra-modules extra-modules
-                                        #:output-port   output-port))
-    (else
+     (else
      (error "Unknown compilation target" target))))
 
 

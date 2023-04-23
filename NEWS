@@ -9,6 +9,25 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
 
 
 * Unreleased
+** New context implementation                                    :API_CHANGE:
+New FSM context implementation consists of three modules that contain
+implementation of common actions/guards:
+- =(smc context common)= -- Common actions/guards.
+- =(smc context char)= -- Guards for a stream of characters.
+- =(smc context u8)= -- Guards for a stream of bytes.
+
+Also there are now two types of structures that provide memory for an FSM:
+- =(smc context functional ...)= -- FSM context based on =(srfi srfi-9 gnu)=
+  structures.
+- =(smc context oop ...)= -- FSM context based on =(oop goops)=.
+** Drop the support for =guile-standalone-copy= target           :API_CHANGE:
+It seems that only two targets are reasonable to keep for now: =guile= (which
+produces code that depends on Guile-SMC) and =guile-standalone= (which
+produces code that does not depend on Guile-SMC and mimic hand-crafted FSM
+implementation.)
+
+Extra compilation targets are adding extra maintenance burden so I'd prefer to
+focus my somewhat limited resources on those that make sense in the long run.
 ** =smc compile=
 *** Now handles "--guile-smc-path" option
 * Version 0.5.2 (2022-09-02)

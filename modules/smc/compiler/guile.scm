@@ -43,8 +43,7 @@
             write-use-modules
             write-transition-table
             write-define-class
-            write-initialize
-            copy-dependencies))
+            write-initialize))
 
 
 
@@ -116,39 +115,6 @@ to specify a list of extra modules that required for the output FSM to work."
 
 
 
-(define (copy-file/substitute source destination substitutes)
-  (let ((src (open-input-file source))
-        (dst (open-output-file destination)))
-    (let loop ((line (read-line src)))
-      (if (eof-object? line)
-          (begin
-            (close-port src)
-            (close-port dst))
-          (let ((ln (let matcher-loop ((subs substitutes)
-                                       (ln   line))
-                      (if (null? subs)
-                          ln
-                          (let ((s (car subs)))
-                            (matcher-loop (cdr subs)
-                                          (regexp-substitute/global #f
-                                                                    (car s)
-                                                                    ln
-                                                                    'pre
-                                                                    (cdr s)
-                                                                    'post)))))))
-            (write-line ln dst)
-            (loop (read-line src)))))))
-
-(define (mkdir* path)
-  "Create directories from a PATH recursively."
-  (let loop ((dirparts (string-split path #\/))
-             (dir      ""))
-    (unless (null? dirparts)
-      (let ((d (string-append dir (car dirparts) "/")))
-        (unless (file-exists? d)
-          (mkdir d))
-        (loop (cdr dirparts) d)))))
-
 (define (modules->paths load-path modules)
   "Locate each module from a MODULES list in the directories from a LOAD-PATH
 list.  Return a list of pairs (module-file full-path)."
@@ -174,72 +140,5 @@ list.  Return a list of pairs (module-file full-path)."
                         (cons (cons mod-file full-path) result))
               (mod-loop (cdr mods)
                         result))))))
-
-(define (copy-dependencies output-directory root-module-name extra-modules)
-  "Copy dependencies to a sub-directory with ROOT-MODULE-NAME of an
-OUTPUT-DIRECTORY."
-
-  (define (copy src dst substitutes)
-    (let ((dir (dirname dst)))
-
-      (unless (file-exists? dir)
-        (log-debug "  creating \"~a\" ..." dir)
-        (mkdir* (dirname dst))
-        (log-debug "  creating \"~a\" ... done" dir))
-      (log-debug "  copying: ~a -> ~a ..." src dst)
-      (copy-file/substitute src dst substitutes)
-      (log-debug "  copying: ~a -> ~a ... done" src dst)))
-
-  (let* ((target-dir (format #f
-                             "~a/~a"
-                             output-directory
-                             (string-join (map symbol->string root-module-name)
-                                          "/")))
-         (files      (list "/fsm.scm"
-                           "/core/common.scm"
-                           "/core/config.scm"
-                           "/core/log.scm"
-                           "/core/state.scm"
-                           "/core/stack.scm"
-                           "/core/transition.scm"
-                           "/context/port.scm"
-                           "/context/char.scm"
-                           "/context/binary.scm"
-                           "/context/context.scm"))
-         (substitutes (list (cons "\\(smc "
-                                  (format #f
-                                          "(~a smc "
-                                          (string-join (map symbol->string
-                                                            root-module-name)
-                                                       " ")))))
-         (substitutes-smc (cons (cons ";;; Commentary:"
-                                      (string-append
-                                       ";;; Commentary:\n\n"
-                                       (format #f ";; Copied from Guile-SMC ~a~%"
-                                               (smc-version/string))))
-                                substitutes))
-         (substitutes-extra (cons (cons "\\(define-module \\("
-                                        (format #f
-                                                "(define-module (~a "
-                                                (string-join (map symbol->string
-                                                                  root-module-name)
-                                                             " ")))
-                                  substitutes)))
-
-    (log-debug "Copying core modules ...")
-    (for-each (lambda (file)
-                (let* ((src (string-append %guile-smc-modules-directory file))
-                       (dst (string-append target-dir "/smc/" file)))
-                  (copy src dst substitutes-smc)))
-              files)
-    (log-debug "Copying core modules ... done")
-
-    (log-debug "Copying extra modules ...")
-    (for-each (lambda (mod)
-                (let* ((src (cdr mod))
-                       (dst (string-append target-dir "/" (car mod))))
-                  (copy src dst substitutes-extra)))
-              (modules->paths %load-path extra-modules))
-    (log-debug "Copying extra modules ... done")))
 
 ;;; guile.scm ends here.
