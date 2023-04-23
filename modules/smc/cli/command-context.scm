@@ -87,10 +87,6 @@ Options:
 
 
 
-(define (%write-separator port)
-  (display #\ff port)
-  (newline port))
-
 (define* (%generate-context-module module exports port)
   (pretty-print `(define-module ,(eval-string
                                   (string-append "(quote " module ")"))
@@ -117,7 +113,7 @@ context."
     (%generate-context-module module procedures port))
 
   (newline port)
-  (%write-separator port)
+  (form-feed port)
   (cli-write-commentary port "Guards.")
   (for-each (lambda (proc)
               (%generate-context-guard-procedure proc port))
@@ -126,7 +122,7 @@ context."
                     procedures))
 
   (newline port)
-  (%write-separator port)
+  (form-feed port)
   (cli-write-commentary port "Actions.")
   (for-each (lambda (proc)
               (%generate-context-action-procedure proc port))
