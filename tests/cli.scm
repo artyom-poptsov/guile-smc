@@ -159,6 +159,16 @@
                        "-T" "functional"))))))
     (string-contains output "(smc context functional char)")))
 
+(test-error "command-context: error: Could not open a file"
+  (with-output-to-string
+    (lambda ()
+      (command-context
+       `("smc"
+         "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
+                                               "/modules/smc/")
+         "--log-driver" "null"
+         "command-context: non-existing-file")))))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
