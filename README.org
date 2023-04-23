@@ -21,6 +21,7 @@ License.
 - make
 - automake
 - autoconf
+- [[https://www.gnu.org/software/help2man/][help2man]]
 
 ** Installation
 *** GNU Guix
