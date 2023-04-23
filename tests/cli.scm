@@ -126,6 +126,17 @@
 
 
 
+(test-assert "command-context: generic"
+  (let ((output (with-output-to-string
+                  (lambda ()
+                    (command-context
+                     `("smc"
+                       "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
+                                                             "/modules/smc/")
+                       "--log-driver" "null"))))))
+    (and (not (string-contains output "(smc context functional char)"))
+         (not (string-contains output "(smc context oop char)")))))
+
 (test-assert "command-context: oop"
   (let ((output (with-output-to-string
                   (lambda ()
