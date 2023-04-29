@@ -38,6 +38,7 @@ SCM_TESTS = \
 	compiler.scm		\
 	compiler-guile.scm	\
 	compiler-guile-standalone.scm	\
+	profiler.scm	\
 	cli.scm
 
 TESTS = ${SCM_TESTS}
