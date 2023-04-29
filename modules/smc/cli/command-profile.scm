@@ -43,9 +43,10 @@
 
 (define (print-help)
   (display "\
-Usage: smc profile [options] <log-file>
+Usage: smc profile [options] [log-file]
 
-Profile a state machine using a logged execution trace.
+Profile a state machine using a logged execution trace.  If no log file is
+specified, then the standard input will be read.
 
 Options:
   --help, -h        Print this message and exit.
@@ -153,7 +154,7 @@ Options:
                             (option-ref options 'log-opt "")))
          (args             (option-ref options '()        #f)))
 
-    (when (or (option-ref options 'help #f) (null? args))
+    (when (option-ref options 'help #f)
       (print-help)
       (exit 0))
 
@@ -162,7 +163,12 @@ Options:
 
     (smc-log-init! log-driver log-opt)
 
-    (let* ((port    (open-input-file (car args)))
+    (let* ((port    (if (null? args)
+                        (current-input-port)
+                        (let ((p (open-input-file (car args))))
+                          (unless p
+                            (error "Could not open a file" (car args)))
+                          p)))
            (context (fsm-run! (make <trace-fsm>
                                 #:debug-mode? debug-mode?)
                               (make <trace-context>
