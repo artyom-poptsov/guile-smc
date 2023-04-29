@@ -1,4 +1,4 @@
-name: GNU Guile 3.0
+name: Ubuntu/Guile 3.0
 
 on:
   push:
