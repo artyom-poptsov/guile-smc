@@ -262,6 +262,7 @@
 
 
 (define* (update-counter ctx #:optional event)
-  (context-counter-update! ctx))
+  (context-counter-update! ctx)
+  ctx)
 
 ;;; generic.scm ends here.
