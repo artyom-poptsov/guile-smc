@@ -29,7 +29,23 @@ implementation.)
 Extra compilation targets are adding extra maintenance burden so I'd prefer to
 focus my somewhat limited resources on those that make sense in the long run.
 ** =smc compile=
-*** Now handles "--guile-smc-path" option
+*** New option: "--guile-smc-path"
+** =smc context=
+*** New option: "--type", "-T"
+This option allows to specify context type for the output context when an
+intermediate context is generated.
+*** New option: "--core-modules-path"
+Sets the path where Guile-SMC core modules are stored.  E.g.:
+=~/.guix-profile/share/guile/site/smc/=
+** =smc run=: Remove the deprecated "--log-file= option           :API_CHANGE:
+** =smc=: Improve the "--debug" mode
+Now when the debug mode is enabled =smc= will not enable stderr logging.  To
+enable logging to stderr in addition to the regular logging drivers, there's
+now logger option "stderr" that can be used to enable/disable stderr logging.
+For example,
+#+BEGIN_EXAMPLE shell
+$ smc compile --log-driver file --log-opt "file=out.log,stderr=true"
+#+END_EXAMPLE
 * Version 0.5.2 (2022-09-02)
 ** Bugfixes
 *** =smc context=: Add missing =(smc core config)= to the FSM context
