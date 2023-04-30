@@ -78,4 +78,8 @@ version.scm: version.scm.in
 	@echo "  GEN      $@"
 	@$(substitute) "$^" > "$@"
 
-CLEANFILES += version.scm config.scm
+CLEANFILES += \
+	version.scm \
+	config.scm \
+	puml-fsm.scm.log \
+	trace-fsm.scm.log
