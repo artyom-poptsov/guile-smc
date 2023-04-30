@@ -1,5 +1,5 @@
 * Guile-SMC
-[[https://github.com/artyom-poptsov/guile-smc/actions/workflows/guile2.2.yml/badge.svg]] [[https://github.com/artyom-poptsov/guile-smc/actions/workflows/guile3.0.yml/badge.svg]]
+[[https://github.com/artyom-poptsov/guile-smc/actions/workflows/guile2.2.yml/badge.svg]] [[https://github.com/artyom-poptsov/guile-smc/actions/workflows/guile3.0.yml/badge.svg]] [[https://github.com/artyom-poptsov/guile-smc/actions/workflows/guix.yml/badge.svg]]
 
 [[https://www.gnu.org/software/guile/][GNU Guile]] state machine compiler.
 
