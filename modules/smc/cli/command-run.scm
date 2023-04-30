@@ -86,14 +86,6 @@ Options:
                       \"stderr=true\"
                       \"stderr=false\"
 
-  --log-file <file>
-                    *This option is deprecated and will be removed in the
-                    Guile-SMC 0.6.0.  Use \"--log-driver\" and \"--log-opt\"
-                    instead.*
-
-                    Log file to use.  Pass \"-\" as the file to use the standard
-                    error stream (stderr.)
-                    'smc run' logs to syslog by default.
   --debug           Enable the debug mode.
 "))
 
@@ -134,19 +126,13 @@ Options:
          (log-driver       (option-ref options 'log-driver "syslog"))
          (log-opt          (cli-options->alist
                             (option-ref options 'log-opt "")))
-         (log-file         (option-ref options 'log-file  #f)) ; deprecated
          (args             (option-ref options '()        #f)))
 
     (when (or (option-ref options 'help #f) (null? args))
       (print-help)
       (exit 0))
 
-    ;; XXX: "--log-file" option is deprecated.  The option must be removed in
-    ;; Guile-SMC 0.6.0.
-
-    (if log-file
-        (smc-log-init! "file" `((file . ,log-file)))
-        (smc-log-init! log-driver log-opt))
+    (smc-log-init! log-driver log-opt))
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
