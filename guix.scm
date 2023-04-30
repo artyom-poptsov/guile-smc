@@ -95,7 +95,10 @@
            help2man
            texinfo
            which
-           texlive))
+           texlive
+           ;; needed when cross-compiling.
+           guile-3.0
+           guile-lib))
     (inputs
      (list bash-minimal
            guile-3.0
