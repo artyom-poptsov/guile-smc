@@ -46,6 +46,7 @@ SUFFIXES = .in
 puml-fsm.scm: puml.puml
 	@echo "  SMC      $<"
 	@smc compile \
+	    --debug \
 	    --load-path "$(abs_top_srcdir)/modules" \
 	    --log-driver file \
 	    --log-opt "file=puml-fsm.scm.log" \
@@ -58,6 +59,7 @@ trace-fsm.scm: trace.puml
 	@echo "  SMC      $<"
 	@smc compile \
 		--load-path $(abs_top_srcdir)/modules \
+		--debug \
 		--log-driver file \
 		--log-opt "file=trace-fsm.scm.log" \
 		--fsm-name "trace-fsm" \
