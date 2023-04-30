@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -18,7 +18,7 @@
 ## along with Guile-SMC.  If not, see <http://www.gnu.org/licenses/>.
 
 EXTRA_DIST = \
-	guile-2.0.m4	\
+	guile.m4	\
 	pkg.m4
 
 ## Makefile.am ends here
