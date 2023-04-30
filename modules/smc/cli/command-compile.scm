@@ -38,7 +38,7 @@
 
 
 (define (print-compile-help)
-  (display "\
+  (display (string-append "\
 Usage: smc compile [options] [input-file]
 
 The program reads a PlantUML transition diagram from an INPUT-FILE or the
@@ -83,6 +83,9 @@ Options:
                     Add a paths separated by a colon to load paths.
   --guile-smc-path <path>
                     The path to Guile-SMC modules.
+
+                    Default value:
+                      " %guile-smc-modules-directory "
   --modules, -U <extra-modules>
                     Load additional modules.  The value must be the same
                     as for 'use-modules'.  Example value:
@@ -101,7 +104,7 @@ Options:
                     Default value is \"guile\".
   --debug           Enable the debug mode.
 
-"))
+")))
 
 
 (define %option-spec
