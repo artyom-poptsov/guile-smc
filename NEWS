@@ -8,7 +8,7 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   notice and this notice are preserved.
 
 
-* Unreleased
+* Version 0.6.0 (2023-04-30)
 ** New context implementation                                    :API_CHANGE:
 New FSM context implementation consists of three modules that contain
 implementation of common actions/guards:
