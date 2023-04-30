@@ -54,8 +54,8 @@ Options:
                     Generate a standalone compiler context.
   --type, -T <type> Set the context type for the output context.
   --generate, -g    Generate a context stub from a given PlantUML file.
-  --core-modules-path <path>
-                    Set the path where Guile-SMC core modules are stored.
+  --guile-smc-path <path>
+                    Set the path where Guile-SMC modules are stored.
 
                     Default value:
                       " %guile-smc-modules-directory "
@@ -258,7 +258,7 @@ specified OUTPUT-PORT."
     (type                     (single-char #\T) (value #t))
     (resolve                  (single-char #\r) (value #f))
     (generate                 (single-char #\g) (value #f))
-    (core-modules-path                          (value #t))
+    (guile-smc-path                             (value #t))
     (module                   (single-char #\m) (value #t))
     (log-driver                                 (value #t))
     (log-opt                                    (value #t))
@@ -268,9 +268,9 @@ specified OUTPUT-PORT."
   (let* ((options          (getopt-long args %option-spec))
          (extra-load-paths (option-ref options 'load-path ""))
          (type             (option-ref options 'type #f))
-         (core-modules-path (option-ref options
-                                        'core-modules-path
-                                        %guile-smc-modules-directory))
+         (guile-smc-path   (option-ref options
+                                       'guile-smc-path
+                                       %guile-smc-modules-directory))
          (extra-modules    (option-ref options 'use-modules #f))
          (module           (option-ref options 'module    "(context)"))
          (resolve?         (option-ref options 'resolve   #f))
@@ -317,12 +317,12 @@ specified OUTPUT-PORT."
                             (current-output-port))))
        (else
         (if standalone?
-            (generate-smc-context/standalone core-modules-path
+            (generate-smc-context/standalone guile-smc-path
                                              module
                                              (current-output-port)
                                              #:type (and (string? type)
                                                          (string->symbol type)))
-            (generate-smc-context core-modules-path
+            (generate-smc-context guile-smc-path
                                   module
                                   (current-output-port)
                                   #:type (and (string? type)
