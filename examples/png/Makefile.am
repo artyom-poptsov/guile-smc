@@ -52,6 +52,7 @@ substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 	--log-driver null \
 	-L "$(top_srcdir)/modules:." \
 	-U "((png-signature-context) (smc core log))" \
+	--guile-smc-path $(abs_top_srcdir)/modules/ \
 	--fsm-name ini-fsm \
 	--fsm-module "(png-signature)" \
 	--validate > $@
