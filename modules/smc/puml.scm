@@ -78,7 +78,6 @@
                     (default-event-source 'event-source)
                     (keep-going? #f)
                     (debug-mode? #f))
-  (log-use-stderr! debug-mode?)
   (let* ((reader-fsm
           (make <puml-fsm>
             #:debug-mode? debug-mode?
