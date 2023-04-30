@@ -72,6 +72,13 @@ Options:
                       \"key1=value1,key2=value2\"
                     Example:
                       \"file=/tmp/smc.log\"
+
+                    There's an option \"stderr\" that is handled independently
+                    from the log driver that allows to configure stderr logging.
+                    Example values:
+                      \"stderr=true\"
+                      \"stderr=false\"
+
   --debug           Enable the debug mode.
 "))
 
@@ -157,9 +164,6 @@ Options:
     (when (option-ref options 'help #f)
       (print-help)
       (exit 0))
-
-    (when debug-mode?
-      (log-use-stderr! debug-mode?))
 
     (smc-log-init! log-driver log-opt)
 

@@ -79,6 +79,13 @@ Options:
                       \"key1=value1,key2=value2\"
                     Example:
                       \"file=/tmp/smc.log\"
+
+                    There's an option \"stderr\" that is handled independently
+                    from the log driver that allows to configure stderr logging.
+                    Example values:
+                      \"stderr=true\"
+                      \"stderr=false\"
+
   --log-file <file>
                     *This option is deprecated and will be removed in the
                     Guile-SMC 0.6.0.  Use \"--log-driver\" and \"--log-opt\"
@@ -140,9 +147,6 @@ Options:
     (if log-file
         (smc-log-init! "file" `((file . ,log-file)))
         (smc-log-init! log-driver log-opt))
-
-    (when debug-mode?
-      (log-use-stderr! debug-mode?))
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
