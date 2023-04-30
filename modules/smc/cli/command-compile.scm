@@ -172,7 +172,7 @@ Options:
           (fsm-compile fsm
                        #:fsm-name      name
                        #:fsm-module    fsm-module
-                       #:modules-path  guile-smc-path
+                       #:modules-path  (string-append guile-smc-path "/smc/")
                        #:extra-modules fsm-extra-modules
                        #:target        (string->symbol target))))))))
 

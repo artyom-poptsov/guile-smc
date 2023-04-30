@@ -67,7 +67,7 @@ trace-fsm.scm: trace.puml
 		--modules "((smc trace-context) (smc context char) (smc context oop char))" \
 		$< > $@
 
-root_moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/smc/
+root_moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)/
 config_substitute = sed -e 's,[@]MODDIR[@],$(root_moddir),g'
 
 config.scm: config.scm.in

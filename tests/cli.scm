@@ -131,8 +131,8 @@
                   (lambda ()
                     (command-context
                      `("smc"
-                       "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
-                                                             "/modules/smc/")
+                       "--guile-smc-path" ,(string-append (getenv "abs_top_srcdir")
+                                                          "/modules")
                        "--log-driver" "null"))))))
     (and (not (string-contains output "(smc context functional char)"))
          (not (string-contains output "(smc context oop char)")))))
@@ -142,8 +142,8 @@
                   (lambda ()
                     (command-context
                      `("smc"
-                       "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
-                                                             "/modules/smc/")
+                       "--guile-smc-path" ,(string-append (getenv "abs_top_srcdir")
+                                                          "/modules")
                        "--log-driver" "null"
                        "-T" "oop"))))))
     (string-contains output "(smc context oop generic)")))
@@ -153,8 +153,8 @@
                   (lambda ()
                     (command-context
                      `("smc"
-                       "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
-                                                             "/modules/smc/")
+                       "--guile-smc-path" ,(string-append (getenv "abs_top_srcdir")
+                                                          "/modules")
                        "--log-driver" "null"
                        "-T" "functional"))))))
     (string-contains output "(smc context functional char)")))
@@ -164,8 +164,8 @@
     (lambda ()
       (command-context
        `("smc"
-         "--core-modules-path" ,(string-append (getenv "abs_top_srcdir")
-                                               "/modules/smc/")
+         "--guile-smc-path" ,(string-append (getenv "abs_top_srcdir")
+                                            "/modules")
          "--log-driver" "null"
          "command-context: non-existing-file")))))
 
