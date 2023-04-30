@@ -147,7 +147,7 @@ context."
           (cadr defmod)
           (get-module-exports (cdr defmod)))))
 
-(define* (generate-smc-context core-modules-path
+(define* (generate-smc-context guile-smc-path
                                module
                                output-port
                                #:key
@@ -155,7 +155,8 @@ context."
   "Generate a Guile-SMC context that can server as intermediate module for the
 derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
-  (let* ((context-code (fsm-get-context-code core-modules-path
+  (let* ((context-code (fsm-get-context-code (string-append guile-smc-path
+                                                            "/smc/")
                                              #:type type
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
@@ -204,7 +205,7 @@ specified OUTPUT-PORT."
           `(,@common-context-code
             ,@re-exports-list)))))))
 
-(define* (generate-smc-context/standalone core-modules-path
+(define* (generate-smc-context/standalone guile-smc-path
                                           module
                                           output-port
                                           #:key
@@ -214,9 +215,10 @@ derivative contexts.  The context is placed into a MODULE and printed to a
 specified OUTPUT-PORT."
   (write-header output-port)
   (newline)
-  (log-debug "generate-smc-context/standalone: Core modules path: ~a"
-             core-modules-path)
-  (let* ((context-code (fsm-get-context-code core-modules-path
+  (log-debug "generate-smc-context/standalone: Guile-SMC path: ~a"
+             guile-smc-path)
+  (let* ((context-code (fsm-get-context-code (string-append guile-smc-path
+                                                            "/smc/")
                                              #:type type
                                              #:skip-define-module? #f))
          (exports      (fold (lambda (sexp prev)
