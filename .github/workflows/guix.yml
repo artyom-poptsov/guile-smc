@@ -15,14 +15,18 @@ jobs:
   x86_64-linux-gnu:
     runs-on: "ubuntu-latest"
     steps:
+      - name: Get the current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: "Guix cache"
         uses: "actions/cache@v3"
         with:
           path: "~/.cache/guix"
-          # use a key that (almost) never matches
-          key: "guix-cache-${{ github.sha }}"
+          # Guix cashed once a day; the first build will be slow but the
+          # subsequent builds on the current day will be faster.
+          key: "guix-cache-x86-${{ steps.date.outputs.date }}"
           restore-keys: |
-            guix-cache-
+            guix-cache-x86-
       - name: "Install Guix"
         uses: "PromyLOPh/guix-install-action@v1"
       - name: "Ensure no locale warning"
@@ -36,14 +40,17 @@ jobs:
   aarch64-linux-gnu:
     runs-on: "ubuntu-latest"
     steps:
+      - name: Get the current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: "Guix cache"
         uses: "actions/cache@v3"
         with:
           path: "~/.cache/guix"
           # use a key that (almost) never matches
-          key: "guix-cache-${{ github.sha }}"
+          key: "guix-cache-aarch64-${{ steps.date.outputs.date }}"
           restore-keys: |
-            guix-cache-
+            guix-cache-aarch64-
       - name: "Install Guix"
         uses: "PromyLOPh/guix-install-action@v1"
       - name: "Ensure no locale warning"
