@@ -21,14 +21,14 @@ include $(top_srcdir)/build-aux/am/guilec
 
 EXTRA_DIST = \
 	fsm.puml		\
-	main.scm.in
+	main.in
 
 SOURCES = \
 	fsm.scm			\
 	context.scm		\
 	custom-fsm.scm		\
 	main.scm	\
-	main.scm.in
+	main.in
 
 examplesdir = $(pkgdatadir)/examples
 examples_parenthesis_checkdir = $(pkgdatadir)/examples/parenthesis-check/
