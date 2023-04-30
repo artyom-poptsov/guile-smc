@@ -54,7 +54,7 @@ custom-fsm.scm: fsm.puml
 	--log-driver null \
 	-L "$(abs_top_srcdir)/modules:$(abs_top_srcdir)/examples/parenthesis-check/" \
 	-U "((context))" \
-	--guile-smc-path $(abs_top_srcdir)/modules/smc/ \
+	--guile-smc-path $(abs_top_srcdir)/modules/ \
 	--target guile-standalone \
 	--fsm-name custom-fsm \
 	--fsm-module "(custom-fsm)" \
