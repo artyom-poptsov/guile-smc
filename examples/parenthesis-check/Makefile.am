@@ -50,7 +50,7 @@ substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 
 custom-fsm.scm: fsm.puml
 	@echo "  SMC      $<"
-	@$(abs_top_builddir)/pre-inst-env $(abs_top_srcdir)/utils/smc compile \
+	@$(abs_top_builddir)/pre-inst-env $(abs_top_builddir)/utils/smc compile \
 	--log-driver null \
 	-L "$(top_srcdir)/modules:." \
 	-U "((context))" \

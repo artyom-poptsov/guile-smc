@@ -48,7 +48,7 @@ substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 
 .puml.scm:
 	@echo "  SMC      $<"
-	@cat $< | $(abs_top_builddir)/pre-inst-env $(abs_top_srcdir)/utils/smc compile \
+	@cat $< | $(abs_top_builddir)/pre-inst-env $(abs_top_builddir)/utils/smc compile \
 	--log-driver null \
 	-L "$(top_srcdir)/modules:." \
 	-U "((png-signature-context) (smc core log))" \
