@@ -84,7 +84,8 @@
                                        fsm-module
                                        extra-modules
                                        output-port
-                                       (modules-path %guile-smc-modules-directory)
+                                       (modules-path (string-append %guile-smc-modules-directory
+                                                                    "/smc/"))
                                        (optimize? #t))
   (write-header output-port)
 
@@ -137,7 +138,8 @@
                       (fsm-name      'custom-fsm)
                       (fsm-module    #f)
                       (extra-modules '())
-                      (modules-path  %guile-smc-modules-directory)
+                      (modules-path  (string-append %guile-smc-modules-directory
+                                                    "/smc/"))
                       (target        'guile)
                       (output-port   (current-output-port)))
   "Compile an FSM for the specified TARGET and print the result to an
