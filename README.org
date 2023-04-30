@@ -87,11 +87,11 @@ Options:
                     Generate a standalone compiler context.
   --type, -T <type> Set the context type for the output context.
   --generate, -g    Generate a context stub from a given PlantUML file.
-  --core-modules-path <path>
-                    Set the path where Guile-SMC core modules are stored.
+  --guile-smc-path <path>
+                    Set the path where Guile-SMC modules are stored.
 
                     Default value:
-                      /gnu/store/yr919ghb37fdma8wmjx4ly7j2bwl5m2z-guile-smc-git/share/guile/site/3.0/smc/
+                      /gnu/store/6j376x184g070383sxdzi775my9x081s-guile-smc-git/share/guile/site/3.0/
   --module, -m <module>
                     Place the output code into a specified module
   --load-path, -L <load-path>
@@ -114,6 +114,13 @@ Options:
                       "key1=value1,key2=value2"
                     Example:
                       "file=/tmp/smc.log"
+
+                    There's an option "stderr" that is handled independently
+                    from the log driver that allows to configure stderr logging.
+                    Example values:
+                      "stderr=true"
+                      "stderr=false"
+
   --debug           Enable the debug mode.
 
 #+END_EXAMPLE
@@ -124,9 +131,16 @@ description (currently only PlantUML format is supported.)
 
 #+BEGIN_EXAMPLE shell
 $ smc compile --help
-Usage: smc compile [options]
+Usage: smc compile [options] [input-file]
 
-The program reads a PlantUML transition diagram from the standard input.
+The program reads a PlantUML transition diagram from an INPUT-FILE or the
+standard input if no file specified, and creates a finite-state machine (FSM)
+from the formal description.
+
+Then the FSM can be validated and/or compiled.
+
+If no INPUT-FILE is specified, then the input PlantUML transition diagram is
+read from the standard input.
 
 Options:
   --help, -h        Print this message and exit.
@@ -141,7 +155,7 @@ Options:
                       rotated as needed.
                       Options:
                       "file" -- the full path to the log file.
-                    - "none" -- disable logging (discard all the messages.)
+                    - "null" -- disable logging (discard all the messages.)
 
                     Default value is "syslog"
   --log-opt <options>
@@ -151,8 +165,19 @@ Options:
                       "key1=value1,key2=value2"
                     Example:
                       "file=/tmp/smc.log"
+
+                    There is an option "stderr" that is handled independently
+                    from the log driver that allows to configure stderr logging.
+                    Example values:
+                      "stderr=true"
+                      "stderr=false"
   --load-path, -L <paths>
                     Add a paths separated by a colon to load paths.
+  --guile-smc-path <path>
+                    The path to Guile-SMC modules.
+
+                    Default value:
+                      /gnu/store/6j376x184g070383sxdzi775my9x081s-guile-smc-git/share/guile/site/3.0/
   --modules, -U <extra-modules>
                     Load additional modules.  The value must be the same
                     as for 'use-modules'.  Example value:
@@ -162,13 +187,15 @@ Options:
   --fsm-module, -m <module>
                     Set the module for the output FSM.  Example value:
                       "(smc puml-fsm)"
-  --target, -t <target>
-                    Compilation target.  Allowed values:
-                      \"guile\", \"guile-standalone\"
   --validate        Validate the output FSM and print the validation result.
                     The exit code is 0 if the validation is passed,
                     and a non-zero value otherwise.
+  --target, -t <target>
+                    Compilation target.  Allowed values:
+                      "guile", "guile-standalone"
+                    Default value is "guile".
   --debug           Enable the debug mode.
+
 #+END_EXAMPLE
 
 Usage example:
@@ -270,7 +297,7 @@ Options:
                       rotated as needed.
                       Options:
                       "file" -- the full path to the log file.
-                    - "none" -- disable logging (discard all the messages.)
+                    - "null" -- disable logging (discard all the messages.)
 
                     Default value is "syslog"
   --log-opt <options>
@@ -280,14 +307,13 @@ Options:
                       "key1=value1,key2=value2"
                     Example:
                       "file=/tmp/smc.log"
-  --log-file <file>
-                    *This option is deprecated and will be removed in the
-                    Guile-SMC 0.6.0.  Use "--log-driver" and "--log-opt"
-                    instead.*
 
-                    Log file to use.  Pass "-" as the file to use the standard
-                    error stream (stderr.)
-                    'smc run' logs to syslog by default.
+                    There is an option "stderr" that is handled independently
+                    from the log driver that allows to configure stderr logging.
+                    Example values:
+                      "stderr=true"
+                      "stderr=false"
+
   --debug           Enable the debug mode.
 #+END_EXAMPLE
 
