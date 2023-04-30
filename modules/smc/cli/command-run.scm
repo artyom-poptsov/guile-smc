@@ -132,7 +132,7 @@ Options:
       (print-help)
       (exit 0))
 
-    (smc-log-init! log-driver log-opt))
+    (smc-log-init! log-driver log-opt)
 
     (add-to-load-path* (string-split extra-load-paths #\:))
 
