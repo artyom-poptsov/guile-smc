@@ -21,7 +21,8 @@ jobs:
               guile-2.2-dev \
               guile-library \
               texinfo \
-              bsdutils
+              bsdutils \
+              help2man
         
       - name: Checkout repository 
         uses: actions/checkout@v2
