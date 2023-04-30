@@ -257,8 +257,31 @@
 (define-method (log-clear-handlers!)
   (slot-set! %logger 'log-handlers '()))
 
+(define-method-with-docs (log-use-stderr! (value <boolean>))
+  "Enable or disable logging to stderr."
+  (if value
+      (log-add-handler! (make <stderr-log>))
+      (log-remove-handler! <stderr-log>)))
+
 (define-method (smc-log-init! (driver <string>) (options <list>))
+  "Initialize Guile-SMC logging facilities.  @var{driver} must be either 'syslog',
+'file' or 'null', otherwise an error will be thrown.  @var{options} must be an
+associative list of log options."
+
   (log-clear-handlers!)
+
+  (let ((use-stderr? (let ((value (assoc-ref options 'stderr)))
+                       (and value
+                            (cond
+                             ((string=? value "true")
+                              #t)
+                             ((string=? value "false")
+                              #f)
+                             (else
+                              (error "Unknown value for \"stderr\" log option"
+                                     options)))))))
+    (log-use-stderr! use-stderr?))
+
   (cond
    ((string=? driver "syslog")
     (log-add-handler! (make <system-log> #:tag %default-guile-smc-syslog-tag)))
@@ -278,11 +301,6 @@
 (smc-log-init! "syslog" '())
 
 
-(define-method-with-docs (log-use-stderr! (value <boolean>))
-  "Enable or disable logging to stderr."
-  (if value
-      (log-add-handler! (make <stderr-log>))
-      (log-remove-handler! <stderr-log>)))
 
 (define (smc-log level fmt . args)
   (let ((message (apply format #f fmt args)))
