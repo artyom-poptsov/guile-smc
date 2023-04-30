@@ -110,6 +110,35 @@ The profiler allows to analyze state machines using its logs (traces) and thus
 provides facilities to detect bottlenecks in state machines in terms of
 running time.
 
+Input data example:
+
+@example
+2023-04-22 23:00:09.032625 (DEBUG): [*] -> [read]
+2023-04-22 23:00:09.032748 (DEBUG): [read] -> [read_section_title]
+2023-04-22 23:00:09.033559 (DEBUG): [read_section_title] -> [read_section_content]
+2023-04-22 23:00:09.033613 (DEBUG): [read_section_content] -> [read_section_property_key]
+2023-04-22 23:00:09.033675 (DEBUG): [read_section_property_key] -> [trim_section_property_key]
+2023-04-22 23:00:09.033717 (DEBUG): [trim_section_property_key] -> [trim_section_property_value]
+2023-04-22 23:00:09.033754 (DEBUG): [trim_section_property_value] -> [read_section_property_value]
+2023-04-22 23:00:09.033811 (DEBUG): [read_section_property_value] -> [read_section_content]
+2023-04-22 23:00:09.033840 (DEBUG): [read_section_content] -> [read_section_property_key]
+2023-04-22 23:00:09.033922 (DEBUG): [read_section_property_key] -> [trim_section_property_key]
+2023-04-22 23:00:09.034378 (DEBUG): [trim_section_property_key] -> [trim_section_property_value]
+2023-04-22 23:00:09.034415 (DEBUG): [trim_section_property_value] -> [read_section_property_value]
+2023-04-22 23:00:09.034450 (DEBUG): [read_section_property_value] -> [read_section_content]
+2023-04-22 23:00:09.034478 (DEBUG): [read_section_content] -> [read_section_property_key]
+2023-04-22 23:00:09.034522 (DEBUG): [read_section_property_key] -> [trim_section_property_key]
+2023-04-22 23:00:09.034547 (DEBUG): [trim_section_property_key] -> [trim_section_property_value]
+2023-04-22 23:00:09.034574 (DEBUG): [trim_section_property_value] -> [read_section_property_value]
+2023-04-22 23:00:09.034661 (DEBUG): [read_section_property_value] -> [read_section_content]
+2023-04-22 23:00:09.034700 (DEBUG): [read_section_content] -> [read_section_property_key]
+2023-04-22 23:00:09.034738 (DEBUG): [read_section_property_key] -> [trim_section_property_key]
+2023-04-22 23:00:09.034765 (DEBUG): [trim_section_property_key] -> [trim_section_property_value]
+2023-04-22 23:00:09.034790 (DEBUG): [trim_section_property_value] -> [read_section_property_value]
+2023-04-22 23:00:09.034830 (DEBUG): [read_section_property_value] -> [read_section_content]
+2023-04-22 23:00:09.034889 (DEBUG): [read_section_content] -> [*]
+@end example
+
 Usage example:
 
 @example shell
