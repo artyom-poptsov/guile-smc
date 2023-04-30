@@ -21,13 +21,14 @@ include $(top_srcdir)/build-aux/am/guilec
 
 EXTRA_DIST = \
 	fsm.puml		\
-	main.in
+	main.in			\
+	context.scm
 
 SOURCES = \
 	fsm.scm			\
 	context.scm		\
 	custom-fsm.scm		\
-	main.scm	\
+	main.scm		\
 	main.in
 
 examplesdir = $(pkgdatadir)/examples
@@ -35,7 +36,6 @@ examples_parenthesis_checkdir = $(pkgdatadir)/examples/parenthesis-check/
 examples_parenthesis_check_DATA = \
 	fsm.puml		\
 	custom-fsm.scm		\
-	context.scm	\
 	main.scm
 
 SUFFIXES = .in .puml
@@ -50,9 +50,9 @@ substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 
 custom-fsm.scm: fsm.puml
 	@echo "  SMC      $<"
-	@$(abs_top_builddir)/pre-inst-env $(abs_top_builddir)/utils/smc compile \
+	$(abs_top_builddir)/pre-inst-env $(abs_top_builddir)/utils/smc compile \
 	--log-driver null \
-	-L "$(top_srcdir)/modules:." \
+	-L "$(abs_top_srcdir)/modules:$(abs_top_srcdir)/examples/parenthesis-check/" \
 	-U "((context))" \
 	--guile-smc-path $(abs_top_srcdir)/modules/smc/ \
 	--target guile-standalone \
