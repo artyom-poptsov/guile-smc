@@ -28,6 +28,17 @@ implementation.)
 
 Extra compilation targets are adding extra maintenance burden so I'd prefer to
 focus my somewhat limited resources on those that make sense in the long run.
+** =<fsm>= now supports "pre-actions" and "post-actions"
+The class slots can be set with "#:pre-action" and "#:post-action" keyword
+parameters in the class constructor.
+
+"pre-action" is a global action that is performed on a context and event
+before all the other guards and actions.
+
+"post-action" is a global action that is performed on a context and event
+after all the other guards and actions are executed in a chain.
+
+By default both actions are procedures that return a context as is.
 ** =smc compile=
 *** New option: "--guile-smc-path"
 ** =smc context=
@@ -38,6 +49,7 @@ intermediate context is generated.
 Sets the path where Guile-SMC core modules are stored.  E.g.:
 =~/.guix-profile/share/guile/site/smc/=
 ** =smc run=: Remove the deprecated "--log-file= option           :API_CHANGE:
+** =smc profile= now allow to print data in JSON format
 ** =smc=: Improve the "--debug" mode
 Now when the debug mode is enabled =smc= will not enable stderr logging.  To
 enable logging to stderr in addition to the regular logging drivers, there's
