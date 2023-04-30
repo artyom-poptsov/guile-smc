@@ -47,6 +47,8 @@ puml-fsm.scm: puml.puml
 	@echo "  SMC      $<"
 	@smc compile \
 	    --load-path "$(abs_top_srcdir)/modules" \
+	    --log-driver file \
+	    --log-opt "file=puml-fsm.scm.log" \
 	    --fsm-name "puml-fsm" \
 	    --fsm-module "(smc puml-fsm)" \
 	    --modules "((smc context char) (smc context oop char) (smc puml-context))" \
@@ -56,6 +58,8 @@ trace-fsm.scm: trace.puml
 	@echo "  SMC      $<"
 	@smc compile \
 		--load-path $(abs_top_srcdir)/modules \
+		--log-driver file \
+		--log-opt "file=trace-fsm.scm.log" \
 		--fsm-name "trace-fsm" \
 		--fsm-module "(smc trace-fsm)" \
 		--modules "((smc trace-context) (smc context char) (smc context oop char))" \
