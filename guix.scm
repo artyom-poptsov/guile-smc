@@ -72,22 +72,22 @@
          (delete 'strip)
          (add-after 'install 'wrap-program
            (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let* ((out       (assoc-ref outputs "out"))
-                    (bin       (string-append out "/bin"))
-                    (guile-lib (assoc-ref inputs "guile-lib"))
-                    (version   (target-guile-effective-version))
-                    (scm       (string-append "/share/guile/site/"
-                                              version))
-                    (go        (string-append  "/lib/guile/"
-                                               version "/site-ccache")))
+             (let* ((bin (string-append (assoc-ref outputs "out") "/bin"))
+                    (version (target-guile-effective-version))
+                    (site-dir
+                     (lambda (dir)
+                       (string-append dir "/share/guile/site/" version)))
+                    (go-dir
+                     (lambda (dir)
+                       (string-append dir "/lib/guile/" version "/site-ccache")))
+                    (dirs (map cdr (append inputs outputs))))
                (wrap-program (string-append bin "/smc")
-                 `("GUILE_LOAD_PATH" prefix
-                   (,(string-append out scm)
-                    ,(string-append guile-lib scm)))
-                 `("GUILE_LOAD_COMPILED_PATH" prefix
-                   (,(string-append out go)
-                    ,(string-append guile-lib go)))))
-             #t)))))
+                 (list "GUILE_LOAD_PATH"
+                       'prefix
+                       (filter file-exists? (map site-dir dirs)))
+                 (list "GUILE_LOAD_COMPILED_PATH"
+                       'prefix
+                       (filter file-exists? (map go-dir dirs))))))))))
     (native-inputs
      (list autoconf
            automake
