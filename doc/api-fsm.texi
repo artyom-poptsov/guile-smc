@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @c This file is part of Guile-SMC Reference Manual.
-@c Copyright (C) 2021 Artyom V. Poptsov
+@c Copyright (C) 2021-2023 Artyom V. Poptsov
 @c See the file guile-smc.texi for copying conditions.
 
 @node FSM
@@ -29,22 +29,97 @@ Optional custom human-readable description for the finite-state machine.
 @item #:debug-mode? (enabled? <boolean>)
 Is the debug mode enabled?
 
-@item #:transition-table (table <list>)
+@item #:transition-table (table <hash-table>)
 A transition table.
 
 @item #:event-source (proc <procedure>)
-Global state machine event source.
+Global state machine event source.  The event source is a procedure that
+accepts a context and returns a next event.
+
+The default value of this parameter is a procedure that always returns
+@code{#t}.
 
 @end table
 
 @end deftp
 
-
 @c -----------------------------------------------------------------------------
 @subsection Public API
 
-@deffn {Scheme Procedure} fsm? object
-Check if an @var{object} is an @code{<fsm>} instance.
+@deffn {Scheme Procedure} fsm? (object <top>)
+Check if an @var{object} is an instance of @code{<fsm>} class.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-description (fsm <fsm>)
+Get the @var{fsm} description.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-description-set! (fsm <fsm>) (description <string>)
+Set the @var{fsm} description.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-debug-mode? (fsm <fsm>)
+Check if the debug mode is enabled for @var{fsm}.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-debug-mode-set! (fsm <fsm>) (value <boolean>)
+Set the debug mode state for @var{fsm}.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-transition-table (fsm <fsm>)
+Get the @var{fsm} transition table.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-transition-table-set! (fsm <fsm>) (table <hash-table>)
+Set the @var{fsm} transition hash table.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-event-source (fsm <fsm>)
+Get the @var{fsm} event source procedure.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-event-source-set! (fsm <fsm>) (proc <procedure>)
+Set the @var{fsm} event source procedure.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-current-state (fsm <fsm>)
+Get the @var{fsm} current state.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-current-state-set! (fsm <fsm>) (state <state>)
+Set the @var{fsm} current state.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-step-counter (fsm <fsm>)
+Get the @var{fsm} step counter value.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-step-counter-set! (fsm <fsm>) (value <number>)
+Set the @var{fsm} step counter value.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-transition-counter (fsm <fsm>)
+Get the @var{fsm} transition counter value.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-transition-counter-set! (fsm <fsm>) (value <number>)
+Set the @var{fsm} transition counter value.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-parent-fsm (fsm <fsm>)
+Get the @var{fsm} parent FSM.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-parent-fsm-set! (fsm <fsm>) (value <fsm>)
+Set the @var{fsm} parent FSM.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-parent-context (fsm <fsm>)
+Get the @var{fsm} parent FSM context.
+@end deffn
+
+@deffn {Scheme Procedure} fsm-parent-context-set! (fsm <fsm>) (value <top>)
+Set the @var{fsm} parent FSM context.
 @end deffn
 
 @deffn {Scheme Procedure} fsm-state-add! (fsm <fsm>) (state <state>)
