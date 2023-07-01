@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @c This file is part of Guile-SMC Reference Manual.
-@c Copyright (C) 2021 Artyom V. Poptsov
+@c Copyright (C) 2021-2023 Artyom V. Poptsov
 @c See the file guile-smc.texi for copying conditions.
 
 @node PlantUML
@@ -8,6 +8,27 @@
 
 The @code{(smc puml)} module contains a parser implementation for
 @url{http://www.plantuml.com/, PlantUML} format.
+
+@c -----------------------------------------------------------------------------
+@subsection Public API
+
+@deffn {Scheme Procedure} puml->fsm port @
+              [#:module=(current-module)] @
+              [#:keep-going?=#f] @
+              [#:debug-mode?=#f]
+
+Read a FSM description from a @var{port} in the PlantUML format and convert it
+to Guile-SMC @code{<fsm>} instance.
+@end deffn
+
+@deffn {Scheme Procedure} puml-string->fsm port @
+              [#:module=(current-module)] @
+              [#:keep-going?=#f] @
+              [#:debug-mode?=#f]
+
+Convert a @var{string} in the PlantUML format and to Guile-SMC @code{<fsm>}
+instance.
+@end deffn
 
 @c -----------------------------------------------------------------------------
 @subsection The PlantUML context
@@ -31,33 +52,50 @@ variants (@code{guard:t} for guards, @code{action:no-op} for actions.)
 
 @end deftp
 
-@c -----------------------------------------------------------------------------
-@subsection Public API
-
 @deffn {Scheme Procedure} puml-context-fsm (context <puml-context>)
 Get the @var{context} output finite state machine.
+@end deffn
+
+@deffn {Scheme Procedure} puml-context-fsm-set! (context <puml-context>) @
+       (fsm <fsm>)
+Set the @var{context} output finite state machine.
 @end deffn
 
 @deffn {Scheme Procedure} puml-context-module (context <puml-context>)
 Get the @var{context} module.
 @end deffn
 
-@deffn {Scheme Procedure} puml->fsm port @
-              [#:module=(current-module)] @
-              [#:keep-going?=#f] @
-              [#:debug-mode?=#f]
-
-Read a FSM description from a @var{port} in the PlantUML format and convert it
-to Guile-SMC @code{<fsm>} instance.
+@deffn {Scheme Procedure} puml-context-keep-going? (context <puml-context>)
+Check if ``keep going'' option is enabled for an PlantUML @var{context}.
 @end deffn
 
-@deffn {Scheme Procedure} puml-string->fsm port @
-              [#:module=(current-module)] @
-              [#:keep-going?=#f] @
-              [#:debug-mode?=#f]
+@c -----------------------------------------------------------------------------
+@subsubsection FSM Guards and Actions
 
-Convert a @var{string} in the PlantUML format and to Guile-SMC @code{<fsm>}
-instance.
+@deffn {Scheme Procedure} title? ctx ch
+Check if PlantUML diagram title is found.
+@end deffn
+
+@deffn {Scheme Procedure} add-description ctx ch
+Add FSM description.
+@end deffn
+
+@deffn {Scheme Procedure} add-state-transition ctx ch
+Add FSM state transition.
+@end deffn
+
+@deffn {Scheme Procedure} process-state-description ctx ch
+
+@end deffn
+
+@deffn  {Scheme Procedure} validate-start-tag ctx ch
+@deffnx {Scheme Procedure} validate-end-tag ctx ch
+Validate start/end tags in a PlantUML data.
+@end deffn
+
+@deffn {Scheme Procedure} throw-no-start-tag-error ctx ch
+@deffnx {Scheme Procedure} throw-unexpected-end-of-file-error ctx ch
+PlantUML parser context error reporting.
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -89,10 +127,52 @@ Pretty-print a @var{puml-context} resolver status to the specified @var{port}.
 @c -----------------------------------------------------------------------------
 @subsection Internal procedures
 
+@deffn  {Scheme Procedure} puml-error ctx message
+@deffnx {Scheme Procedure} puml-error ctx message . args
+Throw an PlantUML error.
+@end deffn
+
 @deffn {Scheme Procedure} resolve-procedure context proc-name default
 This procedure tries to resolve a procedure @var{proc-name} in the provided
 modules of a @var{context}. When no procedure available with the given name,
 returns @var{default} procedure.
+@end deffn
+
+@deffn {Scheme Procedure} module-name module
+Get the name of a @var{module}.
+@end deffn
+
+@deffn {Scheme Procedure} parse-event-source (line <string>)
+Try to parse a @var{line} as an event source definition.  Returns a match or
+@var{#f} if line does not match.
+
+Example event source definition:
+@example
+event-source: some-event-source
+@end example
+
+@end deffn
+
+@deffn {Scheme Procedure} parse-entry-action (line <string>)
+Try to parse a @var{line} as an entry action definition.  Returns a match or
+@var{#f} if line does not match.
+
+Example entry action definition:
+@example
+entry-action: some-entry-action
+@end example
+
+@end deffn
+
+@deffn {Scheme Procedure} parse-exit-action (line <string>)
+Try to parse a @var{line} as an exit action definition.  Returns a match or
+@var{#f} if line does not match.
+
+Example exit action definition:
+@example
+exit-action: some-exit-action
+@end example
+
 @end deffn
 
 @c Local Variables:
