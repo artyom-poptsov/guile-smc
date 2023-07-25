@@ -37,7 +37,9 @@
   #:use-module (smc trace-context)
   #:use-module (smc trace-fsm)
   #:use-module (smc cli common)
-  #:export (command-profile))
+  #:export (command-profile
+
+            print-human-readable))
 
 
 
