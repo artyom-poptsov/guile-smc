@@ -30,6 +30,7 @@
 
             <log-entry>
             <log-entry:message>
+            log-entry-level
             log-entry-timestamp
             log-entry-message
             log-entry?
