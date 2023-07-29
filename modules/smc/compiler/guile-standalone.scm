@@ -170,6 +170,7 @@ neither in the DEFINITIONS nor HARDWIRED-DEFINITIONS lists."
                                (skip-define-module? #t))
   "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the
 code as a list."
+  (log-info "fsm-get-context-code: Generating context type: ~a" type)
   (define (read-module path module-name)
     (log-debug "fsm-get-context-code: Reading module ~a/~a ..."
                path
@@ -203,22 +204,45 @@ code as a list."
             ,@(read-module context-path "common.scm")
             ,@(read-module context-path "char.scm")
             ,@(read-module context-path "u8.scm"))))
-    (case type
-      ((oop)
-       (append
-        common-context-code
-        `(,@(read-module context-path "oop/generic.scm")
-          ,@(read-module context-path "oop/port.scm")
-          ,@(read-module context-path "oop/char.scm")
-          ,@(read-module context-path "oop/u8.scm"))))
-      ((functional)
-       (append
-        common-context-code
-        `(,@(read-module context-path "functional/generic.scm")
-          ,@(read-module context-path "functional/char.scm")
-          ,@(read-module context-path "functional/u8.scm"))))
-      (else
-       common-context-code))))
+    (if type
+        (case type
+          ((oop/generic)
+           (append common-context-code
+                   `(,@(read-module context-path "oop/generic.scm"))))
+          ((oop/port)
+           (append common-context-code
+                   `(,@(read-module context-path "oop/port.scm"))))
+          ((oop/char)
+           (append common-context-code
+                   `(,@(read-module context-path "oop/char.scm"))))
+          ((oop/u8)
+           (append common-context-code
+                   `(,@(read-module context-path "oop/u8.scm"))))
+          ((oop)
+           (append
+            common-context-code
+            `(,@(read-module context-path "oop/generic.scm")
+              ,@(read-module context-path "oop/port.scm")
+              ,@(read-module context-path "oop/char.scm")
+              ,@(read-module context-path "oop/u8.scm"))))
+          ((functional/generic)
+           (append common-context-code
+                   `(,@(read-module context-path "functional/generic.scm"))))
+          ((functional/char)
+           (append common-context-code
+                   `(,@(read-module context-path "functional/char.scm"))))
+          ((functional/u8)
+           (append common-context-code
+                   `(,@(read-module context-path "functional/u8.scm"))))
+          ((functional)
+           (append
+            common-context-code
+            `(,@(read-module context-path "functional/generic.scm")
+              ,@(read-module context-path "functional/char.scm")
+              ,@(read-module context-path "functional/u8.scm"))))
+          (else
+           (error "Unknown context type" type)))
+    common-context-code)))
 
 (define (fsm-get-class-code fsm-name)
   (let ((cname (string->symbol (format #f "<~a>" fsm-name))))

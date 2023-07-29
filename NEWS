@@ -9,6 +9,9 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
 
 * Unreleased
 ** Allow to set a global event source in a PlantUML "legend" block
+** =smc context=: Allow to set context sub-type
+=smc context= now allows to set a context sub-type to minimise the amount 
+of imported code.
 * Version 0.6.0 (2023-04-30)
 ** New context implementation                                    :API_CHANGE:
 New FSM context implementation consists of three modules that contain

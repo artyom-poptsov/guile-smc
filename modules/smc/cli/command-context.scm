@@ -40,6 +40,19 @@
   #:export (command-context
             cli-context-write-commentary))
 
+
+
+(define %supported-types
+  '(oop
+    oop/generic
+    oop/port
+    oop/char
+    oop/u8
+    functional
+    functional/generic
+    functional/char
+    functional/u8))
+
 (define (print-help)
   (display (string-append "\
 Usage: smc context [options] [input-file]
@@ -53,6 +66,16 @@ Options:
   --standalone, -s
                     Generate a standalone compiler context.
   --type, -T <type> Set the context type for the output context.
+                    Expected format: \"<type>[/<sub-type>]\".
+                    Supported values:
+ "
+                          (string-join
+                           (map (lambda (value)
+                                  (format #f
+                                          "                   - ~a~%"
+                                          value))
+                                %supported-types))
+                          "
   --generate, -g    Generate a context stub from a given PlantUML file.
   --guile-smc-path <path>
                     Set the path where Guile-SMC modules are stored.
@@ -195,11 +218,39 @@ specified OUTPUT-PORT."
                 #:use-module (smc context oop char)
                 #:use-module (smc context oop u8))
             ,@re-exports-list))
+         ((oop/generic)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context oop generic))
+            ,@re-exports-list))
+         ((oop/port)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context oop port))
+            ,@re-exports-list))
+         ((oop/char)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context oop char))
+            ,@re-exports-list))
+         ((oop/u8)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context oop u8))
+            ,@re-exports-list))
          ((functional)
           `(,@common-context-code
             ,@'(#:use-module (smc context functional generic)
                 #:use-module (smc context functional char)
                 #:use-module (smc context functional u8))
+            ,@re-exports-list))
+         ((functional/generic)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context functional generic))
+            ,@re-exports-list))
+         ((functional/char)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context functional char))
+            ,@re-exports-list))
+         ((functional/u8)
+          `(,@common-context-code
+            ,@'(#:use-module (smc context functional u8))
             ,@re-exports-list))
          (else
           `(,@common-context-code
@@ -251,6 +302,15 @@ specified OUTPUT-PORT."
 
     (write-footer "Guile-SMC context" output-port)))
 
+
+
+(define (parse-type type)
+  "Parse a TYPE string, return a symbol or #f."
+  (and (string? type)
+       (let ((type (string->symbol type)))
+         (unless (member type %supported-types)
+           (error "Unknown context type" type))
+         type)))
 
 (define %option-spec
   '((help                     (single-char #\h) (value #f))
@@ -319,16 +379,13 @@ specified OUTPUT-PORT."
                             (current-output-port))))
        (else
         (if standalone?
-            (generate-smc-context/standalone guile-smc-path
-                                             module
+            (generate-smc-context/standalone guile-smc-path module
                                              (current-output-port)
-                                             #:type (and (string? type)
-                                                         (string->symbol type)))
+                                             #:type (parse-type type))
             (generate-smc-context guile-smc-path
                                   module
                                   (current-output-port)
-                                  #:type (and (string? type)
-                                              (string->symbol type)))))))))
+                                  #:type (parse-type type))))))))
 
 ;;; command-context.scm ends here.
 
