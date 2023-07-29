@@ -57,13 +57,18 @@
 
             ;; Guards.
             title?
+            legend?
+            legend-event-source?
+            legend-end?
 
             ;; Actions.
+            set-event-source
             add-description
             add-state-transition
             process-state-description
             validate-start-tag
             validate-end-tag
+            throw-no-endlegend-error
             throw-unexpected-end-of-file-error
             throw-no-start-tag-error))
 
@@ -242,6 +247,40 @@
 (define (title? ctx ch)
   (and (char=? ch #\space)
        (string=? (context-buffer->string ctx) "title")))
+
+(define (legend? ctx ch)
+  (and (or (char=? ch #\space)
+           (char=? ch #\newline))
+       (string=? (context-buffer->string ctx) "legend")))
+
+(define (legend-end? ctx ch)
+  (and (or (char=? ch #\space)
+           (char=? ch #\newline))
+       (string=? (context-buffer->string ctx) "endlegend")))
+
+(define (legend-event-source? ctx ch)
+  (and (char=? ch #\newline)
+       (let ((line (string-trim (context-buffer->string ctx))))
+         (string-prefix? "event-source:" line))))
+
+(define (set-event-source ctx ch)
+  (let* ((line (string-trim (context-buffer->string ctx)))
+         (data (string-split line #\:))
+         (event-source-name (string->symbol (string-trim (cadr data))))
+         (event-source (resolve-procedure ctx event-source-name))
+         (fsm (puml-context-fsm ctx)))
+    (context-log-info ctx
+                      "set-event-source: Event source: ~S"
+                      event-source)
+    (unless event-source
+      (puml-error ctx
+                  "Could not resolve procedure"
+                  event-source-name))
+    (fsm-event-source-set! fsm (cdr event-source))
+    (clear-buffer ctx)))
+
+(define (throw-no-endlegend-error ctx ch)
+  (puml-error ctx "No 'endlegend' found"))
 
 (define (throw-no-start-tag-error ctx ch)
   (puml-error ctx "No start tag found"))

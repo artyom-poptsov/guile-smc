@@ -14,9 +14,11 @@
              (tests test-context))
 
 
-(test-begin "puml")
+(define %test-suite-name "puml")
 
-(configure-test-logging! "puml")
+(test-begin %test-suite-name)
+
+(configure-test-logging! %test-suite-name)
 
 (define event-source char-context-event-source)
 
@@ -163,6 +165,46 @@
                                               (current-module))
                                #:debug-mode? #f)))
     (state-exit-action (fsm-state fsm 'state_1))))
+
+
+
+(test-error "legend: no 'endlegend' error"
+  #t
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "legend"
+                                 "[*] -> state_1"
+                                 "state_1: A state description."
+                                 "state_1: exit-action: exit-action"
+                                 "state_1 --> state_1: guard:#t"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    fsm))
+
+(test-equal "legend: event-source"
+  test-event-source
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "legend"
+                                 "event-source: test-event-source"
+                                 "endlegend"
+                                 "[*] -> state_1"
+                                 "state_1: A state description."
+                                 "state_1: exit-action: exit-action"
+                                 "state_1 --> state_1: guard:#t"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-event-source fsm)))
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))

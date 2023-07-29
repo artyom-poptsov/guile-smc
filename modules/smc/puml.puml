@@ -34,9 +34,17 @@ read_skip_comment ->  read_skip_comment
 read_word: Read a word.
 read_word --> [*]: char:eof-object?  -> throw-unexpected-end-of-file-error
 read_word --> read_title: title? -> clear-buffer
+read_word --> read_legend: legend? -> clear-buffer
 read_word --> read_state_description: char:colon? -> push-buffer-to-stanza
 read_word --> search_state_transition: char:space? -> push-buffer-to-stanza
 read_word -> read_word: guard:#t -> push-event-to-buffer
+
+read_legend: Read diagram legend.
+read_legend --> [*]: char:eof-object? -> throw-no-endlegend-error
+read_legend --> read: legend-end? -> clear-buffer
+read_legend -> read_legend: legend-event-source? -> set-event-source
+read_legend -> read_legend: char:newline? -> clear-buffer
+read_legend -> read_legend: guard:#t -> push-event-to-buffer
 
 read_title: Read a diagram title.
 read_title --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
