@@ -170,7 +170,6 @@ neither in the DEFINITIONS nor HARDWIRED-DEFINITIONS lists."
                                (skip-define-module? #t))
   "Read the Guile-SCM context from the GUILE-SMC-MODULES-PATH and return the
 code as a list."
-  (log-info "fsm-get-context-code: Generating context type: ~a" type)
   (define (read-module path module-name)
     (log-debug "fsm-get-context-code: Reading module ~a/~a ..."
                path
@@ -195,6 +194,7 @@ code as a list."
                 (error "Module is empty" path module-name))
               (reverse result))))))
 
+  (log-info "fsm-get-context-code: Generating context type: ~a" type)
   (let* ((core-path    (string-append guile-smc-modules-path "core"))
          (context-path (string-append guile-smc-modules-path "context"))
          (common-context-code
