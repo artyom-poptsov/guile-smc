@@ -86,6 +86,17 @@ Options:
   --standalone, -s
                     Generate a standalone compiler context.
   --type, -T <type> Set the context type for the output context.
+                    Expected format: "<type>[/<sub-type>]".
+                    Supported values:
+                    - oop
+                    - oop/generic
+                    - oop/port
+                    - oop/char
+                    - oop/u8
+                    - functional
+                    - functional/generic
+                    - functional/char
+                    - functional/u8
   --generate, -g    Generate a context stub from a given PlantUML file.
   --guile-smc-path <path>
                     Set the path where Guile-SMC modules are stored.
