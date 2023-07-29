@@ -287,8 +287,7 @@ Return the updated context."
 (define (push-stanza-to-result context event)
   "Push the CONTEXT stanza content to the CONTEXT result and clear the CONTEXT stanza.
 Return the updated context."
-  (clear-stanza context
-                (context-result-set context
+  (clear-stanza (context-result-set context
                                     (cons (context-stanza context)
                                           (context-result context)))))
 
