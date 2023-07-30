@@ -447,7 +447,7 @@ Return the CONTEXT after FSM execution."
                 (fsm-step! fsm event (pre-action context event))
             (if new-state
                 (loop (post-action new-context event))
-                context)))))
+                new-context)))))
       context))
 
 (define-method-with-docs (fsm-run! (fsm <fsm>) context)
@@ -463,7 +463,7 @@ each state."
                 (fsm-step! fsm event (pre-action context event))
               (if new-state
                   (loop (post-action new-context event))
-                  context)))))
+                  new-context)))))
       context))
 
 

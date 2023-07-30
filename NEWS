@@ -12,6 +12,8 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ** =smc context=: Allow to set context sub-type
 =smc context= now allows to set a context sub-type to minimise the amount 
 of imported code.
+** =fsm-run!= bugfix: Return the updated context at the end
+Return the updated context at the end of FSM run.
 * Version 0.6.0 (2023-04-30)
 ** New context implementation                                    :API_CHANGE:
 New FSM context implementation consists of three modules that contain
