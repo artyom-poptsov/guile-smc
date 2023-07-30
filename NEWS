@@ -15,7 +15,8 @@ of imported code.
 ** =fsm-run!= bugfix: Return the updated context at the end
 Return the updated context at the end of FSM run.
 ** =(smc core state)=: Bugfix
-Add missing serialization of the state "exit-action".
+Add missing serialization of the state "exit-action".  Also set the state 
+exit action when the state is de-serialized.
 * Version 0.6.0 (2023-04-30)
 ** New context implementation                                    :API_CHANGE:
 New FSM context implementation consists of three modules that contain

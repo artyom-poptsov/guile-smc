@@ -306,6 +306,8 @@ of a STATE, specified by the 'event-source' slot."
     #:event-source (state:event-source lst)
     #:entry-action (or (state:entry-action lst)
                        %default-entry-action)
+    #:exit-action  (or (state:exit-action lst)
+                       %default-exit-action)
     #:description  (state:description  lst)
     #:transitions  (state:transitions  lst)))
 
