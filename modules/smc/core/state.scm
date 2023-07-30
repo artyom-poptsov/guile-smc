@@ -321,6 +321,9 @@ of a STATE, specified by the 'event-source' slot."
             ,(if (equal? (state-entry-action state) %default-entry-action)
                  '()
                  (cons 'entry-action (state-entry-action state)))
+            ,(if (equal? (state-exit-action state) %default-exit-action)
+                 '()
+                 (cons 'exit-action (state-exit-action state)))
             (transitions  . ,(state-transitions state)))))
 
 

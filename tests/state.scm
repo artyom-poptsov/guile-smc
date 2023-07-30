@@ -241,6 +241,7 @@
   '((name       . #f)
     (event-source unquote test-event-source)
     (entry-action unquote entry-action)
+    (exit-action  unquote exit-action)
     (transitions  ((unquote #{guard:#t}#) (unquote action:no-op) state-1)))
    (let ((state (make <state>
                   #:event-source test-event-source
