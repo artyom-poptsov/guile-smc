@@ -456,21 +456,32 @@
 
     (unless (fsm-state fsm state-name)
       (%context-fsm-state-add! ctx state-name))
-
     (let ((event-source-match (parse-event-source new-description))
           (entry-action-match (parse-entry-action new-description))
           (exit-action-match  (parse-exit-action new-description))
           (state              (fsm-state fsm state-name)))
       (cond
        (event-source-match
+        (context-log-debug ctx
+                           "[~a] Event source match: ~a"
+                           state-name
+                           event-source-match)
         (let ((event-source (%resolve state-name
                                       (match:substring event-source-match 1))))
           (state-event-source-set! state event-source)))
        (entry-action-match
+        (context-log-debug ctx
+                           "[~a] Entry action match: ~a"
+                           state-name
+                           entry-action-match)
         (let ((entry-action (%resolve state-name
                                       (match:substring entry-action-match 1))))
           (state-entry-action-set! state entry-action)))
        (exit-action-match
+        (context-log-debug ctx
+                           "[~a] Exit action match: ~a"
+                           state-name
+                           exit-action-match)
         (let ((exit-action (%resolve state-name
                                      (match:substring exit-action-match 1))))
           (state-exit-action-set! state exit-action)))
