@@ -91,17 +91,50 @@ Guile-SMC that normally goes before this procedure):
 @end example
 
 @section The Context Generator and Analyzer
-@command{smc context} allows to generate and analyze Guile-SMC FSM contexts.
+@command{smc context} command allows to generate and analyze Guile-SMC FSM
+contexts.
 
 There are two modes of context generation: the command either can generate a
 custom context stub based on an input PlantUML state machine description, or
-generate a standalone (intermediate) context that can be used by custom
-contexts to relax the dependency on Guile-SMC modules (and allow to compile
-custom FSMs in standalone mode in the future.)
+generate a standalone (or intermediate) context that can be used by custom
+contexts to relax the dependency on Guile-SMC modules
 
 When @code{--resolve} option is provided the command prints to the standard
 output the list of resolved and unresolved procedures based on the input
 PlantUML file.
+
+Supported options:
+@table @asis
+@item @code{--help}, @code{-h}
+Print the help message and exit.
+@item @code{--resolve}, @code{-r}
+Print the resolver status.
+@item @code{--standalone}, @code{-s}
+Generate a standalone compiler context.
+@item @code{--type <type>}, @code{-T <type>}
+Set the context type for the output context.
+
+Expected format: @code{<type>[/<sub-type>]}
+
+For example: ``functional/char''.
+
+To get the full list of supported formats, see @code{--help}.
+@item @code{--generate}, @code{-g}
+Generate a context stub based on a provided state machine description in a
+PlantUML format.
+@item @code{--guile-smc-path <path>}
+Set the path where Guile-SMC modules are stored.
+@item @code{--module <module>}, @code{-m <module>}
+Place the output code into a specified module
+@item @code{--load-path <load-path>}, @code{-L <load-path>}
+Add an extra load path.
+@item @code{--log-driver <driver>}
+Set the log driver.
+@item @code{--log-opt <options>}
+Set the logging options.  The set of options depends on the logging driver.
+@item @code{--debug}
+Enable the debug mode.
+@end table
 
 @section The Profiler
 @cindex Profiler
