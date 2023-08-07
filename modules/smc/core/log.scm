@@ -50,6 +50,7 @@
 
             smc-log-init!
             smc-log
+            smc-log-default-logger
 
             log-add-handler!
             log-remove-handler!
@@ -243,6 +244,9 @@
 (set-default-logger! %logger)
 (register-logger! %default-guile-smc-syslog-tag %logger)
 (open-log! %logger)
+
+(define (smc-log-default-logger)
+  %logger)
 
 (define-method (log-add-handler! (handler <log-handler>))
   (add-handler! %logger handler))
