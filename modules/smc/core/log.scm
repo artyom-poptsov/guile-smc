@@ -241,6 +241,7 @@
   (make <precise-logger>))
 
 (set-default-logger! %logger)
+(register-logger! %default-guile-smc-syslog-tag %logger)
 (open-log! %logger)
 
 (define-method (log-add-handler! (handler <log-handler>))
