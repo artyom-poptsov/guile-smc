@@ -32,6 +32,7 @@
             <log-entry:message>
             log-entry-level
             log-entry-timestamp
+            log-entry-timestamp/us
             log-entry-message
             log-entry?
             log-entry:message?
@@ -159,6 +160,12 @@
 (define (log-entry:message? x)
   (is-a? x <log-entry:message>))
 
+
+
+(define-method (log-entry-timestamp/us (entry <log-entry>))
+  (+ (* (string->number (strftime "%s" (car (log-entry-timestamp entry))))
+        1000000)
+     (log-entry-timestamp-usec entry)))
 
 
 
@@ -265,7 +272,7 @@
                   #:timestamp-usec     timestamp:usec
                   #:timestamp-relative (if (trace-context-first-entry ctx)
                                            (- timestamp:usec
-                                              (log-entry-timestamp-usec
+                                              (log-entry-timestamp/us
                                                (trace-context-first-entry ctx)))
                                            0)
                   #:level            (string->symbol (match:substring m 3))
@@ -289,7 +296,7 @@
                   #:timestamp-usec     timestamp:usec
                   #:timestamp-relative (if (trace-context-first-entry ctx)
                                            (- timestamp:usec
-                                              (log-entry-timestamp-usec
+                                              (log-entry-timestamp/us
                                                (trace-context-first-entry ctx)))
                                            0)
                   #:level            (string->symbol (match:substring m 3))
