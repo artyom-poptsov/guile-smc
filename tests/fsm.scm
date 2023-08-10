@@ -164,6 +164,41 @@
     (fsm-procedures fsm)))
 
 
+;; fsm-run!
+
+(test-equal "fsm-run!"
+  'context
+  (let ((fsm (make <fsm>
+               #:event-source     test-event-source
+               #:transition-table `(((name . state-1)
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-2)))
+                                    ((name . state-2)
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-3)))
+                                    ((name . state-3)
+                                     (transitions
+                                      (,guard:#t ,action:no-op #f)))))))
+    (fsm-run! fsm 'context)))
+
+(test-equal "fsm-run!: with pre-action"
+  3
+  (let ((fsm (make <fsm>
+               #:event-source     test-event-source
+               #:pre-action       (lambda (context event)
+                                    (+ context 1))
+               #:transition-table `(((name . state-1)
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-2)))
+                                    ((name . state-2)
+                                     (transitions
+                                      (,guard:#t ,action:no-op state-3)))
+                                    ((name . state-3)
+                                     (transitions
+                                      (,guard:#t ,action:no-op #f)))))))
+    (fsm-run! fsm 0)))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end %test-suite-name)
