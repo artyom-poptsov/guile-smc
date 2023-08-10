@@ -335,11 +335,13 @@ These counters are thrown when a syntax error occurred.  Return the updated
 context.
 
 This procedure can be used as a pre-action for an FSM."
-  (if (eof-object? char)
-      context
-      (if (char=? char #\newline)
-          (reset-col-number (update-row-number (update-counter context)))
-          (update-col-number (update-row-number (update-counter context))))))
+  (cond
+   ((or (not char) (eof-object? char))
+    context)
+   ((char=? char #\newline)
+    (reset-col-number (update-row-number (update-counter context))))
+   (else
+    (update-col-number (update-row-number (update-counter context))))))
 
 
 ;;; Logging.
