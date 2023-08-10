@@ -259,7 +259,9 @@
                                  timestamp:usec-part))
          (entry (make <log-entry:transition>
                   #:timestamp          timestamp:tm
-                  #:timestamp-string   (match:substring m 1)
+                  #:timestamp-string   (string-append (match:substring m 1)
+                                                      "."
+                                                      (match:substring m 2))
                   #:timestamp-usec     timestamp:usec
                   #:timestamp-relative (if (trace-context-first-entry ctx)
                                            (- timestamp:usec
@@ -281,7 +283,9 @@
                                  timestamp:usec-part))
          (entry (make <log-entry:message>
                   #:timestamp          timestamp:tm
-                  #:timestamp-string   (match:substring m 1)
+                  #:timestamp-string   (string-append (match:substring m 1)
+                                                      "."
+                                                      (match:substring m 2))
                   #:timestamp-usec     timestamp:usec
                   #:timestamp-relative (if (trace-context-first-entry ctx)
                                            (- timestamp:usec
