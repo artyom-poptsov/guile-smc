@@ -103,14 +103,19 @@ Options:
               (if prev-tr
                   (let* ((prev-state (log-entry-transition-to prev-tr))
                          (time       (hash-ref result prev-state)))
-                    (begin
+                    (let ((new-time (+ (if time
+                                           time
+                                           0)
+                                       (- (log-entry-timestamp-usec tr)
+                                          (log-entry-timestamp-usec prev-tr)))))
+                      (when (negative? new-time)
+                        (error "Time cannot be negative"
+                               `((new-time       . ,new-time)
+                                 (current-entry  . ,tr)
+                                 (previous-entry . ,prev-tr))))
                       (hash-set! result
                                  prev-state
-                                 (+ (if time
-                                        time
-                                        0)
-                                    (- (log-entry-timestamp-usec tr)
-                                       (log-entry-timestamp-usec prev-tr))))
+                                 new-time)
                       (loop tr (cdr trs) result)))
                   (begin
                     (loop tr (cdr trs) result))))))))
@@ -182,6 +187,11 @@ Options:
            (trace   (reverse (trace-context-result context)))
            (total-time (- (log-entry-timestamp-usec (car (trace-context-result context)))
                           (log-entry-timestamp-usec (car trace)))))
+      (when (negative? total-time)
+        (error "Total time cannot be negative"
+               `((total-time . ,total-time)
+                 (first-entry . ,(car trace))
+                 (last-entry . ,(car (trace-context-result context))))))
       (cond
        ((string=? output-format "human-readable")
         (print-human-readable trace total-time))
