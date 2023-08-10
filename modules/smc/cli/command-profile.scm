@@ -106,8 +106,8 @@ Options:
                     (let ((new-time (+ (if time
                                            time
                                            0)
-                                       (- (log-entry-timestamp-usec tr)
-                                          (log-entry-timestamp-usec prev-tr)))))
+                                       (- (log-entry-timestamp/us tr)
+                                          (log-entry-timestamp/us prev-tr)))))
                       (when (negative? new-time)
                         (error "Time cannot be negative"
                                `((new-time       . ,new-time)
@@ -185,8 +185,8 @@ Options:
                               (make <trace-context>
                                 #:port port)))
            (trace   (reverse (trace-context-result context)))
-           (total-time (- (log-entry-timestamp-usec (car (trace-context-result context)))
-                          (log-entry-timestamp-usec (car trace)))))
+           (total-time (- (log-entry-timestamp/us (car (trace-context-result context)))
+                          (log-entry-timestamp/us (car trace)))))
       (when (negative? total-time)
         (error "Total time cannot be negative"
                `((total-time . ,total-time)
