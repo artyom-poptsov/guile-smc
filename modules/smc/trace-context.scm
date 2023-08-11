@@ -47,15 +47,21 @@
 
 
 
-;; Example:
-;; 2022-01-05 10:58:29.086213 (DEBUG): [read_section_content] -> [read_comment]
-(define %fsm-transition-regex
+(define-with-docs %fsm-transition-regex
+  "The regular expression that describes an FSM state transition.
+
+Matching data example:
+2022-01-05 10:58:29.086213 (DEBUG): [read_section_content] -> [read_comment]
+"
   ;;            1. year      month    day      time (HH:MM:SS)             2. us     3. level      4. from      5. to
   (make-regexp "([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\\.([0-9]+) \\((.+)\\): \\[(.+)\\] -> \\[(.+)\\]"))
 
-;; Example:
-;; 2022-01-05 10:58:29.086213 (DEBUG): Some message.
-(define %fsm-message-regex
+(define-with-docs %fsm-message-regex
+  "The regular expression that describes an FSM state transition.
+
+Matching data example:
+2022-01-05 10:58:29.086213 (DEBUG): Some message.
+"
   ;;            1. year      month    day      time (HH:MM:SS)             2. us     2. level  4. message
   (make-regexp "([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\\.([0-9]+) \\((.+)\\): (.*)"))
 
