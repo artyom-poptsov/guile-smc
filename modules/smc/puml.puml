@@ -43,6 +43,8 @@ read_legend: Read diagram legend.
 read_legend --> [*]: char:eof-object? -> throw-no-endlegend-error
 read_legend --> read: legend-end? -> clear-buffer
 read_legend -> read_legend: legend-event-source? -> set-event-source
+read_legend -> read_legend: legend-pre-action? -> set-pre-action
+read_legend -> read_legend: legend-post-action? -> set-post-action
 read_legend -> read_legend: char:newline? -> clear-buffer
 read_legend -> read_legend: guard:#t -> push-event-to-buffer
 

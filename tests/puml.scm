@@ -206,6 +206,46 @@
                                #:debug-mode? #t)))
     (fsm-event-source fsm)))
 
+(test-equal "legend: pre-action"
+  pre-action
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "legend"
+                                 "pre-action: pre-action"
+                                 "endlegend"
+                                 "[*] -> state_1"
+                                 "state_1: A state description."
+                                 "state_1: exit-action: exit-action"
+                                 "state_1 --> state_1: guard:#t"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-pre-action fsm)))
+
+(test-equal "legend: post-action"
+  post-action
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "legend"
+                                 "post-action: post-action"
+                                 "endlegend"
+                                 "[*] -> state_1"
+                                 "state_1: A state description."
+                                 "state_1: exit-action: exit-action"
+                                 "state_1 --> state_1: guard:#t"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-post-action fsm)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 

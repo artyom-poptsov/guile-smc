@@ -8,8 +8,8 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              6587
-;;;   transition-counter:         863
+;;;   step-counter:              6719
+;;;   transition-counter:         887
 ;;;
 ;;; Resolver status:
 ;;;   #<directory (smc context char)>
@@ -38,14 +38,18 @@
 ;;;     #<procedure add-state-transition (ctx ch)>
 ;;;     #<procedure legend-end? (ctx ch)>
 ;;;     #<procedure legend-event-source? (ctx ch)>
+;;;     #<procedure legend-post-action? (ctx ch)>
+;;;     #<procedure legend-pre-action? (ctx ch)>
 ;;;     #<procedure legend? (ctx ch)>
 ;;;     #<procedure process-state-description (ctx ch)>
 ;;;     #<procedure set-event-source (ctx ch)>
+;;;     #<procedure set-post-action (ctx ch)>
+;;;     #<procedure set-pre-action (ctx ch)>
 ;;;     #<procedure throw-no-endlegend-error (ctx ch)>
 ;;;     #<procedure throw-unexpected-end-of-file-error (ctx ch)>
 ;;;     #<procedure title? (ctx ch)>
-;;;     #<procedure validate-end-tag (ctx ch)>
-;;;     #<procedure validate-start-tag (ctx ch)>
+;;;     #<procedure validate-end-tag (ctx #:optional ch)>
+;;;     #<procedure validate-start-tag (ctx #:optional ch)>
 
 
 (define-module
@@ -76,6 +80,10 @@
        (,legend-end? ,clear-buffer read)
        (,legend-event-source?
         ,set-event-source
+        read_legend)
+       (,legend-pre-action? ,set-pre-action read_legend)
+       (,legend-post-action?
+        ,set-post-action
         read_legend)
        (,char:newline? ,clear-buffer read_legend)
        (,#{guard:#t}# ,push-event-to-buffer read_legend)))
