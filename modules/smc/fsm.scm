@@ -57,6 +57,7 @@
             fsm-statistics
             fsm-pretty-print-statistics
             fsm-procedures
+            fsm-pre-action
             fsm-pre-action-set!
 
             fsm-parent
