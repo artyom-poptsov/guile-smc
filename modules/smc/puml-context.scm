@@ -59,10 +59,14 @@
             title?
             legend?
             legend-event-source?
+            legend-pre-action?
+            legend-post-action?
             legend-end?
 
             ;; Actions.
             set-event-source
+            set-pre-action
+            set-post-action
             add-description
             add-state-transition
             process-state-description
@@ -263,6 +267,16 @@
        (let ((line (string-trim (context-buffer->string ctx))))
          (string-prefix? "event-source:" line))))
 
+(define (legend-pre-action? ctx ch)
+  (and (char=? ch #\newline)
+       (let ((line (string-trim (context-buffer->string ctx))))
+         (string-prefix? "pre-action:" line))))
+
+(define (legend-post-action? ctx ch)
+  (and (char=? ch #\newline)
+       (let ((line (string-trim (context-buffer->string ctx))))
+         (string-prefix? "post-action:" line))))
+
 (define (set-event-source ctx ch)
   (let* ((line (string-trim (context-buffer->string ctx)))
          (data (string-split line #\:))
@@ -277,6 +291,38 @@
                   "Could not resolve procedure"
                   event-source-name))
     (fsm-event-source-set! fsm (cdr event-source))
+    (clear-buffer ctx)))
+
+(define (set-pre-action ctx ch)
+  (let* ((line (string-trim (context-buffer->string ctx)))
+         (data (string-split line #\:))
+         (pre-action-name (string->symbol (string-trim (cadr data))))
+         (pre-action (resolve-procedure ctx pre-action-name))
+         (fsm (puml-context-fsm ctx)))
+    (context-log-info ctx
+                      "set-pre-action: pre-action: ~S"
+                      pre-action)
+    (unless pre-action
+      (puml-error ctx
+                  "Could not resolve procedure"
+                  pre-action-name))
+    (fsm-pre-action-set! fsm (cdr pre-action))
+    (clear-buffer ctx)))
+
+(define (set-post-action ctx ch)
+  (let* ((line (string-trim (context-buffer->string ctx)))
+         (data (string-split line #\:))
+         (post-action-name (string->symbol (string-trim (cadr data))))
+         (post-action (resolve-procedure ctx post-action-name))
+         (fsm (puml-context-fsm ctx)))
+    (context-log-info ctx
+                      "set-post-action: post-action: ~S"
+                      post-action)
+    (unless post-action
+      (puml-error ctx
+                  "Could not resolve procedure"
+                  post-action-name))
+    (fsm-post-action-set! fsm (cdr post-action))
     (clear-buffer ctx)))
 
 (define (throw-no-endlegend-error ctx ch)
