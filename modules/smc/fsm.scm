@@ -59,6 +59,7 @@
             fsm-procedures
             fsm-pre-action
             fsm-pre-action-set!
+            fsm-post-action
 
             fsm-parent
             fsm-parent-set!
