@@ -57,6 +57,7 @@
             fsm-statistics
             fsm-pretty-print-statistics
             fsm-procedures
+            fsm-pre-action-set!
 
             fsm-parent
             fsm-parent-set!
@@ -132,7 +133,8 @@
   (pre-action
    #:init-value   (lambda (context event) context)
    #:init-keyword #:pre-action
-   #:getter       fsm-pre-action)
+   #:getter       fsm-pre-action
+   #:setter       fsm-pre-action-set!)
 
   ;; Global action that is performed on a context and event after all the
   ;; other guards and actions are executed in a chain.
