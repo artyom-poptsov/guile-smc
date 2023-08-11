@@ -60,6 +60,7 @@
             fsm-pre-action
             fsm-pre-action-set!
             fsm-post-action
+            fsm-post-action-set!
 
             fsm-parent
             fsm-parent-set!
@@ -145,7 +146,8 @@
   (post-action
    #:init-value   (lambda (context event) context)
    #:init-keyword #:post-action
-   #:getter       fsm-post-action)
+   #:getter       fsm-post-action
+   #:setter       fsm-post-action-set!)
 
   ;; REQUIRED.  Name of the current state.
   ;;
