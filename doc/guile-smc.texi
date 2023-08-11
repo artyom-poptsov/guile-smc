@@ -101,6 +101,7 @@ Core:
 Context:
 
 * Context::     A generic FSM context.
+* Context Memory:: Structures that provide memory for FSMs.
 
 @end menu
 
@@ -112,6 +113,7 @@ Context:
 @include api-core-state.texi
 @include api-core-transition.texi
 @include api-context.texi
+@include api-context-memory.texi
 
 @include cli.texi
 

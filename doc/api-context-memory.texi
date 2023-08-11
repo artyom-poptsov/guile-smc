@@ -1,0 +1,171 @@
+@c -*-texinfo-*-
+@c This file is part of Guile-SMC Reference Manual.
+@c Copyright (C) 2023 Artyom V. Poptsov
+@c See the file guile-smc.texi for copying conditions.
+
+@cindex Context Memory
+@node Context Memory
+@section Context Memory
+
+Some problems are hard to solve (or cannot be solved at all) by an FSM that
+stores only its state.  Thus, some kind of memory is required to approach such
+tasks.
+
+A stack is often used in such cases but naturally there are cases where
+several kinds of memory is required.
+
+Although a context memory can be represented by any data type that Scheme
+supports, Guile-SMC context memory provides pre-defined means for FSMs to
+store a complex state.
+
+@c -----------------------------------------------------------------------------
+@subsection General Concepts
+
+Guile-SMC context memory has three pre-defined stacks:
+
+@itemize
+@item Buffer
+The context @emph{buffer} holds immediate values (e.g. recently read symbols)
+that have to be processed.
+
+For example, when an FSM reads DSV table like a stream of symbols, buffer may
+hold the symbols of the DSV data field that being read.
+
+@item Stanza
+The context @emph{stanza} holds logical units of parsing.
+
+For example, for a DSV reader mentioned above a logical unit of parsing could
+be a single table row consisting of several fields from the input file.
+
+@item Result
+The context @emph{result} holds the final result of the FSM work.
+
+For example, a DSV reader could the input table and store it as a list of
+lists, where each sub-list represents a table row.
+
+@end itemize
+
+@c -----------------------------------------------------------------------------
+@subsection Functional Memory
+
+@subsubsection generic
+
+See the @code{(smc context functional generic)} module.
+
+@deftp {Structure} <context> @
+                   debug-mode? @
+                   counter @
+                   buffer @
+                   stanza @
+                   result @
+                   custom-data
+
+Structure fields:
+@table @asis
+@item @var{debug-mode?}
+Flag that specifies whether the debug mode for the context is enabled.
+@item @var{counter}
+Context counter.  Can be used to count incoming events, for example.
+@item @var{buffer}
+Context buffer to store intermediate values.
+@item @var{stanza}
+Context stanza to store the chunks of intermediate context data.
+@item @var{result}
+Context result to store the end result of the parser.
+@item @var{custom-data}
+Context custom data that can be used by the custom contexts to store different
+things such as ports or some data structures.
+@end table
+
+@end deftp
+
+@deffn {Scheme Procedure} make-context @
+       [#:debug-mode?=#f] @
+       [#:counter=0] @
+       [#:buffer='()] @
+       [#:stanza='()] @
+       [#:result='()] @
+       [#:custom-data='()]
+The @code{<context>} constructor.
+@end deffn
+
+@deffn {Scheme Procedure} context-buffer/reversed context
+Return the reversed @var{context} buffer.
+@end deffn
+
+@deffn {Scheme Procedure} context-stanza/reversed context
+Return the reversed @var{context} stanza.
+@end deffn
+
+@deffn {Scheme Procedure} context-result/reversed context
+Return the reversed @var{context} result.
+@end deffn
+
+@deffn {Scheme Procedure} context-counter-update @
+       context @
+       [delta=1]
+
+Increment the @var{context} counter by @var{delta} value.  Return the updated
+@var{context}.
+@end deffn
+
+@deffn {Scheme Procedure} clear-buffer context [event]
+
+@end deffn
+
+@deffn {Scheme Procedure} clear-stanza context [event]
+
+@end deffn
+
+@deffn {Scheme Procedure} clear-result context [event]
+
+@end deffn
+
+@deffn {Scheme Procedure} update-counter context [event]
+
+@end deffn
+
+@deffn {Scheme Procedure} reverse-buffer context [event]
+
+@end deffn
+
+@deffn {Scheme Procedure} reverse-stanza context [event]
+
+@end deffn
+
+@deffn {Scheme Procedure} reverse-result context [event]
+
+@end deffn
+
+@deffn {Scheme Procedure} push-event-to-buffer context event
+
+@end deffn
+
+@deffn {Scheme Procedure} push-event-to-stanza context event
+
+@end deffn
+
+@deffn {Scheme Procedure} push-event-to-result context event
+
+@end deffn
+
+@subsubsection char
+
+@code{(smc context functional char)} module provides a memory for FSMs that
+read and parse a stream of characters.
+
+@c -----------------------------------------------------------------------------
+@subsubsection u8
+
+@code{(smc context functional u8)} module provides a memory for FSMs that
+read and parse a stream of bytes.
+
+@c -----------------------------------------------------------------------------
+@subsection OOP
+
+@code{(smc context oop)} modules provide a memory for FSMs that is written in
+GOOPS style.
+
+@c Local Variables:
+@c TeX-master: "guile-smc.texi"
+@c End:

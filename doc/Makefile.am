@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ## 
@@ -28,6 +28,7 @@ guile_smc_TEXINFOS = \
 	api-core-state.texi 	\
 	api-core-transition.texi 	\
 	api-context.texi	\
+	api-context-memory.texi	\
 	api-fsm.texi		\
 	api-puml.texi		\
 	api-compiler.texi	\
