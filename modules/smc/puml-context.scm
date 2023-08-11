@@ -293,13 +293,13 @@
   (fsm-description-set! (puml-context-fsm ctx) (context-buffer->string ctx))
   (clear-buffer (clear-stanza ctx ch) ch))
 
-(define (validate-start-tag ctx ch)
+(define* (validate-start-tag ctx #:optional ch)
   (let ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@startuml")
       (puml-error ctx "Misspelled @startuml"))
     (clear-buffer ctx ch)))
 
-(define (validate-end-tag ctx ch)
+(define* (validate-end-tag ctx #:optional ch)
   (let* ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@enduml")
       (puml-error ctx "Misspelled @enduml"))
