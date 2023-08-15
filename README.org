@@ -420,6 +420,7 @@ PlantUML format -- see =examples/pumlpuml.scm=.
 Also see other examples the =examples= directory.
 
 *** Projects that use Guile-SMC
+- [[https://github.com/artyom-poptsov/guile-dsv][Guile-DSV]]
 - [[https://github.com/artyom-poptsov/guile-ini][Guile-INI]]
 - [[https://github.com/artyom-poptsov/guile-ics][Guile-ICS]]
 - [[https://github.com/artyom-poptsov/guile-png][Guile-PNG]]
