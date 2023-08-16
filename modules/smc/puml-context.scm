@@ -260,7 +260,8 @@
 (define (legend-end? ctx ch)
   (and (or (char=? ch #\space)
            (char=? ch #\newline))
-       (string=? (context-buffer->string ctx) "endlegend")))
+       (or (string=? (context-buffer->string ctx) "endlegend")
+           (string=? (context-buffer->string ctx) "end legend"))))
 
 (define (legend-event-source? ctx ch)
   (and (char=? ch #\newline)

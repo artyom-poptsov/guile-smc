@@ -295,6 +295,24 @@
                                #:debug-mode? #t)))
     (fsm-post-action fsm)))
 
+(test-equal "legend: 'end legend' variant"
+  pre-action
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "legend"
+                                 "pre-action: pre-action"
+                                 "end legend"
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-pre-action fsm)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
