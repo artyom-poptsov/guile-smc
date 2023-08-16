@@ -7,6 +7,9 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
+* Unreleased
+** PlantUML parser now handles multi-line comments
+
 * Version 0.6.2 (2023-08-11)
 ** Bugfixes
 *** =(smc context functional char)=: =pre-action= now always returns context

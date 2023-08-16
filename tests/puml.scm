@@ -167,6 +167,55 @@
     (state-exit-action (fsm-state fsm 'state_1))))
 
 
+;;; Multi-line comments.
+
+(test-assert "puml-string->fsm: Multi-line comment before @startuml"
+  (puml-string->fsm
+   (string-join (list
+                 "/' this is a"
+                 "   commentary '/"
+                 "@startuml"
+                 "[*] -> state_1"
+                 "@enduml")
+                "\n")
+   #:debug-mode? #t))
+
+(test-assert "puml-string->fsm: Multi-line comment after @startuml"
+  (puml-string->fsm
+   (string-join (list
+                 "@startuml"
+                 "/' this is a"
+                 "   commentary '/"
+                 "[*] -> state_1"
+                 "@enduml")
+                "\n")
+   #:debug-mode? #t))
+
+(test-error "puml-string->fsm: EOF in a top multi-line comment"
+  #t
+  (puml-string->fsm
+   (string-join (list
+                 "/' this is a"
+                 "   commentary"
+                 "@startuml"
+                 "[*] -> state_1"
+                 "@enduml")
+                "\n")
+   #:debug-mode? #t))
+
+(test-error "puml-string->fsm: EOF in a multi-line comment"
+  #t
+  (puml-string->fsm
+   (string-join (list
+                 "@startuml"
+                 "[*] -> state_1"
+                 "/' this is a"
+                 "   commentary"
+                 "@enduml")
+                "\n")
+   #:debug-mode? #t))
+
+
 
 (test-error "legend: no 'endlegend' error"
   #t

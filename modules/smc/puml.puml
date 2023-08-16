@@ -2,7 +2,12 @@
 title PlantUML <https://plantuml.com> Reader Finite-State Machine.\nThis FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n<https://github.com/artyom-poptsov/guile-smc>
 
 ' Entry point
-[*] -> read_start_tag
+[*] -> search_start_tag
+
+search_start_tag --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+search_start_tag --> check_top_multiline_comment_begin: char:solidus?
+search_start_tag --> read_start_tag: char:at-symbol? -> push-event-to-buffer
+search_start_tag -> search_start_tag
 
 read_start_tag: Read the start @startuml tag and check it for errors
 read_start_tag --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
@@ -10,13 +15,40 @@ read_start_tag --> read: char:space? -> validate-start-tag
 read_start_tag --> read: char:newline? -> validate-start-tag
 read_start_tag -> read_start_tag: guard:#t -> push-event-to-buffer
 
+check_top_multiline_comment_begin -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+check_top_multiline_comment_begin --> read_top_multiline_comment: char:single-quote?
+check_top_multiline_comment_begin --> [*]: throw-syntax-error
+
+read_top_multiline_comment: Read a multiline comment before the start tag.
+read_top_multiline_comment -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_top_multiline_comment -> check_top_multiline_comment_end: char:single-quote?
+read_top_multiline_comment -> read_top_multiline_comment
+
+check_top_multiline_comment_end -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+check_top_multiline_comment_end --> search_start_tag: char:solidus?
+check_top_multiline_comment_end --> read_top_multiline_comment
+
 read: Read the PlantUML transition table.
 read -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read --> check_multiline_comment_begin: char:solidus?
 read --> read_end_tag: char:at-symbol? -> push-event-to-buffer
 read --> read_skip_comment: char:single-quote?
 read --> read_state: char:left-square-bracket?
 read --> read_word: char:letter? -> push-event-to-buffer
 read -> read
+
+check_multiline_comment_begin -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+check_multiline_comment_begin --> read_multiline_comment: char:single-quote?
+check_multiline_comment_begin --> [*]: throw-syntax-error
+
+read_multiline_comment: Read a multiline comment before the start tag.
+read_multiline_comment -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_multiline_comment -> check_multiline_comment_end: char:single-quote?
+read_multiline_comment -> read_multiline_comment
+
+check_multiline_comment_end -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+check_multiline_comment_end --> read: char:solidus?
+check_multiline_comment_end --> read_multiline_comment
 
 read_end_tag: Read and check the @enduml tag.
 read_end_tag:
