@@ -342,13 +342,13 @@
 (define* (validate-start-tag ctx #:optional ch)
   (let ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@startuml")
-      (puml-error ctx "Misspelled @startuml"))
+      (puml-error ctx "Misspelled @startuml: ~S" tag))
     (clear-buffer ctx ch)))
 
 (define* (validate-end-tag ctx #:optional ch)
   (let* ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@enduml")
-      (puml-error ctx "Misspelled @enduml"))
+      (puml-error ctx "Misspelled @enduml: ~S" tag))
     (clear-buffer ctx ch)))
 
 
