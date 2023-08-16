@@ -58,6 +58,7 @@
             ;; Guards.
             title?
             legend?
+            hide?
             legend-event-source?
             legend-pre-action?
             legend-post-action?
@@ -258,6 +259,11 @@
   (and (or (char=? ch #\space)
            (char=? ch #\newline))
        (string=? (context-buffer->string ctx) "legend")))
+
+(define (hide? context ch)
+  "Check if the CONTEXT buffer contains 'hide' token"
+  (and (char=? ch #\space)
+       (string=? (context-buffer->string context) "hide")))
 
 (define (legend-end? ctx ch)
   "Check if the CTX context buffer contains 'legend end' token."

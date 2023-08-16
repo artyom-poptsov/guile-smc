@@ -8,8 +8,8 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:              8527
-;;;   transition-counter:        1099
+;;;   step-counter:              8735
+;;;   transition-counter:        1138
 ;;;
 ;;; Resolver status:
 ;;;   #<directory (smc context char)>
@@ -37,6 +37,7 @@
 ;;;     #<<generic> char-context-event-source (1)>
 ;;;     #<procedure add-description (ctx ch)>
 ;;;     #<procedure add-state-transition (ctx ch)>
+;;;     #<procedure hide? (context ch)>
 ;;;     #<procedure legend-end? (ctx ch)>
 ;;;     #<procedure legend-event-source? (ctx ch)>
 ;;;     #<procedure legend-post-action? (ctx ch)>
@@ -73,7 +74,41 @@
 
 
 (define %transition-table
-  `(((name . read_legend)
+  `(((name . read_title)
+     (description . "Read a diagram title.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:newline? ,add-description read)
+       (,#{guard:#t}# ,push-event-to-buffer read_title)))
+    ((name . read_end_tag)
+     (description . "Read and check the @enduml tag.")
+     (event-source unquote char-context-event-source)
+     (exit-action unquote validate-end-tag)
+     (transitions
+       (,char:eof-object? ,action:no-op #f)
+       (,char:newline? ,action:no-op #f)
+       (,char:space? ,action:no-op #f)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_end_tag)))
+    ((name . search_state_action_arrow)
+     (description
+       .
+       "Check if a transition has an attached action.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object? ,action:no-op #f)
+       (,char:newline? ,action:no-op read)
+       (,char:hyphen-minus?
+        ,action:no-op
+        read_state_action_arrow)
+       (,#{guard:#t}#
+        ,action:no-op
+        search_state_action_arrow)))
+    ((name . read_legend)
      (description . "Read diagram legend.")
      (event-source unquote char-context-event-source)
      (transitions
@@ -88,6 +123,97 @@
         read_legend)
        (,char:newline? ,clear-buffer read_legend)
        (,#{guard:#t}# ,push-event-to-buffer read_legend)))
+    ((name . check_top_multiline_comment_begin)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:single-quote?
+        ,action:no-op
+        read_top_multiline_comment)
+       (,throw-syntax-error ,action:no-op #f)))
+    ((name . check_multiline_comment_begin)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:single-quote?
+        ,action:no-op
+        read_multiline_comment)
+       (,throw-syntax-error ,action:no-op #f)))
+    ((name . skip_hide_block)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:newline? ,action:no-op read)
+       (,#{guard:#t}# ,action:no-op skip_hide_block)))
+    ((name . read_state_transition_guard)
+     (description . "Read a state transition guard.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object? ,action:no-op #f)
+       (,char:space?
+        ,push-buffer-to-stanza
+        search_state_action_arrow)
+       (,char:newline? ,add-state-transition read)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_state_transition_guard)))
+    ((name . read_state)
+     (description . "Read a PlantUML stanza.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object? ,action:no-op #f)
+       (,char:newline? ,throw-syntax-error #f)
+       (,char:right-square-bracket?
+        ,push-buffer-to-stanza
+        search_state_transition)
+       (,char:space?
+        ,push-buffer-to-stanza
+        search_state_transition)
+       (,char:colon?
+        ,push-buffer-to-stanza
+        read_state_description)
+       (,#{guard:#t}# ,push-event-to-buffer read_state)))
+    ((name . read_state_action_arrow)
+     (description . "Read and skip the action arrow.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:newline? ,action:no-op #f)
+       (,char:more-than-sign?
+        ,action:no-op
+        search_state_transition_action)))
+    ((name . check_top_multiline_comment_end)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:solidus? ,action:no-op search_start_tag)
+       (,#{guard:#t}#
+        ,action:no-op
+        read_top_multiline_comment)))
+    ((name . read_state_left_arrow)
+     (event-source unquote char-context-event-source)
+     (transitions))
+    ((name . read_skip_comment)
+     (description
+       .
+       "Skip commentaries that are written between stanzas.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:newline? ,action:no-op read)
+       (,#{guard:#t}# ,action:no-op read_skip_comment)))
     ((name . read_multiline_comment)
      (description
        .
@@ -122,19 +248,6 @@
        (,#{guard:#t}#
         ,action:no-op
         search_state_transition)))
-    ((name . search_state_transition_guard)
-     (description
-       .
-       "Check if the transition has a guard.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object? ,action:no-op #f)
-       (,char:letter?
-        ,push-event-to-buffer
-        read_state_transition_guard)
-       (,#{guard:#t}#
-        ,action:no-op
-        search_state_transition_guard)))
     ((name . read_start_tag)
      (description
        .
@@ -149,6 +262,36 @@
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_start_tag)))
+    ((name . read_state_transition_action)
+     (description
+       .
+       "Read the state transition action.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:newline? ,add-state-transition read)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_state_transition_action)))
+    ((name . read_word)
+     (description . "Read a word.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,title? ,clear-buffer read_title)
+       (,legend? ,clear-buffer read_legend)
+       (,hide? ,clear-buffer skip_hide_block)
+       (,char:colon?
+        ,push-buffer-to-stanza
+        read_state_description)
+       (,char:space?
+        ,push-buffer-to-stanza
+        search_state_transition)
+       (,#{guard:#t}# ,push-event-to-buffer read_word)))
     ((name . read_state_description)
      (description
        .
@@ -160,33 +303,96 @@
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_description)))
-    ((name . read_word)
-     (description . "Read a word.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,title? ,clear-buffer read_title)
-       (,legend? ,clear-buffer read_legend)
-       (,char:colon?
-        ,push-buffer-to-stanza
-        read_state_description)
-       (,char:space?
-        ,push-buffer-to-stanza
-        search_state_transition)
-       (,#{guard:#t}# ,push-event-to-buffer read_word)))
-    ((name . read_skip_comment)
+    ((name . read_top_multiline_comment)
      (description
        .
-       "Skip commentaries that are written between stanzas.")
+       "Read a multiline comment before the start tag.")
      (event-source unquote char-context-event-source)
      (transitions
        (,char:eof-object?
         ,throw-unexpected-end-of-file-error
         #f)
-       (,char:newline? ,action:no-op read)
-       (,#{guard:#t}# ,action:no-op read_skip_comment)))
+       (,char:single-quote?
+        ,action:no-op
+        check_top_multiline_comment_end)
+       (,#{guard:#t}#
+        ,action:no-op
+        read_top_multiline_comment)))
+    ((name . read_state_transition_to)
+     (description
+       .
+       "Read a state that the current state transitions to.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object? ,action:no-op #f)
+       (,char:right-square-bracket?
+        ,action:no-op
+        read_state_transition_to)
+       (,char:colon?
+        ,push-buffer-to-stanza
+        search_state_transition_guard)
+       (,char:newline? ,add-state-transition read)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_state_transition_to)))
+    ((name . search_start_tag)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:solidus?
+        ,action:no-op
+        check_top_multiline_comment_begin)
+       (,char:at-symbol?
+        ,push-event-to-buffer
+        read_start_tag)
+       (,#{guard:#t}# ,action:no-op search_start_tag)))
+    ((name . search_state_transition_to)
+     (description
+       .
+       "Search for a state that the current state transitions to.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object? ,action:no-op #f)
+       (,char:letter?
+        ,push-event-to-buffer
+        read_state_transition_to)
+       (,char:left-square-bracket?
+        ,action:no-op
+        read_state_transition_to)
+       (,#{guard:#t}#
+        ,action:no-op
+        search_state_transition_to)))
+    ((name . search_state_transition_guard)
+     (description
+       .
+       "Check if the transition has a guard.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object? ,action:no-op #f)
+       (,char:letter?
+        ,push-event-to-buffer
+        read_state_transition_guard)
+       (,#{guard:#t}#
+        ,action:no-op
+        search_state_transition_guard)))
+    ((name . search_state_transition_action)
+     (description
+       .
+       "Check if an action is present after the arrow.  Issue an error if it is not.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:letter?
+        ,push-event-to-buffer
+        read_state_transition_action)
+       (,char:newline? ,action:no-op #f)
+       (,#{guard:#t}#
+        ,action:no-op
+        search_state_transition_action)))
     ((name . read)
      (description
        .
@@ -210,35 +416,6 @@
         read_state)
        (,char:letter? ,push-event-to-buffer read_word)
        (,#{guard:#t}# ,action:no-op read)))
-    ((name . search_state_transition_action)
-     (description
-       .
-       "Check if an action is present after the arrow.  Issue an error if it is not.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:letter?
-        ,push-event-to-buffer
-        read_state_transition_action)
-       (,char:newline? ,action:no-op #f)
-       (,#{guard:#t}#
-        ,action:no-op
-        search_state_transition_action)))
-    ((name . read_state_left_arrow)
-     (event-source unquote char-context-event-source)
-     (transitions))
-    ((name . check_top_multiline_comment_end)
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:solidus? ,action:no-op search_start_tag)
-       (,#{guard:#t}#
-        ,action:no-op
-        read_top_multiline_comment)))
     ((name . read_state_right_arrow)
      (description
        .
@@ -252,42 +429,6 @@
        (,#{guard:#t}#
         ,action:no-op
         read_state_right_arrow)))
-    ((name . check_top_multiline_comment_begin)
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:single-quote?
-        ,action:no-op
-        read_top_multiline_comment)
-       (,throw-syntax-error ,action:no-op #f)))
-    ((name . read_top_multiline_comment)
-     (description
-       .
-       "Read a multiline comment before the start tag.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:single-quote?
-        ,action:no-op
-        check_top_multiline_comment_end)
-       (,#{guard:#t}#
-        ,action:no-op
-        read_top_multiline_comment)))
-    ((name . read_end_tag)
-     (description . "Read and check the @enduml tag.")
-     (event-source unquote char-context-event-source)
-     (exit-action unquote validate-end-tag)
-     (transitions
-       (,char:eof-object? ,action:no-op #f)
-       (,char:newline? ,action:no-op #f)
-       (,char:space? ,action:no-op #f)
-       (,#{guard:#t}#
-        ,push-event-to-buffer
-        read_end_tag)))
     ((name . check_multiline_comment_end)
      (event-source unquote char-context-event-source)
      (transitions
@@ -297,138 +438,7 @@
        (,char:solidus? ,action:no-op read)
        (,#{guard:#t}#
         ,action:no-op
-        read_multiline_comment)))
-    ((name . read_state_transition_guard)
-     (description . "Read a state transition guard.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object? ,action:no-op #f)
-       (,char:space?
-        ,push-buffer-to-stanza
-        search_state_action_arrow)
-       (,char:newline? ,add-state-transition read)
-       (,#{guard:#t}#
-        ,push-event-to-buffer
-        read_state_transition_guard)))
-    ((name . check_multiline_comment_begin)
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:single-quote?
-        ,action:no-op
-        read_multiline_comment)
-       (,throw-syntax-error ,action:no-op #f)))
-    ((name . read_state)
-     (description . "Read a PlantUML stanza.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object? ,action:no-op #f)
-       (,char:newline? ,throw-syntax-error #f)
-       (,char:right-square-bracket?
-        ,push-buffer-to-stanza
-        search_state_transition)
-       (,char:space?
-        ,push-buffer-to-stanza
-        search_state_transition)
-       (,char:colon?
-        ,push-buffer-to-stanza
-        read_state_description)
-       (,#{guard:#t}# ,push-event-to-buffer read_state)))
-    ((name . read_state_action_arrow)
-     (description . "Read and skip the action arrow.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:newline? ,action:no-op #f)
-       (,char:more-than-sign?
-        ,action:no-op
-        search_state_transition_action)))
-    ((name . read_state_transition_action)
-     (description
-       .
-       "Read the state transition action.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:newline? ,add-state-transition read)
-       (,#{guard:#t}#
-        ,push-event-to-buffer
-        read_state_transition_action)))
-    ((name . read_state_transition_to)
-     (description
-       .
-       "Read a state that the current state transitions to.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object? ,action:no-op #f)
-       (,char:right-square-bracket?
-        ,action:no-op
-        read_state_transition_to)
-       (,char:colon?
-        ,push-buffer-to-stanza
-        search_state_transition_guard)
-       (,char:newline? ,add-state-transition read)
-       (,#{guard:#t}#
-        ,push-event-to-buffer
-        read_state_transition_to)))
-    ((name . read_title)
-     (description . "Read a diagram title.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:newline? ,add-description read)
-       (,#{guard:#t}# ,push-event-to-buffer read_title)))
-    ((name . search_state_transition_to)
-     (description
-       .
-       "Search for a state that the current state transitions to.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object? ,action:no-op #f)
-       (,char:letter?
-        ,push-event-to-buffer
-        read_state_transition_to)
-       (,char:left-square-bracket?
-        ,action:no-op
-        read_state_transition_to)
-       (,#{guard:#t}#
-        ,action:no-op
-        search_state_transition_to)))
-    ((name . search_state_action_arrow)
-     (description
-       .
-       "Check if a transition has an attached action.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object? ,action:no-op #f)
-       (,char:newline? ,action:no-op read)
-       (,char:hyphen-minus?
-        ,action:no-op
-        read_state_action_arrow)
-       (,#{guard:#t}#
-        ,action:no-op
-        search_state_action_arrow)))
-    ((name . search_start_tag)
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:solidus?
-        ,action:no-op
-        check_top_multiline_comment_begin)
-       (,char:at-symbol?
-        ,push-event-to-buffer
-        read_start_tag)
-       (,#{guard:#t}# ,action:no-op search_start_tag)))))
+        read_multiline_comment)))))
 
 
 (define-class <puml-fsm> (<fsm>))

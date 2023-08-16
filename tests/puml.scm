@@ -350,6 +350,24 @@
     (fsm-pre-action fsm)))
 
 
+;; "hide" property.
+
+(test-assert "check 'hide' block skipping"
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "hide empty description"
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-state fsm 'state_1)))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end "puml")
