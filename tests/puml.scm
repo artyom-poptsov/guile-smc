@@ -313,6 +313,42 @@
                                #:debug-mode? #t)))
     (fsm-pre-action fsm)))
 
+(test-equal "legend: with top left alignment"
+  pre-action
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "legend top left"
+                                 "pre-action: pre-action"
+                                 "end legend"
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-pre-action fsm)))
+
+(test-equal "legend: with right"
+  pre-action
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "legend right"
+                                 "pre-action: pre-action"
+                                 "end legend"
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-pre-action fsm)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
