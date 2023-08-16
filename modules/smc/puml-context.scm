@@ -249,15 +249,18 @@
 
 
 (define (title? ctx ch)
+  "Check if context CTX contains 'title' token."
   (and (char=? ch #\space)
        (string=? (context-buffer->string ctx) "title")))
 
 (define (legend? ctx ch)
+  "Check if the CTX context buffer contains 'legend' token."
   (and (or (char=? ch #\space)
            (char=? ch #\newline))
        (string=? (context-buffer->string ctx) "legend")))
 
 (define (legend-end? ctx ch)
+  "Check if the CTX context buffer contains 'legend end' token."
   (and (or (char=? ch #\space)
            (char=? ch #\newline))
        (or (string=? (context-buffer->string ctx) "endlegend")
