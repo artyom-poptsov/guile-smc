@@ -142,7 +142,7 @@
   (context-counter (pre-action (make-char-context) #\a)))
 
 (test-equal "pre-action: row-number"
-  1
+  0
   (context-row-number (pre-action (make-char-context) #\a)))
 
 (test-equal "pre-action: col-number"

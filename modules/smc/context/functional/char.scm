@@ -341,7 +341,7 @@ This procedure can be used as a pre-action for an FSM."
    ((char=? char #\newline)
     (reset-col-number (update-row-number (update-counter context))))
    (else
-    (update-col-number (update-row-number (update-counter context))))))
+    (update-col-number (update-counter context)))))
 
 
 ;;; Logging.
