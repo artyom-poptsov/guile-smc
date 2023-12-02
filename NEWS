@@ -12,6 +12,13 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ** =(smc context functional char)=: Bugfix
 =pre-action= procedure would increment the row counter even when the input
 event is not a newline character.  Now the procedure counts rows properly.
+** Skip "hide" blocks in state diagrams
+For example, the following code will be ignored by the PlantUML parser:
+#+BEGIN_EXAMPLE
+hide empty description
+#+END_EXAMPLE
+** Allow to use "end legend" syntax for "legend" blocks
+** Improve error reporting in the PlantUML parser
 
 * Version 0.6.2 (2023-08-11)
 ** Bugfixes
