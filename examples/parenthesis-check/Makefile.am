@@ -50,6 +50,7 @@ substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 
 custom-fsm.scm: fsm.puml
 	@echo "  SMC      $<"
+	GUILE_AUTO_COMPILE=0; export GUILE_AUTO_COMPILE;
 	$(abs_top_builddir)/pre-inst-env $(abs_top_builddir)/utils/smc compile \
 	--log-driver null \
 	-L "$(abs_top_srcdir)/modules:$(abs_top_srcdir)/examples/parenthesis-check/" \
