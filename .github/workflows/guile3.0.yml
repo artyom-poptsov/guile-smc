@@ -23,8 +23,8 @@ jobs:
               texinfo \
               bsdutils \
               help2man
-        
-      - name: Checkout repository 
+
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Autoreconf
@@ -38,3 +38,14 @@ jobs:
 
       - name: Run tests
         run: make -j$(nproc) check
+
+      - name: Distcheck
+        run: make -j$(nproc) distcheck
+
+      - name: Upload the artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: guile-png
+          compression-level: 0
+          path: "guile-smc-*.tar.gz"
