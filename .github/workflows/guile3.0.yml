@@ -22,7 +22,8 @@ jobs:
               guile-library \
               texinfo \
               bsdutils \
-              help2man
+              help2man \
+              texlive
 
       - name: Checkout repository
         uses: actions/checkout@v2
