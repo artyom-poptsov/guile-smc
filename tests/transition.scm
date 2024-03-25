@@ -73,6 +73,14 @@
         (transition-table-run table '() '())
       new-context)))
 
+(test-equal "transition-table-run: check the next state"
+  'state-2
+  (let ((table `((,(const #f)  ,action:no-op state-1)
+                 (,guard:null? ,action:append-error state-2))))
+    (receive (next-state new-context)
+        (transition-table-run table '() '())
+      next-state)))
+
 
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
