@@ -40,10 +40,14 @@ $ guix package -f guix.scm
 $ git clone https://github.com/artyom-poptsov/guile-smc.git
 $ cd guile-smc
 $ autoreconf -vif
-$ ./configure
+$ ./configure --with-guilesitedir=<path-to-guile-site> --prefix=<prefix>
 $ make
 $ sudo make install
 #+END_EXAMPLE
+
+Where =<path-to-guile-site>= is the path where Guile modules are stored
+(usually something like =/usr/share/guile/site/3.0=) and =<prefix>= is the
+installation prefix (usually =/usr/=.)
 
 ** Quick start
 *NOTE:* To read the full Guile-SMC documentation run =info guile-smc=
