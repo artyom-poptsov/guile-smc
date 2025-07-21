@@ -64,8 +64,13 @@
     (arguments
      (list
       #:make-flags #~(list "GUILE_AUTO_COMPILE=0")     ;to prevent guild warnings
-       #:phases
-       #~(modify-phases %standard-phases
+      #:modules `(((guix build guile-build-system)
+                   #:select (target-guile-effective-version))
+                  ,@%default-gnu-modules)
+      #:imported-modules `((guix build guile-build-system)
+                           ,@%default-gnu-imported-modules)
+      #:phases
+      #~(modify-phases %standard-phases
            (delete 'strip)
            (add-after 'install 'wrap-program
              (lambda* (#:key inputs outputs #:allow-other-keys)
