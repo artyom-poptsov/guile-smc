@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2023-2024 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2023-2025 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -56,7 +56,7 @@ custom-fsm.scm: fsm.puml
 	$(SMC_ENVIRONMENT) \
 	$(abs_top_builddir)/pre-inst-env $(abs_top_builddir)/utils/smc compile \
 	--log-driver null \
-	-L "$(abs_top_srcdir)/modules:$(abs_top_srcdir)/examples/parenthesis-check/" \
+	--load-path "$(abs_top_srcdir)/modules:$(abs_top_srcdir)/examples/parenthesis-check/" \
 	-U "((context))" \
 	--guile-smc-path $(abs_top_srcdir)/modules/ \
 	--target guile-standalone \
