@@ -1,5 +1,13 @@
 Authors of Guile-SMC
 
-* Artyom V. Poptsov <poptsov.artyom@gmail.com>
+See also files THANKS and ChangeLog.
 
-  
+* Artyom V. Poptsov <poptsov.artyom@gmail.com>
+  The author and the current maintainer.
+* Ivan Sokolov <ivan-p-sokolov@ya.ru>
+  Patches to "guix.scm".
+* mooseyboots <https://codeberg.org/martianh>
+  Bug reports:
+  - "unable to install to right path"
+    <https://github.com/artyom-poptsov/guile-smc/issues/6>
+
