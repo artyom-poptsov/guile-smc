@@ -7,6 +7,18 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   are permitted in any medium without royalty provided the copyright
   notice and this notice are preserved.
 
+* Unreleased
+** Fix compilation of =puml-fsm.scm= from =puml.puml=
+Sometimes Guile-SMC would try to build =puml-fsm.scm= from =puml.puml= which
+would produce an error when there are no Guile-SMC installed on the system.
+Now Guile-SMC does not try to re-build =puml-fsm.scm= if it is present, even
+when =puml.puml= has newer timestamp.
+** Modernize =guix.scm=
+** Add a new test for "transition.scm"
+** Improve the build process of "parenthesis-check" example
+- Disable Guile auto-compilation in =examples/parenthesis-check/Makefile.am=.
+- Set the build environment right before the calling of the Guile state
+  machine compiler.
 * Version 0.6.3 (2023-12-02)
 ** PlantUML parser now handles multi-line comments
 ** =(smc context functional char)=: Bugfix
