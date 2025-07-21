@@ -3,7 +3,7 @@ dnl   Process this file with autoconf to produce configure.
 dnl
 
 define(GUILE_SMC_CONFIGURE_COPYRIGHT, [[
-Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+Copyright (C) 2021-2025 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 
 This file is part of Guile-SMC.
 
@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License
 along with Guile-SMC.  If not, see <http://www.gnu.org/licenses/>.
 ]])
 
-AC_INIT([Guile-SMC], [0.6.3], [poptsov.artyom@gmail.com],
+AC_INIT([Guile-SMC], [0.6.4], [poptsov.artyom@gmail.com],
                      [guile-smc],
                      [https://github.com/artyom-poptsov/guile-smc])
 
