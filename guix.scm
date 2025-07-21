@@ -1,6 +1,6 @@
 ;; guix.scm --- GNU Guix package recipe    -*- coding: utf-8 -*-
 ;;
-;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2025 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This file is part of Guile-SMC.
 ;;
@@ -62,33 +62,29 @@
                         #:select? (git-predicate %source-dir)))
     (build-system gnu-build-system)
     (arguments
-     `(#:make-flags '("GUILE_AUTO_COMPILE=0")     ;to prevent guild warnings
-       #:modules (((guix build guile-build-system)
-                   #:select (target-guile-effective-version))
-                  ,@%gnu-build-system-modules)
-       #:imported-modules ((guix build guile-build-system)
-                           ,@%gnu-build-system-modules)
+     (list
+      #:make-flags #~(list "GUILE_AUTO_COMPILE=0")     ;to prevent guild warnings
        #:phases
-       (modify-phases %standard-phases
-         (delete 'strip)
-         (add-after 'install 'wrap-program
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let* ((bin (string-append (assoc-ref outputs "out") "/bin"))
-                    (version (target-guile-effective-version))
-                    (site-dir
-                     (lambda (dir)
-                       (string-append dir "/share/guile/site/" version)))
-                    (go-dir
-                     (lambda (dir)
-                       (string-append dir "/lib/guile/" version "/site-ccache")))
-                    (dirs (map cdr (append inputs outputs))))
-               (wrap-program (string-append bin "/smc")
-                 (list "GUILE_LOAD_PATH"
-                       'prefix
-                       (filter file-exists? (map site-dir dirs)))
-                 (list "GUILE_LOAD_COMPILED_PATH"
-                       'prefix
-                       (filter file-exists? (map go-dir dirs))))))))))
+       #~(modify-phases %standard-phases
+           (delete 'strip)
+           (add-after 'install 'wrap-program
+             (lambda* (#:key inputs outputs #:allow-other-keys)
+               (let* ((bin (string-append #$output "/bin"))
+                      (version (target-guile-effective-version))
+                      (site-dir
+                       (lambda (dir)
+                         (string-append dir "/share/guile/site/" version)))
+                      (go-dir
+                       (lambda (dir)
+                         (string-append dir "/lib/guile/" version "/site-ccache")))
+                      (dirs (map cdr (append inputs outputs))))
+                 (wrap-program (string-append bin "/smc")
+                               (list "GUILE_LOAD_PATH"
+                                     'prefix
+                                     (filter file-exists? (map site-dir dirs)))
+                               (list "GUILE_LOAD_COMPILED_PATH"
+                                     'prefix
+                                     (filter file-exists? (map go-dir dirs))))))))))
     (native-inputs
      (list autoconf
            automake
