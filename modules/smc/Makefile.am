@@ -43,7 +43,7 @@ godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache/smc/
 
 SUFFIXES = .in
 
-puml-fsm.scm: puml.puml
+puml-fsm.scm: | puml.puml
 	@echo "  SMC      $<"
 	@smc compile \
 	    --debug \
@@ -53,7 +53,7 @@ puml-fsm.scm: puml.puml
 	    --fsm-name "puml-fsm" \
 	    --fsm-module "(smc puml-fsm)" \
 	    --modules "((smc context char) (smc context oop char) (smc puml-context))" \
-	    $< > $@
+	    $| > $@
 
 trace-fsm.scm: trace.puml
 	@echo "  SMC      $<"
