@@ -55,7 +55,7 @@ puml-fsm.scm: | puml.puml
 	    --modules "((smc context char) (smc context oop char) (smc puml-context))" \
 	    $| > $@
 
-trace-fsm.scm: trace.puml
+trace-fsm.scm: | trace.puml
 	@echo "  SMC      $<"
 	@smc compile \
 		--load-path $(abs_top_srcdir)/modules \
