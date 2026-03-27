@@ -1,6 +1,6 @@
 ;; guix.scm --- GNU Guix package recipe    -*- coding: utf-8 -*-
 ;;
-;; Copyright (C) 2021-2025 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This file is part of Guile-SMC.
 ;;
@@ -97,7 +97,7 @@
            help2man
            texinfo
            which
-           texlive
+           texlive-scheme-basic
            ;; needed when cross-compiling.
            guile-3.0
            guile-lib))
