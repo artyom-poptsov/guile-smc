@@ -1,32 +1,29 @@
 @startuml
 title PlantUML <https://plantuml.com> Reader Finite-State Machine.\nThis FSM is a part of Guile State-Machine Compiler (Guile-SMC)\n<https://github.com/artyom-poptsov/guile-smc>
 
+' -------------------------------------------------------------------------------
 ' Entry point
+
 [*] -> search_start_tag
 
+' -------------------------------------------------------------------------------
+' Read the start "@plantuml" tag.
+
+search_start_tag: Search for the the "@" symbol that marks the start of the
+search_start_tag: "@plantuml" tag.
 search_start_tag --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 search_start_tag --> check_top_multiline_comment_begin: char:solidus?
 search_start_tag --> read_start_tag: char:at-symbol? -> push-event-to-buffer
 search_start_tag -> search_start_tag
 
-read_start_tag: Read the start @startuml tag and check it for errors
+read_start_tag: Read the start "@startuml" tag and check it for errors
 read_start_tag --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read_start_tag --> read: char:space? -> validate-start-tag
 read_start_tag --> read: char:newline? -> validate-start-tag
 read_start_tag -> read_start_tag: guard:#t -> push-event-to-buffer
 
-check_top_multiline_comment_begin -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
-check_top_multiline_comment_begin --> read_top_multiline_comment: char:single-quote?
-check_top_multiline_comment_begin --> [*]: throw-syntax-error
-
-read_top_multiline_comment: Read a multiline comment before the start tag.
-read_top_multiline_comment -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
-read_top_multiline_comment -> check_top_multiline_comment_end: char:single-quote?
-read_top_multiline_comment -> read_top_multiline_comment
-
-check_top_multiline_comment_end -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
-check_top_multiline_comment_end --> search_start_tag: char:solidus?
-check_top_multiline_comment_end --> read_top_multiline_comment
+' -------------------------------------------------------------------------------
+' Main loop where we read the PlantUML data.
 
 read: Read the PlantUML transition table.
 read -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
@@ -37,6 +34,28 @@ read --> read_state: char:left-square-bracket?
 read --> read_word: char:letter? -> push-event-to-buffer
 read -> read
 
+' -------------------------------------------------------------------------------
+' Read multi-line and single-line comments.
+
+check_top_multiline_comment_begin: Check for a single quote symbol that marks
+check_top_multiline_comment_begin: the start of a multi-line comment at the
+check_top_multiline_comment_begin: beginning of the PlantUML data.
+check_top_multiline_comment_begin -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+check_top_multiline_comment_begin --> read_top_multiline_comment: char:single-quote?
+check_top_multiline_comment_begin --> [*]: throw-syntax-error
+
+read_top_multiline_comment: Read a multiline comment before the start tag.
+read_top_multiline_comment -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_top_multiline_comment -> check_top_multiline_comment_end: char:single-quote?
+read_top_multiline_comment -> read_top_multiline_comment
+
+check_top_multiline_comment_end: Check if the current multiline comment ends.
+check_top_multiline_comment_end -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+check_top_multiline_comment_end --> search_start_tag: char:solidus?
+check_top_multiline_comment_end --> read_top_multiline_comment
+
+check_multiline_comment_begin: Check for a single quote symbol that marks
+check_multiline_comment_begin: the start of a multiline comment.
 check_multiline_comment_begin -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 check_multiline_comment_begin --> read_multiline_comment: char:single-quote?
 check_multiline_comment_begin --> [*]: throw-syntax-error
@@ -46,22 +65,17 @@ read_multiline_comment -> [*]: char:eof-object? -> throw-unexpected-end-of-file-
 read_multiline_comment -> check_multiline_comment_end: char:single-quote?
 read_multiline_comment -> read_multiline_comment
 
+check_multiline_comment_end: Check if the current multiline comment ends.
 check_multiline_comment_end -> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 check_multiline_comment_end --> read: char:solidus?
 check_multiline_comment_end --> read_multiline_comment
-
-read_end_tag: Read and check the @enduml tag.
-read_end_tag:
-read_end_tag: exit-action: validate-end-tag
-read_end_tag --> [*]: char:eof-object?
-read_end_tag --> [*]: char:newline?
-read_end_tag --> [*]: char:space?
-read_end_tag ->  read_end_tag: guard:#t -> push-event-to-buffer
 
 read_skip_comment: Skip commentaries that are written between stanzas.
 read_skip_comment --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read_skip_comment --> read: char:newline?
 read_skip_comment ->  read_skip_comment
+
+' -------------------------------------------------------------------------------
 
 read_word: Read a word.
 read_word --> [*]: char:eof-object?  -> throw-unexpected-end-of-file-error
@@ -71,6 +85,11 @@ read_word --> skip_hide_block: hide? -> clear-buffer
 read_word --> read_state_description: char:colon? -> push-buffer-to-stanza
 read_word --> search_state_transition: char:space? -> push-buffer-to-stanza
 read_word -> read_word: guard:#t -> push-event-to-buffer
+
+read_title: Read a diagram title.
+read_title --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_title --> read: char:newline? -> add-description
+read_title -> read_title: guard:#t -> push-event-to-buffer
 
 skip_hide_block: Skip the "hide" block in a state diagram.
 skip_hide_block --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
@@ -86,10 +105,9 @@ read_legend -> read_legend: legend-post-action? -> set-post-action
 read_legend -> read_legend: char:newline? -> clear-buffer
 read_legend -> read_legend: guard:#t -> push-event-to-buffer
 
-read_title: Read a diagram title.
-read_title --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
-read_title --> read: char:newline? -> add-description
-read_title -> read_title: guard:#t -> push-event-to-buffer
+' -------------------------------------------------------------------------------
+' Read PlantUML stanzas.  A stanza is a single state definition line, either
+' a state transition or a state description.
 
 read_state: Read a PlantUML stanza.
 read_state --> [*]: char:eof-object?
@@ -106,17 +124,22 @@ search_state_transition --> read_state_right_arrow: char:hyphen-minus?
 search_state_transition --> read_state_left_arrow: char:less-than-sign?
 search_state_transition ->  search_state_transition
 
-read_state_description: Read a state description if it is present.
+read_state_description: Read a state description if it is present.  If a state
+read_state_description: has several description lines, they are joined together
+read_state_description: into a single state description string.
 read_state_description --> [*]: char:eof-object?
 read_state_description --> read: char:newline? -> process-state-description
 read_state_description ->  read_state_description: guard:#t -> push-event-to-buffer
 
+' TODO: Currently only right-pointing arrows are supported, while
+' PlantUML allows us to use left-pointing arrows as well.
 read_state_right_arrow: Read a right arrow that indicates a transition.
 read_state_right_arrow --> [*]: char:eof-object?
 read_state_right_arrow --> search_state_transition_to: char:space?
 read_state_right_arrow -> read_state_right_arrow
 
-search_state_transition_to: Search for a state that the current state transitions to.
+search_state_transition_to: Search for a state that the current state
+search_state_transition_to: transitions to.
 search_state_transition_to --> [*]: char:eof-object?
 search_state_transition_to --> read_state_transition_to: char:letter? -> push-event-to-buffer
 search_state_transition_to --> read_state_transition_to: char:left-square-bracket?
@@ -162,4 +185,16 @@ read_state_transition_action: Read the state transition action.
 read_state_transition_action --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 read_state_transition_action --> read: char:newline? -> add-state-transition
 read_state_transition_action -> read_state_transition_action: guard:#t -> push-event-to-buffer
+
+' -------------------------------------------------------------------------------
+' Read the "@enduml" tag.
+
+read_end_tag: Read and check the @enduml tag.
+read_end_tag:
+read_end_tag: exit-action: validate-end-tag
+read_end_tag --> [*]: char:eof-object?
+read_end_tag --> [*]: char:newline?
+read_end_tag --> [*]: char:space?
+read_end_tag ->  read_end_tag: guard:#t -> push-event-to-buffer
+
 @enduml
