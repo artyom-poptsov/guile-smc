@@ -48,6 +48,17 @@
   (safe-module-ref (resolve-module '(smc core common))
                    'some-non-existing-procedure))
 
+(test-assert "safe-module-list-ref"
+  (let ((modules (list (resolve-module '(scheme documentation))
+                       (resolve-module '(smc core common)))))
+    (safe-module-list-ref modules 'safe-module-ref)))
+
+(test-equal "safe-module-list-ref: #f"
+  #f
+  (let ((modules (list (resolve-module '(scheme documentation))
+                       (resolve-module '(oop goops)))))
+    (safe-module-list-ref modules 'safe-module-ref)))
+
 
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
