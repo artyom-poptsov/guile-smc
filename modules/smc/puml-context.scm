@@ -59,10 +59,12 @@
             title?
             legend?
             hide?
+            note?
             legend-event-source?
             legend-pre-action?
             legend-post-action?
             legend-end?
+            note-end?
 
             ;; Actions.
             set-event-source
@@ -267,6 +269,12 @@ When a procedure cannot be resolved, return #f."
            (char=? ch #\newline))
        (string=? (context-buffer->string ctx) "legend")))
 
+(define (note? ctx ch)
+  "Check if the CTX context buffer contains 'note?' token."
+  (and (or (char=? ch #\space)
+           (char=? ch #\newline))
+       (string=? (context-buffer->string ctx) "note")))
+
 (define (hide? context ch)
   "Check if the CONTEXT buffer contains 'hide' token"
   (and (char=? ch #\space)
@@ -278,6 +286,12 @@ When a procedure cannot be resolved, return #f."
            (char=? ch #\newline))
        (or (string=? (context-buffer->string ctx) "endlegend")
            (string=? (context-buffer->string ctx) "end legend"))))
+
+(define (note-end? ctx ch)
+  "Check if the CTX context buffer contains 'note end' token."
+  (let ((s (string-trim-both (context-buffer->string ctx))))
+    (or (string=? s "endnote")
+        (string=? s "end note"))))
 
 (define (legend-event-source? ctx ch)
   (and (char=? ch #\newline)
