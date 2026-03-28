@@ -1,6 +1,6 @@
 ;;; puml-context.scm -- PlantUML parser context.
 
-;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023, 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -161,12 +161,12 @@
 
 
 
-;; This procedure tries to resolve a procedure PROC-NAME in the provided
-;; modules.
-;;
-;; Return a pair which 'car' is the module and 'cdr' -- the resolved
-;; procedure.  When a procedure cannot be resolved, return #f.
 (define (resolve-procedure ctx proc-name)
+  "This procedure tries to resolve a procedure PROC-NAME in the provided
+context modules.
+
+Return a pair which 'car' is the module and 'cdr' -- the resolved procedure.
+When a procedure cannot be resolved, return #f."
   (and proc-name
        (let* ((resolved-procs (puml-context-resolved-procedures ctx))
               (p              (hash-ref resolved-procs proc-name)))
@@ -174,8 +174,15 @@
              p
              (let* ((modules (puml-context-module ctx))
                     (result  (safe-module-list-ref modules proc-name)))
+               (context-log-info ctx
+                                 "PlantUML context modules: ~a~%"
+                                 modules)
+               (context-log-debug ctx
+                                  "PlantUML resolver result: ~a~%"
+                                  result)
                (if result
                    (begin
+                     (context-log-debug ctx "Adding result to the cache...~%")
                      (hash-set! resolved-procs proc-name result)
                      result)
                    (begin
