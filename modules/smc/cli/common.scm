@@ -1,6 +1,6 @@
 ;;; common.scm -- Common CLI procedures for Guile-SMC.
 
-;; Copyright (C) 2021-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021-2023, 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -72,6 +72,8 @@
 
 
 (define (string-any=? str string-list)
+  "Search for a string @var{str} in a @var{string-list}.  Return @code{#t} if
+string is found, or @code{#f} otherwise."
   (cond
    ((null? string-list)
     #f)
