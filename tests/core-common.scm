@@ -1,4 +1,4 @@
- ;;; cli.scm -- Guile-SMC CLI tests.
+;;; cli.scm -- Guile-SMC CLI tests.
 
 ;; Copyright (C) 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
