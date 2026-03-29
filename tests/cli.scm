@@ -1,6 +1,6 @@
 ;;; cli.scm -- Guile-SMC CLI tests.
 
-;; Copyright (C) 2022-2023 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2022-2023, 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -39,6 +39,12 @@
 
 (configure-test-logging! %test-suite-name)
 (test-begin %test-suite-name)
+
+
+(test-equal "eval-string/quote"
+  'TEST
+  (eval-string/quote "TEST"))
+
 
 ;; compile
 
