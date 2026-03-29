@@ -45,6 +45,18 @@
   'TEST
   (eval-string/quote "TEST"))
 
+(test-equal "string-any=?: null"
+  #f
+  (string-any=? "test" '()))
+
+(test-equal "string-any=?: #t"
+  #t
+  (string-any=? "world" '("hello" "world")))
+
+(test-equal "string-any=?: #f"
+  #f
+  (string-any=? "test" '("hello" "world")))
+
 
 ;; compile
 
