@@ -10,6 +10,11 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
 * Unreleased
 ** Add support for PlantUML =note= blocks
 Now Guile-SMC reads and skips single-line and multi-lines =note= blocks.
+** =smc compile=: Reload extra Guile-SMC modules                     :BUGFIX:
+When extra Guile-SMC modules are explicitly provided with =--modules= option,
+those modules will be reloaded.  This allows Guile-SSH to use the most recent
+Guile-SMC contexts from the source tree instead of the installed modules and
+fixes a bug when Guile-SMC compiles itself.
 
 * Version 0.6.4 (2025-07-21)
 ** Fix compilation of =puml-fsm.scm= from =puml.puml=
