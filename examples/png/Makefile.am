@@ -1,6 +1,6 @@
 ## Makefile.am -- Config file for GNU Automake.
 ##
-## Copyright (C) 2021-2022 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+## Copyright (C) 2021-2022, 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ##
 ## This file is part of Guile-SMC.
 ##
@@ -51,7 +51,7 @@ substitute = sed -e 's,[@]GUILE[@],$(GUILE),g'
 	@cat $< | $(abs_top_builddir)/pre-inst-env $(abs_top_builddir)/utils/smc compile \
 	--log-driver null \
 	-L "$(top_srcdir)/modules:." \
-	-U "((png-signature-context) (smc core log))" \
+	-U "((png-signature-context))" \
 	--guile-smc-path $(abs_top_srcdir)/modules/ \
 	--fsm-name ini-fsm \
 	--fsm-module "(png-signature)" \
