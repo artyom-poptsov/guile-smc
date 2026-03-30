@@ -60,6 +60,10 @@
 
 (define puml-modules
   (case-lambda
+    "Get the list of PlantUML modules plus load any custom modules that a user
+specified.  This procedure has two forms: it either accept no arguments and
+just returns the core Guile-SMC modules, or it returns the core modules with
+appended user modules."
     (()
      %core-modules)
     ((modules-list)
