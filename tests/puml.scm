@@ -368,6 +368,57 @@
     (fsm-state fsm 'state_1)))
 
 
+;; "note" blocks.
+
+(test-assert "check single-line 'note' block skipping"
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "note right of state_1: empty description"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-state fsm 'state_1)))
+
+(test-assert "check multi-line 'note' block skipping"
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "note right of state_1"
+                                 "  empty description"
+                                 "end note"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-state fsm 'state_1)))
+
+(test-error "check multi-line 'note' block error"
+  #t
+  (puml-string->fsm (string-join
+                     (list
+                      "@startuml"
+                      "title This is an FSM description."
+                      "[*] -> state_1"
+                      "state_1 --> [*]"
+                      "note right of state_1"
+                      "  empty description"
+                      "@enduml")
+                     "\n")
+                    #:module (list (resolve-module '(test-context))
+                                   (current-module))
+                    #:debug-mode? #t))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end "puml")

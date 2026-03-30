@@ -8,8 +8,8 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:             10580
-;;;   transition-counter:        1207
+;;;   step-counter:             11191
+;;;   transition-counter:        1318
 ;;;
 ;;; Resolver status:
 ;;;   #<directory (smc context char)>
@@ -34,7 +34,7 @@
 ;;;     #<procedure push-event-to-buffer (context event)>
 ;;;     #<procedure throw-syntax-error (ctx ch)>
 ;;;   #<directory (smc puml-context)>
-;;;     #<<generic> char-context-event-source (1)>
+;;;     #<<generic> char-context-event-source (2)>
 ;;;     #<procedure add-description (ctx ch)>
 ;;;     #<procedure add-state-transition (ctx ch)>
 ;;;     #<procedure hide? (context ch)>
@@ -43,11 +43,14 @@
 ;;;     #<procedure legend-post-action? (ctx ch)>
 ;;;     #<procedure legend-pre-action? (ctx ch)>
 ;;;     #<procedure legend? (ctx ch)>
+;;;     #<procedure note-end? (ctx ch)>
+;;;     #<procedure note? (ctx ch)>
 ;;;     #<procedure process-state-description (ctx ch)>
 ;;;     #<procedure set-event-source (ctx ch)>
 ;;;     #<procedure set-post-action (ctx ch)>
 ;;;     #<procedure set-pre-action (ctx ch)>
 ;;;     #<procedure throw-no-endlegend-error (ctx ch)>
+;;;     #<procedure throw-no-endnote-error (ctx ch)>
 ;;;     #<procedure throw-unexpected-end-of-file-error (ctx ch)>
 ;;;     #<procedure title? (ctx ch)>
 ;;;     #<procedure validate-end-tag (ctx #:optional ch)>
@@ -123,6 +126,11 @@
         read_legend)
        (,char:newline? ,clear-buffer read_legend)
        (,#{guard:#t}# ,push-event-to-buffer read_legend)))
+    ((name . skip_short_note)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:newline? ,action:no-op read)
+       (,#{guard:#t}# ,action:no-op skip_short_note)))
     ((name . check_top_multiline_comment_begin)
      (description
        .
@@ -160,6 +168,15 @@
         #f)
        (,char:newline? ,action:no-op read)
        (,#{guard:#t}# ,action:no-op skip_hide_block)))
+    ((name . skip_long_note)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object? ,throw-no-endnote-error #f)
+       (,note-end? ,clear-buffer read)
+       (,char:newline? ,clear-buffer skip_long_note)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        skip_long_note)))
     ((name . read_state_transition_guard)
      (description . "Read a state transition guard.")
      (event-source unquote char-context-event-source)
@@ -274,19 +291,6 @@
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_start_tag)))
-    ((name . read_state_transition_action)
-     (description
-       .
-       "Read the state transition action.")
-     (event-source unquote char-context-event-source)
-     (transitions
-       (,char:eof-object?
-        ,throw-unexpected-end-of-file-error
-        #f)
-       (,char:newline? ,add-state-transition read)
-       (,#{guard:#t}#
-        ,push-event-to-buffer
-        read_state_transition_action)))
     ((name . read_word)
      (description . "Read a word.")
      (event-source unquote char-context-event-source)
@@ -296,6 +300,7 @@
         #f)
        (,title? ,clear-buffer read_title)
        (,legend? ,clear-buffer read_legend)
+       (,note? ,clear-buffer skip_note)
        (,hide? ,clear-buffer skip_hide_block)
        (,char:colon?
         ,push-buffer-to-stanza
@@ -315,6 +320,19 @@
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_description)))
+    ((name . read_state_transition_action)
+     (description
+       .
+       "Read the state transition action.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:newline? ,add-state-transition read)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_state_transition_action)))
     ((name . read_top_multiline_comment)
      (description
        .
@@ -444,6 +462,18 @@
        (,#{guard:#t}#
         ,action:no-op
         read_state_right_arrow)))
+    ((name . skip_note)
+     (description
+       .
+       "Skip the \"note\" block in a state diagram.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:colon? ,action:no-op skip_short_note)
+       (,char:newline? ,action:no-op skip_long_note)
+       (,#{guard:#t}# ,action:no-op skip_note)))
     ((name . check_multiline_comment_end)
      (description
        .

@@ -59,10 +59,12 @@
             title?
             legend?
             hide?
+            note?
             legend-event-source?
             legend-pre-action?
             legend-post-action?
             legend-end?
+            note-end?
 
             ;; Actions.
             set-event-source
@@ -73,6 +75,7 @@
             process-state-description
             validate-start-tag
             validate-end-tag
+            throw-no-endnote-error
             throw-no-endlegend-error
             throw-unexpected-end-of-file-error
             throw-no-start-tag-error))
@@ -267,6 +270,12 @@ When a procedure cannot be resolved, return #f."
            (char=? ch #\newline))
        (string=? (context-buffer->string ctx) "legend")))
 
+(define (note? ctx ch)
+  "Check if the CTX context buffer contains 'note?' token."
+  (and (or (char=? ch #\space)
+           (char=? ch #\newline))
+       (string=? (context-buffer->string ctx) "note")))
+
 (define (hide? context ch)
   "Check if the CONTEXT buffer contains 'hide' token"
   (and (char=? ch #\space)
@@ -278,6 +287,12 @@ When a procedure cannot be resolved, return #f."
            (char=? ch #\newline))
        (or (string=? (context-buffer->string ctx) "endlegend")
            (string=? (context-buffer->string ctx) "end legend"))))
+
+(define (note-end? ctx ch)
+  "Check if the CTX context buffer contains 'note end' token."
+  (let ((s (string-trim-both (context-buffer->string ctx))))
+    (or (string=? s "endnote")
+        (string=? s "end note"))))
 
 (define (legend-event-source? ctx ch)
   (and (char=? ch #\newline)
@@ -341,6 +356,9 @@ When a procedure cannot be resolved, return #f."
                   post-action-name))
     (fsm-post-action-set! fsm (cdr post-action))
     (clear-buffer ctx)))
+
+(define (throw-no-endnote-error ctx ch)
+  (puml-error ctx "No 'end note' or 'endnote' found"))
 
 (define (throw-no-endlegend-error ctx ch)
   (puml-error ctx "No 'endlegend' found"))
