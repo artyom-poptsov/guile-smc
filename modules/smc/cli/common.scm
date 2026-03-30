@@ -64,7 +64,18 @@
      %core-modules)
     ((modules-list)
      (if modules-list
-         (append (map resolve-module
+         (append (map (lambda (module)
+                        (let ((m (resolve-module module)))
+                          (if (equal? (car module) 'smc)
+                              (begin
+                                ;; Reload Guile-SMC modules so when we
+                                ;; re-compile Guile-SMC state machines with
+                                ;; API changes we get the updated contexts
+                                ;; from the Guile-SMC source tree instead of
+                                ;; the installed ones.
+                                (reload-module m)
+                                m)
+                              m)))
                       (eval-string/quote modules-list))
                  %core-modules)
          %core-modules))))
