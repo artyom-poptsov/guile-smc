@@ -1,6 +1,6 @@
 ;;; state.scm -- An FSM state.
 
-;; Copyright (C) 2021 Artyom V. Poptsov <poptsov.artyom@gmail.com>
+;; Copyright (C) 2021, 2026 Artyom V. Poptsov <poptsov.artyom@gmail.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@
   #:export (<state>
             state?
             state-name
+            state-long-name
+            state-long-name-set!
             state-run
             state-event-source
             state:event-source/name
@@ -57,6 +59,7 @@
             state-dead-end?
 
             state:name
+            state:long-name
             state:description
             state:event-source
             state:entry-action
@@ -88,6 +91,15 @@
    #:accessor     state-name
    #:init-value   #f
    #:init-keyword #:name)
+
+  ;; State long name.
+  ;;
+  ;; <string>
+  (long-name
+   #:getter       state-long-name
+   #:setter       state-long-name-set!
+   #:init-value   #f
+   #:init-keyword #:long-name)
 
   ;; <string>
   (description
@@ -265,6 +277,7 @@ of a STATE, specified by the 'event-source' slot."
 ;; State serialized to an associative list of the following form:
 ;;
 ;;   `((name         . state-name)
+;;     (long-name    . "An optional long state name")
 ;;     (description  . "State description")
 ;;     (event-source . ,event-source:state-name)
 ;;     (entry-action . ,some-entry-action)
@@ -276,6 +289,9 @@ of a STATE, specified by the 'event-source' slot."
 
 (define (state:name state)
   (assoc-ref state 'name))
+
+(define (state:long-name state)
+  (assoc-ref state 'long-name))
 
 (define (state:description state)
   (assoc-ref state 'description))
@@ -303,6 +319,7 @@ of a STATE, specified by the 'event-source' slot."
   "Convert a list LST to a <state> instance, return the new state."
   (make <state>
     #:name         (state:name         lst)
+    #:long-name    (state:long-name    lst)
     #:event-source (state:event-source lst)
     #:entry-action (or (state:entry-action lst)
                        %default-entry-action)
@@ -314,6 +331,9 @@ of a STATE, specified by the 'event-source' slot."
 (define-method (state->list (state <state>))
   (filter (lambda (e) (not (null? e)))
           `((name         . ,(state-name        state))
+            ,(if (state-long-name state)
+                 (cons 'long-name (state-long-name state))
+                 '())
             ,(if (state-description state)
                  (cons 'description  (state-description state))
                  '())

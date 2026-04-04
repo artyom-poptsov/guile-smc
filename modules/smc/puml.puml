@@ -84,6 +84,7 @@ read_word --> read_legend: legend? -> clear-buffer
 read_word --> skip_note: note? -> clear-buffer
 read_word --> skip_hide_block: hide? -> clear-buffer
 read_word --> skip_scale_block: scale? -> clear-buffer
+read_word --> lookup_long_state_name: state? -> clear-buffer
 read_word --> read_state_description: char:colon? -> push-buffer-to-stanza
 read_word --> search_state_transition: char:space? -> push-buffer-to-stanza
 read_word -> read_word: guard:#t -> push-event-to-buffer
@@ -125,6 +126,37 @@ read_legend -> read_legend: legend-pre-action? -> set-pre-action
 read_legend -> read_legend: legend-post-action? -> set-post-action
 read_legend -> read_legend: char:newline? -> clear-buffer
 read_legend -> read_legend: guard:#t -> push-event-to-buffer
+
+lookup_long_state_name: Lookup for the long state name.
+lookup_long_state_name --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+lookup_long_state_name -> lookup_long_state_name: char:space?
+lookup_long_state_name -> read_long_state_name: char:double-quote? -> clear-buffer
+lookup_long_state_name --> [*]: char:newline? -> throw-unexpected-symbol
+
+read_long_state_name: Read an optional long state name.
+read_long_state_name --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_long_state_name --> lookup_as_token: char:double-quote? -> push-buffer-to-stanza
+read_long_state_name -> read_long_state_name: guard:#t -> push-event-to-buffer
+
+lookup_as_token: Lookup for "as" token.
+lookup_as_token --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+lookup_as_token -> lookup_as_token: char:space?
+lookup_as_token --> read_as_token: guard:#t -> push-event-to-buffer
+
+read_as_token --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_as_token -> lookup_state_name: char:space? -> validate-as-token
+read_as_token -> read_as_token: guard:#t -> push-event-to-buffer
+
+lookup_state_name: Lookup the short state name.
+lookup_state_name --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+lookup_state_name -> lookup_state_name: char:space?
+lookup_state_name --> read_state_name: guard:#t -> push-event-to-buffer
+
+read_state_name: Read a short state name associated with the long name.
+read_state_name --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+read_state_name --> read: char:space? -> set-long-state-name
+read_state_name --> read: char:newline? -> set-long-state-name
+read_state_name -> read_state_name: guard:#t -> push-event-to-buffer
 
 ' -------------------------------------------------------------------------------
 ' Read PlantUML stanzas.  A stanza is a single state definition line, either

@@ -437,6 +437,25 @@
                     #:debug-mode? #t))
 
 
+;; Long state names.
+
+(test-equal "long state name reading"
+  "Long state name"
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "state \"Long state name\" as state_1"
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (state-long-name (fsm-state fsm 'state_1))))
+
+
 (define exit-status (test-runner-fail-count (test-runner-current)))
 
 (test-end "puml")

@@ -8,6 +8,13 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   notice and this notice are preserved.
 
 * Unreleased
+** Add support for long state names
+Guile-SMC now reads long state names and stores them in the state objects.
+
+An example of a long state name specification:
+#+begin_example plantuml
+state "Long state name" as state_1
+#+end_example
 ** Guile-SMC now skips PlantUML =note= blocks
 Guile-SMC now skips single-line and multi-lines =note= blocks.
 ** Guile-SMC now skips PlantUML =scale= properties

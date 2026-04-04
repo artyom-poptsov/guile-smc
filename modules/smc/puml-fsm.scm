@@ -8,8 +8,8 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:             11467
-;;;   transition-counter:        1359
+;;;   step-counter:             13248
+;;;   transition-counter:        1614
 ;;;
 ;;; Resolver status:
 ;;;   #<directory (smc context char)>
@@ -17,6 +17,7 @@
 ;;;     #<procedure action:no-op (ctx event)>
 ;;;     #<procedure char:at-symbol? (ctx ch2)>
 ;;;     #<procedure char:colon? (ctx ch2)>
+;;;     #<procedure char:double-quote? (ctx ch2)>
 ;;;     #<procedure char:eof-object? (ctx ch)>
 ;;;     #<procedure char:hyphen-minus? (ctx ch2)>
 ;;;     #<procedure char:left-square-bracket? (ctx ch2)>
@@ -48,12 +49,16 @@
 ;;;     #<procedure process-state-description (ctx ch)>
 ;;;     #<procedure scale? (context ch)>
 ;;;     #<procedure set-event-source (ctx ch)>
+;;;     #<procedure set-long-state-name (ctx ch)>
 ;;;     #<procedure set-post-action (ctx ch)>
 ;;;     #<procedure set-pre-action (ctx ch)>
+;;;     #<procedure state? (ctx ch)>
 ;;;     #<procedure throw-no-endlegend-error (ctx ch)>
 ;;;     #<procedure throw-no-endnote-error (ctx ch)>
 ;;;     #<procedure throw-unexpected-end-of-file-error (ctx ch)>
+;;;     #<procedure throw-unexpected-symbol (ctx ch)>
 ;;;     #<procedure title? (ctx ch)>
+;;;     #<procedure validate-as-token (ctx ch)>
 ;;;     #<procedure validate-end-tag (ctx #:optional ch)>
 ;;;     #<procedure validate-start-tag (ctx #:optional ch)>
 
@@ -217,6 +222,18 @@
        (,char:more-than-sign?
         ,action:no-op
         search_state_transition_action)))
+    ((name . read_as_token)
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:space?
+        ,validate-as-token
+        lookup_state_name)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_as_token)))
     ((name . check_top_multiline_comment_end)
      (description
        .
@@ -230,9 +247,34 @@
        (,#{guard:#t}#
         ,action:no-op
         read_top_multiline_comment)))
+    ((name . read_state_name)
+     (description
+       .
+       "Read a short state name associated with the long name.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:space? ,set-long-state-name read)
+       (,char:newline? ,set-long-state-name read)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_state_name)))
     ((name . read_state_left_arrow)
      (event-source unquote char-context-event-source)
      (transitions))
+    ((name . lookup_state_name)
+     (description . "Lookup the short state name.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:space? ,action:no-op lookup_state_name)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_state_name)))
     ((name . read_skip_comment)
      (description
        .
@@ -315,6 +357,7 @@
        (,note? ,clear-buffer skip_note)
        (,hide? ,clear-buffer skip_hide_block)
        (,scale? ,clear-buffer skip_scale_block)
+       (,state? ,clear-buffer lookup_long_state_name)
        (,char:colon?
         ,push-buffer-to-stanza
         read_state_description)
@@ -333,6 +376,20 @@
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_description)))
+    ((name . lookup_long_state_name)
+     (description . "Lookup for the long state name.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:space?
+        ,action:no-op
+        lookup_long_state_name)
+       (,char:double-quote?
+        ,clear-buffer
+        read_long_state_name)
+       (,char:newline? ,throw-unexpected-symbol #f)))
     ((name . read_state_transition_action)
      (description
        .
@@ -378,6 +435,17 @@
        (,#{guard:#t}#
         ,push-event-to-buffer
         read_state_transition_to)))
+    ((name . lookup_as_token)
+     (description . "Lookup for \"as\" token.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:space? ,action:no-op lookup_as_token)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_as_token)))
     ((name . search_start_tag)
      (description
        .
@@ -462,6 +530,21 @@
         read_state)
        (,char:letter? ,push-event-to-buffer read_word)
        (,#{guard:#t}# ,action:no-op read)))
+    ((name . read_long_state_name)
+     (description
+       .
+       "Read an optional long state name.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:double-quote?
+        ,push-buffer-to-stanza
+        lookup_as_token)
+       (,#{guard:#t}#
+        ,push-event-to-buffer
+        read_long_state_name)))
     ((name . read_state_right_arrow)
      (description
        .

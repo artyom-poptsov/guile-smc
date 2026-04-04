@@ -61,6 +61,7 @@
             hide?
             note?
             scale?
+            state?
             legend-event-source?
             legend-pre-action?
             legend-post-action?
@@ -73,13 +74,16 @@
             set-post-action
             add-description
             add-state-transition
+            set-long-state-name
             process-state-description
             validate-start-tag
             validate-end-tag
+            validate-as-token
             throw-no-endnote-error
             throw-no-endlegend-error
             throw-unexpected-end-of-file-error
-            throw-no-start-tag-error))
+            throw-no-start-tag-error
+            throw-unexpected-symbol))
 
 
 (define-class <puml-context> (<char-context>)
@@ -287,6 +291,11 @@ When a procedure cannot be resolved, return #f."
   (and (char=? ch #\space)
        (string=? (context-buffer->string context) "scale")))
 
+(define (state? ctx ch)
+  "Check if context CTX contains 'state' token."
+  (and (char=? ch #\space)
+       (string=? (context-buffer->string ctx) "state")))
+
 (define (legend-end? ctx ch)
   "Check if the CTX context buffer contains 'legend end' token."
   (and (or (char=? ch #\space)
@@ -375,6 +384,13 @@ When a procedure cannot be resolved, return #f."
 (define (throw-unexpected-end-of-file-error ctx ch)
   (puml-error ctx "Unexpected end of file"))
 
+(define (throw-unexpected-symbol ctx ch)
+  (puml-error ctx "Unexpected symbol" ch))
+
+(define (throw-unexpected-token ctx ch)
+  (let ((token (context-buffer->string ctx)))
+    (puml-error ctx "Unexpected token" token)))
+
 
 (define (add-description ctx ch)
   (fsm-description-set! (puml-context-fsm ctx) (context-buffer->string ctx))
@@ -390,6 +406,13 @@ When a procedure cannot be resolved, return #f."
   (let* ((tag (context-buffer->string ctx)))
     (unless (string=? tag "@enduml")
       (puml-error ctx "Misspelled @enduml: ~S" tag))
+    (clear-buffer ctx ch)))
+
+(define (validate-as-token ctx ch)
+  "Check if context CTX contains 'state' token."
+  (let ((token (context-buffer->string ctx)))
+    (unless (string=? token "as")
+      (throw-unexpected-token ctx ch))
     (clear-buffer ctx ch)))
 
 
@@ -509,6 +532,24 @@ When a procedure cannot be resolved, return #f."
 ;;
 (define-method (parse-exit-action (line <string>))
   (string-match "[ \t]+exit-action:[ \t]+([^ \t\n]+)" line))
+
+(define (set-long-state-name ctx ch)
+  (let* ((fsm             (puml-context-fsm ctx))
+         (stanza          (context-stanza ctx))
+         (state-name      (string->symbol (context-buffer->string ctx)))
+         (state-long-name (list->string (list-ref stanza 0))))
+    (unless (fsm-state fsm state-name)
+      (context-log-info ctx
+                        "[~a] New state"
+                        state-name)
+      (%context-fsm-state-add! ctx state-name))
+    (let ((state (fsm-state fsm state-name)))
+      (context-log-info ctx
+                        "[~a] Long name: ~a"
+                        state-name
+                        state-long-name)
+      (state-long-name-set! state state-long-name))
+    (clear-stanza (clear-buffer ctx))))
 
 (define (process-state-description ctx ch)
 
