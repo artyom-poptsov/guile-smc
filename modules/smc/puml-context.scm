@@ -60,6 +60,7 @@
             legend?
             hide?
             note?
+            scale?
             legend-event-source?
             legend-pre-action?
             legend-post-action?
@@ -280,6 +281,11 @@ When a procedure cannot be resolved, return #f."
   "Check if the CONTEXT buffer contains 'hide' token"
   (and (char=? ch #\space)
        (string=? (context-buffer->string context) "hide")))
+
+(define (scale? context ch)
+  "Check if the CONTEXT buffer contains 'scale' token"
+  (and (char=? ch #\space)
+       (string=? (context-buffer->string context) "scale")))
 
 (define (legend-end? ctx ch)
   "Check if the CTX context buffer contains 'legend end' token."

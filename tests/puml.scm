@@ -368,6 +368,24 @@
     (fsm-state fsm 'state_1)))
 
 
+;; "scale" property.
+
+(test-assert "check 'scale' block skipping"
+  (let ((fsm (puml-string->fsm (string-join
+                                (list
+                                 "@startuml"
+                                 "title This is an FSM description."
+                                 "scale 600 width"
+                                 "[*] -> state_1"
+                                 "state_1 --> [*]"
+                                 "@enduml")
+                                "\n")
+                               #:module (list (resolve-module '(test-context))
+                                              (current-module))
+                               #:debug-mode? #t)))
+    (fsm-state fsm 'state_1)))
+
+
 ;; "note" blocks.
 
 (test-assert "check single-line 'note' block skipping"

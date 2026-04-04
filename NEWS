@@ -8,8 +8,9 @@ Copyright (C) Artyom V. Poptsov <poptsov.artyom@gmail.com>
   notice and this notice are preserved.
 
 * Unreleased
-** Add support for PlantUML =note= blocks
-Now Guile-SMC reads and skips single-line and multi-lines =note= blocks.
+** Guile-SMC now skips PlantUML =note= blocks
+Guile-SMC now skips single-line and multi-lines =note= blocks.
+** Guile-SMC now skips PlantUML =scale= properties
 ** =smc compile=: Reload extra Guile-SMC modules                     :BUGFIX:
 When extra Guile-SMC modules are explicitly provided with =--modules= option,
 those modules will be reloaded.  This allows Guile-SSH to use the most recent
@@ -20,13 +21,10 @@ Turn "trace.puml" into an order-only prerequisite, to prevent the target from
 rebuilding when "trace.puml" modification date is updated.  This should fix
 build-time errors that occur when "trace.puml" has newer timestamp than
 "trace-fsm.scm" but Guile-SMC is not available on the system yet.
-** PlantUML parser now skips =note= blocks
-PlantUML parser now skips single-line and multi-line =note= blocks.
 ** CI: Improve GitHub Guix workflows
-Don't use Guix cache and pull, simply use the latest Guix release.  Use a
-matrix to set all targets.
+Sped up the CI: don't use Guix cache and pull, simply use the latest Guix
+release.
 
->>>>>>> e547617 (NEWS: Update)
 * Version 0.6.4 (2025-07-21)
 ** Fix compilation of =puml-fsm.scm= from =puml.puml=
 Sometimes Guile-SMC would try to build =puml-fsm.scm= from =puml.puml= which

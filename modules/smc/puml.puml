@@ -83,6 +83,7 @@ read_word --> read_title: title? -> clear-buffer
 read_word --> read_legend: legend? -> clear-buffer
 read_word --> skip_note: note? -> clear-buffer
 read_word --> skip_hide_block: hide? -> clear-buffer
+read_word --> skip_scale_block: scale? -> clear-buffer
 read_word --> read_state_description: char:colon? -> push-buffer-to-stanza
 read_word --> search_state_transition: char:space? -> push-buffer-to-stanza
 read_word -> read_word: guard:#t -> push-event-to-buffer
@@ -96,6 +97,11 @@ skip_hide_block: Skip the "hide" block in a state diagram.
 skip_hide_block --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
 skip_hide_block -> read: char:newline?
 skip_hide_block -> skip_hide_block
+
+skip_scale_block: Skip the "scale" block in a state diagram.
+skip_scale_block --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error
+skip_scale_block --> read: char:newline?
+skip_scale_block -> skip_scale_block
 
 skip_note: Skip the "note" block in a state diagram.
 skip_note --> [*]: char:eof-object? -> throw-unexpected-end-of-file-error

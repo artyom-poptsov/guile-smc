@@ -8,8 +8,8 @@
 ;;;   <https://github.com/artyom-poptsov/guile-smc>
 ;;;
 ;;; Statistics:
-;;;   step-counter:             11191
-;;;   transition-counter:        1318
+;;;   step-counter:             11467
+;;;   transition-counter:        1359
 ;;;
 ;;; Resolver status:
 ;;;   #<directory (smc context char)>
@@ -46,6 +46,7 @@
 ;;;     #<procedure note-end? (ctx ch)>
 ;;;     #<procedure note? (ctx ch)>
 ;;;     #<procedure process-state-description (ctx ch)>
+;;;     #<procedure scale? (context ch)>
 ;;;     #<procedure set-event-source (ctx ch)>
 ;;;     #<procedure set-post-action (ctx ch)>
 ;;;     #<procedure set-pre-action (ctx ch)>
@@ -243,6 +244,17 @@
         #f)
        (,char:newline? ,action:no-op read)
        (,#{guard:#t}# ,action:no-op read_skip_comment)))
+    ((name . skip_scale_block)
+     (description
+       .
+       "Skip the \"scale\" block in a state diagram.")
+     (event-source unquote char-context-event-source)
+     (transitions
+       (,char:eof-object?
+        ,throw-unexpected-end-of-file-error
+        #f)
+       (,char:newline? ,action:no-op read)
+       (,#{guard:#t}# ,action:no-op skip_scale_block)))
     ((name . read_multiline_comment)
      (description
        .
@@ -302,6 +314,7 @@
        (,legend? ,clear-buffer read_legend)
        (,note? ,clear-buffer skip_note)
        (,hide? ,clear-buffer skip_hide_block)
+       (,scale? ,clear-buffer skip_scale_block)
        (,char:colon?
         ,push-buffer-to-stanza
         read_state_description)
